@@ -1,5 +1,5 @@
 # Install-Dog
-## 主要为了静默安装
+### 主要为了静默安装
 
 - 接入了  [Delegated-Scopes-Manager](https://github.com/heruoxin/Delegated-Scopes-Manager)
 - 需要托管设备管理员权限
