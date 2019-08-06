@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Install Lion</string>
+    <string name="name_install1">Install Lion with IceBox</string>
+    <string name="name_install2">Install Lion with DSM</string>
+    <string name="request">Available state</string>
+    <string name="av_no">Unavailable!Click to request permissions</string>
+    <string name="av_ok">Available</string>
+    <string name="install_end">OVER! Check the choice of fate</string>
+    <string name="install_start">Start installing</string>
+    <string name="failed_read">Reading apk failed</string>
+    <string name="success_install">Successful</string>
+    <string name="failed_install">Failed</string>
+    <string name="success_enable">Failed</string>
+    <string name="summaryOn">Enabled</string>
+    <string name="summaryOff">Disabled</string>
+    <string name="exit_tip">Press Back Again to Exit</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="hide_title">Hidden icon in launcher</string>
+    <string name="hide_tip">After hiding, you can re-enable it via the system application settings - manage space</string>
+    <string name="enable_title">Enable installer</string>
+
+</resources>

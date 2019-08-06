@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/name_install2">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="enable2"
+            android:summaryOff="@string/summaryOff"
+            android:summaryOn="@string/summaryOn"
+            android:title="@string/enable_title" />
+        <Preference
+            android:id="@+id/getOwnerPackageName"
+            android:key="getOwnerPackageName"
+            android:title="已安装的托管主应用包名" />
+        <Preference
+            android:id="@+id/getOwnerSDKVersion"
+            android:key="getOwnerSDKVersion"
+            android:title="托管应用SDK版本" />
+        <Preference
+            android:id="@+id/getDelegatedScopes"
+            android:key="getDelegatedScopes"
+            android:title="本应用已授权的 scopes" />
+        <Preference
+            android:id="@+id/av_install2"
+            android:key="av_install2"
+            android:title="@string/request" />
+    </PreferenceCategory>
+</PreferenceScreen>

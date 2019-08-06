@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="hide_icon"
+        android:persistent="false"
+        android:summary="@string/hide_tip"
+        android:title="@string/hide_title" />
+    <PreferenceCategory android:title="@string/name_install1">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="enable1"
+            android:summaryOff="@string/summaryOff"
+            android:summaryOn="@string/summaryOn"
+            android:title="@string/enable_title" />
+        <Preference
+            android:id="@+id/icebox_supported"
+            android:key="icebox_supported"
+            android:title="冰箱支持状态" />
+        <Preference
+            android:id="@+id/icebox_permission"
+            android:key="icebox_permission"
+            android:title="冰箱授权状态" />
+        <Preference
+            android:id="@+id/av_install1"
+            android:key="av_install1"
+            android:title="@string/request" />
+    </PreferenceCategory>
+</PreferenceScreen>
