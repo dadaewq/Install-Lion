@@ -10,6 +10,9 @@ import android.widget.Toast;
 import com.modosa.apkinstaller.R;
 
 
+/**
+ * @author dadaewq
+ */
 public class ManageActivity extends Activity {
 
     @Override
@@ -21,7 +24,6 @@ public class ManageActivity extends Activity {
     @Override
     public void onStart() {
         super.onStart();
-//        Log.e("onStart", "onStart");
         try {
             enable();
         } catch (Exception e) {
@@ -34,25 +36,20 @@ public class ManageActivity extends Activity {
     @Override
     public void onResume() {
         super.onResume();
-//        Log.e("onResume", "onResume");
     }
 
     private void enable() {
-//        Log.e("enable", "enable");
-        ComponentName comptName = new ComponentName(this, MainActivity.class);
+        ComponentName ctMain = new ComponentName(this, MainActivity.class);
         PackageManager pm = getPackageManager();
-        int state = pm.getComponentEnabledSetting(comptName);
-        boolean isenabled = (state == (PackageManager.COMPONENT_ENABLED_STATE_DEFAULT) || state == (PackageManager.COMPONENT_ENABLED_STATE_ENABLED));
-//        Log.e("--state-", state + "");
+        int state = pm.getComponentEnabledSetting(ctMain);
+        boolean isEnabled = (state == (PackageManager.COMPONENT_ENABLED_STATE_DEFAULT) || state == (PackageManager.COMPONENT_ENABLED_STATE_ENABLED));
         try {
-            if (isenabled) {
-//                Log.e("-state--1-", state + "");
+            if (isEnabled) {
                 Toast.makeText(getApplicationContext(), getString(R.string.success_enable), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplication(), MainActivity.class);
                 startActivity(intent);
             } else {
-//                Log.e("-state--0-", state + "");
-                pm.setComponentEnabledSetting(comptName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+                pm.setComponentEnabledSetting(ctMain, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
             }
         } catch (Exception e0) {
             e0.printStackTrace();

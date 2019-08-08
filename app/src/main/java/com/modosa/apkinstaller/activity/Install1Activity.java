@@ -20,6 +20,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
+/**
+ * @author dadaewq
+ */
 public class Install1Activity extends Activity {
     private Uri uri = null;
     private String apkSourcePath;
@@ -29,15 +32,17 @@ public class Install1Activity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Uri geturi = getIntent().getData();
-        if (geturi != null) {
+        Uri getUri = getIntent().getData();
+        if (getUri != null) {
             Log.e("---getIntent--", getIntent().getData() + "");
-            if ("file".equalsIgnoreCase(geturi.getScheme())) {
-                apkSourcePath = geturi.getPath();
-            } else if ("content".equalsIgnoreCase(geturi.getScheme())) {
+            String content = "content";
+            String file = "file";
+            if (file.equalsIgnoreCase(getUri.getScheme())) {
+                apkSourcePath = getUri.getPath();
+            } else if (content.equalsIgnoreCase(getUri.getScheme())) {
                 apkSourcePath = null;
             } else {
-                showToast("无法解析" + geturi);
+                showToast("无法解析" + getUri);
                 finish();
             }
         } else {
@@ -45,7 +50,7 @@ public class Install1Activity extends Activity {
             finish();
         }
         Log.e("---apkSourcePath--", apkSourcePath + "");
-        startInstall(apkSourcePath, geturi);
+        startInstall(apkSourcePath, getUri);
     }
 
     private void showToast(final String text) {
@@ -59,13 +64,13 @@ public class Install1Activity extends Activity {
     }
 
 
-    private void startInstall(String apkSourcePath, Uri geturi) {
+    private void startInstall(String apkSourcePath, Uri getUri) {
         if (apkSourcePath != null) {
             String authority = getPackageName() + ".FILE_PROVIDER";
             uri = FileProvider.getUriForFile(getApplicationContext(), authority, new File(apkSourcePath));
         } else {
 
-            uri = geturi;
+            uri = getUri;
         }
         handler = new Handler(Looper.getMainLooper());
         new InstallApkTask().start();
@@ -81,7 +86,7 @@ public class Install1Activity extends Activity {
     }
 
     private void disposeSafety() {
-        if (mSubscribe != null && !mSubscribe.isDisposed()){
+        if (mSubscribe != null && !mSubscribe.isDisposed()) {
             mSubscribe.dispose();
         }
         mSubscribe = null;

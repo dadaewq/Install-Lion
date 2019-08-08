@@ -15,7 +15,9 @@ import com.modosa.apkinstaller.R;
 
 import java.io.File;
 
-
+/**
+ * @author dadaewq
+ */
 public class Install2Activity extends Activity {
     private Uri uri = null;
     private String apkSourcePath;
@@ -24,15 +26,17 @@ public class Install2Activity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Uri geturi = getIntent().getData();
-        if (geturi != null) {
+        Uri getUri = getIntent().getData();
+        if (getUri != null) {
             Log.e("---getIntent--", getIntent().getData() + "");
-            if ("file".equalsIgnoreCase(geturi.getScheme())) {
-                apkSourcePath = geturi.getPath();
-            } else if ("content".equalsIgnoreCase(geturi.getScheme())) {
+            String content = "content";
+            String file = "file";
+            if (file.equalsIgnoreCase(getUri.getScheme())) {
+                apkSourcePath = getUri.getPath();
+            } else if (content.equalsIgnoreCase(getUri.getScheme())) {
                 apkSourcePath = null;
             } else {
-                showToast("无法解析" + geturi);
+                showToast("无法解析" + getUri);
                 finish();
             }
             Log.e("---apkSourcePath--", apkSourcePath + "");
@@ -40,7 +44,7 @@ public class Install2Activity extends Activity {
             showToast(getString(R.string.failed_read));
             finish();
         }
-        startInstall(apkSourcePath, geturi);
+        startInstall(apkSourcePath, getUri);
     }
 
     private void showToast(final String text) {
@@ -53,20 +57,20 @@ public class Install2Activity extends Activity {
         finish();
     }
 
-    private void startInstall(String apkSourcePath, Uri geturi) {
+    private void startInstall(String apkSourcePath, Uri getUri) {
         if (apkSourcePath != null) {
             String authority = getPackageName() + ".FILE_PROVIDER";
             uri = FileProvider.getUriForFile(getApplicationContext(), authority, new File(apkSourcePath));
         } else {
-            uri = geturi;
+            uri = getUri;
         }
         handler = new Handler(Looper.getMainLooper());
         new InstallApkTask().start();
     }
 
-    private void installApp(Uri DSMuri) {
+    private void installApp(Uri uri_DSM) {
         try {
-            DSMClient.installApp(this, DSMuri, null);
+            DSMClient.installApp(this, uri_DSM, null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -80,7 +84,6 @@ public class Install2Activity extends Activity {
             super.run();
 //            Log.e("state", Thread.currentThread() + "");
             new Thread(() -> {
-                Log.e("Taskuri", uri + "");
                 handler.post(() -> installApp(uri));
                 finish();
             }).start();

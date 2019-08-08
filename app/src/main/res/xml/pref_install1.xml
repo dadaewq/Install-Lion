@@ -23,7 +23,7 @@
             android:title="冰箱授权状态" />
         <Preference
             android:id="@+id/av_install1"
-            android:key="av_install1"
+            android:key="avInstall1"
             android:title="@string/request" />
     </PreferenceCategory>
 </PreferenceScreen>

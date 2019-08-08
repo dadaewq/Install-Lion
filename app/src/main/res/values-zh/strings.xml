@@ -5,8 +5,8 @@
     <string name="request">可用状态</string>
     <string name="av_no">不可用！点击申请权限</string>
     <string name="av_ok">现在可以使用</string>
-    <string name="install_end">安装结束,请查看命运的选择</string>
-    <string name="install_start">开始安装</string>
+    <string name="install_end">安装结束,我也不知道是否安装成功了</string>
+    <string name="install_start">IceBox开始安装</string>
     <string name="failed_read">读取apk失败</string>
     <string name="success_install">安装成功</string>
     <string name="failed_install">安装失败</string>

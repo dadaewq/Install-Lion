@@ -12,10 +12,13 @@ import androidx.core.content.ContextCompat;
 import com.modosa.apkinstaller.R;
 import com.modosa.apkinstaller.fragment.MainFragment;
 
-
+/**
+ * @author dadaewq
+ */
 public class MainActivity extends AppCompatActivity {
     private final String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
     private long exitTime = 0;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -30,10 +33,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
-
-            if ((System.currentTimeMillis() - exitTime) > 2000) {
+            long intervals = 2000;
+            if ((System.currentTimeMillis() - exitTime) > intervals) {
                 Toast.makeText(getApplicationContext(), getString(R.string.exit_tip), Toast.LENGTH_SHORT).show();
                 exitTime = System.currentTimeMillis();
             } else {
@@ -52,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updatePermissionState() {
-        int permissionW = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        boolean judge = (permissionW == 0);
+        int permissionWrite = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        boolean judge = (permissionWrite == 0);
         if (!judge) {
             requestPermission();
         }

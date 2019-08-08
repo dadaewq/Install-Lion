@@ -21,7 +21,7 @@
             android:title="本应用已授权的 scopes" />
         <Preference
             android:id="@+id/av_install2"
-            android:key="av_install2"
+            android:key="avInstall2"
             android:title="@string/request" />
     </PreferenceCategory>
 </PreferenceScreen>

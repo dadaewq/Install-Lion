@@ -5,7 +5,7 @@
     <string name="request">Available state</string>
     <string name="av_no">Unavailable!Click to request permissions</string>
     <string name="av_ok">Available</string>
-    <string name="install_end">OVER! Check the choice of fate</string>
+    <string name="install_end">OVER! I don\'t know if the installation was successful.</string>
     <string name="install_start">Start installing</string>
     <string name="failed_read">Reading apk failed</string>
     <string name="success_install">Successful</string>
