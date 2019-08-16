@@ -3,8 +3,10 @@
     <string name="name_install1">安装狮-IceBox</string>
     <string name="name_install2">安装狮-DSM</string>
     <string name="request">可用状态</string>
+    <string name="av_nonono">不可用!</string>
     <string name="av_no">不可用！点击申请权限</string>
     <string name="av_ok">现在可以使用</string>
+    <string name="notexist">不存在</string>
     <string name="install_end">安装结束,我也不知道是否安装成功了</string>
     <string name="install_start">IceBox开始安装</string>
     <string name="failed_read">读取apk失败</string>
@@ -17,6 +19,7 @@
     <string name="confirm">确定</string>
     <string name="cancel">取消</string>
     <string name="hide_title">隐藏桌面图标</string>
+    <string name="dialog_title">隐藏图标并退出应用</string>
     <string name="hide_tip">隐藏后可以通过系统应用设置-管理空间-重新启用</string>
     <string name="enable_title">启用安装器</string>
 

@@ -93,7 +93,7 @@ public class MainFragment extends PreferenceFragment {
 
         hideIcon = (SwitchPreference) findPreference("hide_icon");
         hideIcon.setOnPreferenceClickListener(preference -> {
-            showRestartDialog();
+            showHideIconDialog();
             return true;
         });
 
@@ -123,7 +123,7 @@ public class MainFragment extends PreferenceFragment {
             getDelegatedScopes = getPreferenceScreen().findPreference("getDelegatedScopes");
             avInstall2 = getPreferenceScreen().findPreference("avInstall2");
             avInstall2.setOnPreferenceClickListener(preference -> {
-                DSMClient.requestScopes(getActivity(), "dsm-delegation-install-uninstall-app");
+                DSMClient.requestScopes(getActivity(), 0x52,"dsm-delegation-install-uninstall-app");
                 return true;
             });
             updateComponentName("enable2");
@@ -158,41 +158,51 @@ public class MainFragment extends PreferenceFragment {
         int permission0 = ContextCompat.checkSelfPermission(getActivity(), IceBox.SDK_PERMISSION);
         icebox_supported.setSummary(status);
         icebox_permission.setSummary(permission0 == PackageManager.PERMISSION_GRANTED ? "已授权" : "未授权");
-        avInstall1.setSummary(getString(R.string.av_no));
+        avInstall1.setSummary(R.string.av_nonono);
         String s_SUPPORTED = "SUPPORTED";
+        String s_SR = "PERMISSION_REQUIRED";
         if (s_SUPPORTED.equals(state + "")) {
-            avInstall1.setSummary(getString(R.string.av_ok));
+            avInstall1.setSummary(R.string.av_ok);
+        } else if (s_SR.equals(state + "")) {
+            avInstall1.setSummary(R.string.av_no);
         }
         if (avDSM) {
-            getOwnerPackageName.setSummary(DSMClient.getOwnerPackageName(getActivity()));
-            getOwnerSDKVersion.setSummary(DSMClient.getOwnerSDKVersion(getActivity()) + "");
-            List<String> scopes = DSMClient.getDelegatedScopes(getActivity());
-            StringBuilder stringBuilder = new StringBuilder();
-            for (String scope : scopes) {
-                stringBuilder.append(scope);
-            }
+            String OwnerPkgname = DSMClient.getOwnerPackageName(getActivity());
             getDelegatedScopes.setSummary(" ");
-            avInstall2.setSummary(getString(R.string.av_no));
-            String s_install = "install";
-            if (stringBuilder.toString().contains(s_install)) {
-                getDelegatedScopes.setSummary(stringBuilder.toString());
-                avInstall2.setSummary(getString(R.string.av_ok));
+            if (OwnerPkgname != null) {
+                getOwnerPackageName.setSummary(OwnerPkgname);
+                getOwnerSDKVersion.setSummary(DSMClient.getOwnerSDKVersion(getActivity()) + "");
+                List<String> scopes = DSMClient.getDelegatedScopes(getActivity());
+                StringBuilder stringBuilder = new StringBuilder();
+                for (String scope : scopes) {
+                    stringBuilder.append(scope);
+                }
+                avInstall2.setSummary(R.string.av_no);
+                String s_install = "install";
+
+                if (stringBuilder.toString().contains(s_install)) {
+                    getDelegatedScopes.setSummary(stringBuilder.toString());
+                    avInstall2.setSummary(R.string.av_ok);
+                }
+            } else {
+                getOwnerPackageName.setSummary(R.string.notexist);
+                avInstall2.setSummary(R.string.av_nonono);
             }
         }
     }
 
-    private void showRestartDialog() {
+    private void showHideIconDialog() {
         new AlertDialog.Builder(getActivity()).setCancelable(false)
-                .setTitle(getString(R.string.hide_title))
+                .setTitle(R.string.dialog_title)
                 .setMessage("\n" + getString(R.string.hide_tip))
                 .setCancelable(false)
-                .setNegativeButton(getString(R.string.cancel), (dialog, which) -> {
+                .setNegativeButton(R.string.cancel, (dialog, which) -> {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putBoolean("hide_icon", false);
                     editor.apply();
                     hideIcon.setChecked(false);
                 })
-                .setPositiveButton(getString(R.string.confirm), (dialog, which) -> {
+                .setPositiveButton(R.string.confirm, (dialog, which) -> {
                     changeState("hide_icon", ctMain, false);
                     android.os.Process.killProcess(android.os.Process.myPid());
                 })

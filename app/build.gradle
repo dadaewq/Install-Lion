@@ -2,14 +2,14 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 29
-    buildToolsVersion "29.0.1"
+    buildToolsVersion "29.0.2"
     defaultConfig {
         resConfig 'zh'
         applicationId "com.modosa.apkinstaller"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 8
-        versionName "2.0"
+        versionCode 9
+        versionName "2.1"
     }
     buildTypes {
         release {
@@ -29,6 +29,6 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'com.catchingnow.icebox:SDK:1.0.5'
     implementation 'io.reactivex.rxjava2:rxjava:2.2.9'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
     implementation 'com.github.heruoxin.Delegated-Scopes-Manager:client:-SNAPSHOT'
 }

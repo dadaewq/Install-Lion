@@ -20,7 +20,7 @@
         <Preference
             android:id="@+id/icebox_permission"
             android:key="icebox_permission"
-            android:title="冰箱授权状态" />
+            android:title="冰箱权限状态" />
         <Preference
             android:id="@+id/av_install1"
             android:key="avInstall1"
