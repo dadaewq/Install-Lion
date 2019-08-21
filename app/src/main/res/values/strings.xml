@@ -8,11 +8,11 @@
     <string name="av_ok">Available</string>
     <string name="notexist">not exist</string>
     <string name="install_end">OVER! I don\'t know if the installation was successful.</string>
-    <string name="install_start">Start installing</string>
+    <string name="install_start">Icebox Start installing</string>
     <string name="failed_read">Reading apk failed</string>
-    <string name="success_install">Successful</string>
-    <string name="failed_install">Failed</string>
-    <string name="success_enable">Failed</string>
+    <string name="success_install">Installed succeed</string>
+    <string name="failed_install">Installed failed </string>
+    <string name="success_enable">Successfully enabled</string>
     <string name="summaryOn">Enabled</string>
     <string name="summaryOff">Disabled</string>
     <string name="exit_tip">Press Back Again to Exit</string>
