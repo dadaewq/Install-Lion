@@ -7,9 +7,11 @@
     <string name="av_no">不可用！点击申请权限</string>
     <string name="av_ok">现在可以使用</string>
     <string name="notexist">不存在</string>
+    <string name="install_over">安装结束</string>
     <string name="install_end">安装结束,我也不知道是否安装成功了</string>
-    <string name="install_start">IceBox开始安装</string>
+    <string name="install_start">开始安装</string>
     <string name="failed_read">读取apk失败</string>
+    <string name="failed_prase">无法解析</string>
     <string name="success_install">安装成功</string>
     <string name="failed_install">安装失败</string>
     <string name="success_enable">启用成功</string>
@@ -22,5 +24,7 @@
     <string name="dialog_title">隐藏图标并退出应用</string>
     <string name="hide_tip">隐藏后可以通过系统应用设置-管理空间-重新启用</string>
     <string name="enable_title">启用安装器</string>
-
+    <string name="click_run">点击打开应用</string>
+    <string name="dialog_install_title">确认安装</string>
+    <string name="items">以后不再确认</string>
 </resources>

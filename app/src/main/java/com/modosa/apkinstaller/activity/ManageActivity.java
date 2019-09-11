@@ -18,7 +18,6 @@ public class ManageActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        Log.e("onCreate", "onCreate");
     }
 
     @Override

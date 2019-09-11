@@ -123,7 +123,7 @@ public class MainFragment extends PreferenceFragment {
             getDelegatedScopes = getPreferenceScreen().findPreference("getDelegatedScopes");
             avInstall2 = getPreferenceScreen().findPreference("avInstall2");
             avInstall2.setOnPreferenceClickListener(preference -> {
-                DSMClient.requestScopes(getActivity(), 0x52,"dsm-delegation-install-uninstall-app");
+                DSMClient.requestScopes(getActivity(), 0x52, "dsm-delegation-install-uninstall-app");
                 return true;
             });
             updateComponentName("enable2");

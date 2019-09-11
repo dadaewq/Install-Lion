@@ -32,8 +32,8 @@
         <activity
             android:name=".activity.Install1Activity"
             android:excludeFromRecents="true"
-            android:noHistory="true"
             android:label="@string/name_install1"
+            android:noHistory="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -49,8 +49,8 @@
         <activity
             android:name=".activity.Install2Activity"
             android:excludeFromRecents="true"
-            android:noHistory="true"
             android:label="@string/name_install2"
+            android:noHistory="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -61,6 +61,18 @@
                 <data android:scheme="file" />
                 <data android:scheme="content" />
                 <data android:mimeType="application/vnd.android.package-archive" />
+            </intent-filter>
+        </activity>
+
+
+        <activity
+            android:name=".activity.NotifyActivity"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 

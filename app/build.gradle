@@ -8,8 +8,8 @@ android {
         applicationId "com.modosa.apkinstaller"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 9
-        versionName "2.1"
+        versionCode 10
+        versionName "2.2"
     }
     buildTypes {
         release {
@@ -26,7 +26,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.catchingnow.icebox:SDK:1.0.5'
     implementation 'io.reactivex.rxjava2:rxjava:2.2.9'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
