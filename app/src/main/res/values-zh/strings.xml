@@ -27,4 +27,6 @@
     <string name="click_run">点击打开应用</string>
     <string name="dialog_install_title">确认安装</string>
     <string name="items">以后不再确认</string>
+    <string name="show_title">显示通知</string>
+    <string name="show_tip">安装结束后显示通知，点击通知可打开应用</string>
 </resources>

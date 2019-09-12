@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.widget.Toast;
@@ -43,6 +44,7 @@ public class Install2Activity extends Activity {
     private SharedPreferences.Editor editor;
     private Disposable mSubscribe;
     private String[] apkinfo;
+    private boolean is_show;
 
 
     @Override
@@ -54,6 +56,9 @@ public class Install2Activity extends Activity {
 
         needrequest = (Build.VERSION.SDK_INT >= 23) && ((uri + "").contains("file://"));
 
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        is_show = sharedPreferences.getBoolean("show_notification", false);
+
         init();
 
     }
@@ -61,7 +66,6 @@ public class Install2Activity extends Activity {
 
     private void init() {
         String apkPath;
-        sharedPreferences = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
         boolean needconfirm = sharedPreferences.getBoolean("needconfirm", true);
 
         apkPath = preInstall();
@@ -148,16 +152,18 @@ public class Install2Activity extends Activity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
-                    Intent intent = new Intent();
-                    intent.setComponent(new ComponentName(getPackageName(), getPackageName() + ".activity.NotifyActivity"));
-                    Log.e("packagename", apkinfo[0]);
+                    if (is_show) {
+                        Intent intent = new Intent();
+                        intent.setComponent(new ComponentName(getPackageName(), getPackageName() + ".activity.NotifyActivity"));
+                        Log.e("packagename", apkinfo[0]);
 
-                    intent.putExtra("channelId", "2");
-                    intent.putExtra("channelName", getString(R.string.name_install2));
-                    intent.putExtra("packageName", apkinfo[0]);
-                    intent.putExtra("packageLable", apkinfo[1]);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
+                        intent.putExtra("channelId", "2");
+                        intent.putExtra("channelName", getString(R.string.name_install2));
+                        intent.putExtra("packageName", apkinfo[0]);
+                        intent.putExtra("packageLable", apkinfo[1]);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
                 }
                 showToast(getString(R.string.install_end));
 

@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.widget.Toast;
@@ -46,6 +47,7 @@ public class Install1Activity extends Activity {
     private SharedPreferences.Editor editor;
     private Disposable mSubscribe;
     private String[] apkinfo;
+    private boolean is_show;
 
 
     @Override
@@ -57,6 +59,9 @@ public class Install1Activity extends Activity {
 
         needrequest = (Build.VERSION.SDK_INT >= 23) && ((uri + "").contains("file://"));
 
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        is_show = sharedPreferences.getBoolean("show_notification", false);
+
         init();
 
     }
@@ -64,7 +69,6 @@ public class Install1Activity extends Activity {
 
     private void init() {
         String apkPath;
-        sharedPreferences = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
         boolean needconfirm = sharedPreferences.getBoolean("needconfirm", true);
 
         apkPath = preInstall();
@@ -159,7 +163,7 @@ public class Install1Activity extends Activity {
                         if (istemp) {
                             deleteSingleFile(apkFile);
                         }
-                        if (success) {
+                        if (success && is_show) {
                             Intent intent = new Intent();
                             intent.setComponent(new ComponentName(getPackageName(), getPackageName() + ".activity.NotifyActivity"));
                             Log.e("packagename", apkinfo[0]);

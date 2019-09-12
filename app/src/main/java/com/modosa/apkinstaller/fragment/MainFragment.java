@@ -80,6 +80,7 @@ public class MainFragment extends PreferenceFragment {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("first", false);
             editor.putBoolean("hide_icon", false);
+            editor.putBoolean("show_notification", false);
             editor.putBoolean("enable1", true);
             editor.putBoolean("enable2", true);
             editor.apply();

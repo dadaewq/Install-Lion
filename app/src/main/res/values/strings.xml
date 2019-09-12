@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Install Lion</string>
-    <string name="name_install1">Install Lion with IceBox</string>
-    <string name="name_install2">Install Lion with DSM</string>
+    <string name="name_install1">Install Lion-IceBox</string>
+    <string name="name_install2">Install Lion-DSM</string>
     <string name="request">Available state</string>
     <string name="av_nonono">Unavailable!</string>
     <string name="av_no">Unavailable!Click to request permissions</string>
@@ -27,4 +27,6 @@
     <string name="click_run">Click to run the app</string>
     <string name="dialog_install_title">Confirm installation</string>
     <string name="items">No longer confirmed in the future</string>
+    <string name="show_title">Show notification</string>
+    <string name="show_tip">Show notification after installation\nYou can run the app by clicking the notification</string>
 </resources>
