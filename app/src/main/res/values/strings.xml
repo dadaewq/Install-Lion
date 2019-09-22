@@ -2,6 +2,7 @@
     <string name="app_name">Install Lion</string>
     <string name="name_install1">Install Lion-IceBox</string>
     <string name="name_install2">Install Lion-DSM</string>
+    <string name="name_install3">Install Lion-Shizuku</string>
     <string name="request">Available state</string>
     <string name="av_nonono">Unavailable!</string>
     <string name="av_no">Unavailable!Click to request permissions</string>
@@ -29,4 +30,9 @@
     <string name="items">No longer confirmed in the future</string>
     <string name="show_title">Show notification</string>
     <string name="show_tip">Show notification after installation\nYou can run the app by clicking the notification</string>
+    <string name="confirm_title">Confirmation before installation</string>
+    <string name="confirm_tip">Display a confirmation dialog before installation</string>
+    <string name="installer_error_shell">%s installer error:\n\n %s</string>
+    <string name="installer_error_shizuku_unavailable">Unable to access Shizuku Server, please make sure it\'s running and SAI is authorized to use it</string>
+    <string name="installer_device">Device</string>
 </resources>

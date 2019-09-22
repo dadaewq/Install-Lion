@@ -8,19 +8,15 @@
             android:summaryOn="@string/summaryOn"
             android:title="@string/enable_title" />
         <Preference
-            android:id="@+id/getOwnerPackageName"
             android:key="getOwnerPackageName"
             android:title="已安装的托管主应用包名" />
         <Preference
-            android:id="@+id/getOwnerSDKVersion"
             android:key="getOwnerSDKVersion"
             android:title="托管应用SDK版本" />
         <Preference
-            android:id="@+id/getDelegatedScopes"
             android:key="getDelegatedScopes"
             android:title="本应用已授权的 scopes" />
         <Preference
-            android:id="@+id/av_install2"
             android:key="avInstall2"
             android:title="@string/request" />
     </PreferenceCategory>

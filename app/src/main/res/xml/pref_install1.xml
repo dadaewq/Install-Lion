@@ -10,6 +10,11 @@
         android:key="show_notification"
         android:summary="@string/show_tip"
         android:title="@string/show_title" />
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="needconfirm"
+        android:summary="@string/confirm_tip"
+        android:title="@string/confirm_title" />
     <PreferenceCategory android:title="@string/name_install1">
         <SwitchPreference
             android:defaultValue="true"
@@ -18,15 +23,12 @@
             android:summaryOn="@string/summaryOn"
             android:title="@string/enable_title" />
         <Preference
-            android:id="@+id/icebox_supported"
             android:key="icebox_supported"
             android:title="冰箱支持状态" />
         <Preference
-            android:id="@+id/icebox_permission"
             android:key="icebox_permission"
             android:title="冰箱权限状态" />
         <Preference
-            android:id="@+id/av_install1"
             android:key="avInstall1"
             android:title="@string/request" />
     </PreferenceCategory>

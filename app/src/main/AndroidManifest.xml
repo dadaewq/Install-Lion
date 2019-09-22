@@ -7,6 +7,11 @@
     <uses-permission android:name="com.catchingnow.icebox.SDK" />
     <uses-permission android:name="com.catchingnow.icebox.STATE" />
 
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
+
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -63,8 +68,23 @@
                 <data android:mimeType="application/vnd.android.package-archive" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activity.Install3Activity"
+            android:excludeFromRecents="true"
+            android:label="@string/name_install3"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.INSTALL_PACKAGE" />
 
+                <category android:name="android.intent.category.DEFAULT" />
 
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/vnd.android.package-archive" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".activity.NotifyActivity"
             android:noHistory="true"
@@ -88,6 +108,14 @@
                 android:name="android.app.develop.delegation"
                 android:resource="@xml/app_delegation" />
         </receiver>
+
+        <provider
+            android:name="moe.shizuku.api.ShizukuBinderReceiveProvider"
+            android:authorities="${applicationId}.shizuku"
+            android:enabled="true"
+            android:exported="true"
+            android:multiprocess="false"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

@@ -8,8 +8,8 @@ android {
         applicationId "com.modosa.apkinstaller"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 11
-        versionName "2.3"
+        versionCode 12
+        versionName "2.4"
     }
     buildTypes {
         release {
@@ -31,4 +31,5 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.2.9'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
     implementation 'com.github.heruoxin.Delegated-Scopes-Manager:client:-SNAPSHOT'
+    implementation 'moe.shizuku.privilege:api:3.0.0-alpha10'
 }

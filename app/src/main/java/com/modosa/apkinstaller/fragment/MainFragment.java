@@ -21,6 +21,7 @@ import com.catchingnow.icebox.sdk_client.IceBox;
 import com.modosa.apkinstaller.R;
 import com.modosa.apkinstaller.activity.Install1Activity;
 import com.modosa.apkinstaller.activity.Install2Activity;
+import com.modosa.apkinstaller.activity.Install3Activity;
 import com.modosa.apkinstaller.activity.MainActivity;
 
 import java.util.List;
@@ -31,15 +32,20 @@ import java.util.Objects;
  */
 public class MainFragment extends PreferenceFragment {
     private final String S_first = "first";
+    private final String shizuku_PERMISSION = "moe.shizuku.manager.permission.API_V23";
     private SwitchPreference hideIcon;
+    private SwitchPreference needconfirm;
     private SwitchPreference enable1;
     private SwitchPreference enable2;
+    private SwitchPreference enable3;
     private SharedPreferences sharedPreferences;
     private ComponentName ctMain;
     private ComponentName ctInstall1;
     private ComponentName ctInstall2;
+    private ComponentName ctInstall3;
     private Preference icebox_supported;
     private Preference icebox_permission;
+    private Preference shizuku_permission;
     private Preference avInstall1;
     private Preference avInstall2;
     private Preference getOwnerPackageName;
@@ -61,6 +67,7 @@ public class MainFragment extends PreferenceFragment {
         if (avDSM) {
             addPreferencesFromResource(R.xml.pref_install2);
         }
+        addPreferencesFromResource(R.xml.pref_install3);
         initialize(avDSM);
     }
 
@@ -76,13 +83,16 @@ public class MainFragment extends PreferenceFragment {
         ctMain = new ComponentName(this.getActivity(), MainActivity.class);
         ctInstall1 = new ComponentName(this.getActivity(), Install1Activity.class);
         ctInstall2 = new ComponentName(this.getActivity(), Install2Activity.class);
+        ctInstall3 = new ComponentName(this.getActivity(), Install3Activity.class);
         if (sharedPreferences.getBoolean(S_first, true)) {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("first", false);
             editor.putBoolean("hide_icon", false);
             editor.putBoolean("show_notification", false);
+            editor.putBoolean("needconfirm", true);
             editor.putBoolean("enable1", true);
             editor.putBoolean("enable2", true);
+            editor.putBoolean("enable3", true);
             editor.apply();
             if (!avDSM) {
                 PackageManager pm = this.getActivity().getPackageManager();
@@ -97,6 +107,7 @@ public class MainFragment extends PreferenceFragment {
             showHideIconDialog();
             return true;
         });
+        needconfirm = (SwitchPreference) findPreference("needconfirm");
 
         enable1 = (SwitchPreference) getPreferenceManager().findPreference("enable1");
         Objects.requireNonNull(enable1).setOnPreferenceChangeListener((preference, o) -> {
@@ -129,9 +140,24 @@ public class MainFragment extends PreferenceFragment {
             });
             updateComponentName("enable2");
         }
+        enable3 = (SwitchPreference) getPreferenceManager().findPreference("enable3");
+        Objects.requireNonNull(enable3).setOnPreferenceChangeListener((preference, o) -> {
+            changeState("enable3", ctInstall3, !sharedPreferences.getBoolean("enable3", true));
+            return true;
+        });
+        shizuku_permission = getPreferenceScreen().findPreference("shizuku_permission");
+        shizuku_permission.setOnPreferenceClickListener(preference -> {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{shizuku_PERMISSION},
+                    0x332);
+            return true;
+        });
+        updateComponentName("enable3");
     }
 
     private void printStatus(boolean avDSM) {
+        needconfirm.setChecked(sharedPreferences.getBoolean("needconfirm", true));
+
         IceBox.SilentInstallSupport state = IceBox.querySupportSilentInstall(getActivity());
         String status;
         switch (state) {
@@ -190,6 +216,10 @@ public class MainFragment extends PreferenceFragment {
                 avInstall2.setSummary(R.string.av_nonono);
             }
         }
+
+
+        int permission1 = ContextCompat.checkSelfPermission(getActivity(), shizuku_PERMISSION);
+        shizuku_permission.setSummary(permission1 == PackageManager.PERMISSION_GRANTED ? "已授权" : "未授权,点击申请权限");
     }
 
     private void showHideIconDialog() {
@@ -232,6 +262,7 @@ public class MainFragment extends PreferenceFragment {
         PackageManager pm = this.getActivity().getPackageManager();
         String s_enable1 = "enable1";
         String s_enable2 = "enable2";
+        String s_enable3 = "enable3";
         switch (s) {
             case "enable1":
                 boolean isEnabled1 = (pm.getComponentEnabledSetting(ctInstall1) == (PackageManager.COMPONENT_ENABLED_STATE_DEFAULT) || pm.getComponentEnabledSetting(ctInstall1) == (PackageManager.COMPONENT_ENABLED_STATE_ENABLED));
@@ -247,6 +278,14 @@ public class MainFragment extends PreferenceFragment {
                     editor.putBoolean("enable2", isEnabled2);
                     editor.commit();
                     enable2.setChecked(isEnabled2);
+                }
+                break;
+            case "enable3":
+                boolean isEnabled3 = (pm.getComponentEnabledSetting(ctInstall3) == (PackageManager.COMPONENT_ENABLED_STATE_DEFAULT) || pm.getComponentEnabledSetting(ctInstall3) == (PackageManager.COMPONENT_ENABLED_STATE_ENABLED));
+                if (isEnabled3 != sharedPreferences.getBoolean(s_enable3, true)) {
+                    editor.putBoolean("enable3", isEnabled3);
+                    editor.commit();
+                    enable3.setChecked(isEnabled3);
                 }
                 break;
             default:

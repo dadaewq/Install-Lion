@@ -15,38 +15,44 @@ import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 
-import com.catchingnow.delegatedscopeclient.DSMClient;
 import com.modosa.apkinstaller.R;
 import com.modosa.apkinstaller.utils.ApkInfo;
+import com.modosa.apkinstaller.utils.apksource.ApkSource;
+import com.modosa.apkinstaller.utils.installer.ApkSourceBuilder;
+import com.modosa.apkinstaller.utils.installer.SAIPackageInstaller;
+import com.modosa.apkinstaller.utils.installer.shizuku.ShizukuSAIPackageInstaller;
+
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * @author dadaewq
  */
-public class Install2Activity extends Activity {
+public class Install3Activity extends Activity implements com.modosa.apkinstaller.utils.installer.SAIPackageInstaller.InstallationStatusListener {
+    private static final String TAG = "method";
     private final String[] permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
     private boolean istemp = false;
-
     private Uri uri;
     private boolean needrequest;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private String[] apkinfo;
     private boolean is_show;
-
+    private long mOngoingSessionId;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
@@ -60,7 +66,6 @@ public class Install2Activity extends Activity {
         init();
 
     }
-
 
     private void init() {
         String apkPath;
@@ -108,7 +113,7 @@ public class Install2Activity extends Activity {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         if (needrequest) {
             confirmPermission();
@@ -138,43 +143,44 @@ public class Install2Activity extends Activity {
         Log.d("Start install", apkPath + "");
         if (apkPath != null) {
             final File apkFile = new File(apkPath);
-            String authority = getPackageName() + ".FILE_PROVIDER";
-            Uri installuri = FileProvider.getUriForFile(getApplicationContext(), authority, apkFile);
+
             apkinfo = new ApkInfo(this, apkPath).getApkPkgInfo();
 
+            ArrayList<File> files = new ArrayList<>();
+            files.add(apkFile);
             new Thread(() -> {
                 showToast(getString(R.string.install_start) + apkinfo[1]);
-
                 try {
-                    DSMClient.installApp(this, installuri, null);
+                    installPackages(files);
                 } catch (Exception e) {
                     e.printStackTrace();
-                } finally {
-                    if (is_show) {
-                        Intent intent = new Intent();
-                        intent.setComponent(new ComponentName(getPackageName(), getPackageName() + ".activity.NotifyActivity"));
-                        Log.e("packagename", apkinfo[0]);
-
-                        intent.putExtra("channelId", "2");
-                        intent.putExtra("channelName", getString(R.string.name_install2));
-                        intent.putExtra("packageName", apkinfo[0]);
-                        intent.putExtra("packageLable", apkinfo[1]);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                    }
                 }
-                showToast(getString(R.string.install_end));
-
 
                 if (istemp) {
                     deleteSingleFile(apkFile);
                 }
                 finish();
-            }).start();
+            }
+
+            ).start();
         } else {
             showToast(getString(R.string.failed_read));
             finish();
         }
+    }
+
+    private void installPackages(List<File> apkFiles) {
+        Log.d(TAG, "installPackages: ");
+
+        Context mContext = getApplication();
+        SAIPackageInstaller mInstaller = ShizukuSAIPackageInstaller.getInstance(mContext);
+        mInstaller.addStatusListener(this);
+        ApkSource apkSource = new ApkSourceBuilder()
+                .fromApkFiles(apkFiles)
+                .build();
+
+        mOngoingSessionId = mInstaller.createInstallationSession(apkSource);
+        mInstaller.startInstallationSession(mOngoingSessionId);
     }
 
     private void requestPermission() {
@@ -188,7 +194,6 @@ public class Install2Activity extends Activity {
             requestPermission();
         }
     }
-
 
     private void showToast(final String text) {
         runOnUiThread(() -> Toast.makeText(this, text, Toast.LENGTH_SHORT).show());
@@ -216,7 +221,6 @@ public class Install2Activity extends Activity {
         return tempFile.getAbsolutePath();
     }
 
-
     private void deleteSingleFile(File file) {
         if (file.exists() && file.isFile()) {
             if (file.delete()) {
@@ -226,6 +230,40 @@ public class Install2Activity extends Activity {
             }
         } else {
             finish();
+        }
+    }
+
+    @Override
+    public void onStatusChanged(long installationID, SAIPackageInstaller.InstallationStatus status, @Nullable String packageNameOrErrorDescription) {
+        if (installationID != mOngoingSessionId) {
+            return;
+        }
+        Log.e("status", status + "");
+        switch (status) {
+            case QUEUED:
+            case INSTALLING:
+                break;
+            case INSTALLATION_SUCCEED:
+                showToast(getString(R.string.success_install));
+                if (is_show) {
+                    Intent intent = new Intent();
+                    intent.setComponent(new ComponentName(getPackageName(), getPackageName() + ".activity.NotifyActivity"));
+                    Log.e("packagename", apkinfo[0]);
+
+                    intent.putExtra("channelId", "3");
+                    intent.putExtra("channelName", getString(R.string.name_install3));
+                    intent.putExtra("packageName", apkinfo[0]);
+                    intent.putExtra("packageLable", apkinfo[1]);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
+                break;
+            case INSTALLATION_FAILED:
+                finish();
+                showToast(getString(R.string.failed_install));
+                break;
+            default:
+                finish();
         }
     }
 

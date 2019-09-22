@@ -2,6 +2,7 @@
     <string name="app_name">安装狮</string>
     <string name="name_install1">安装狮-IceBox</string>
     <string name="name_install2">安装狮-DSM</string>
+    <string name="name_install3">安装狮-Shizuku</string>
     <string name="request">可用状态</string>
     <string name="av_nonono">不可用!</string>
     <string name="av_no">不可用！点击申请权限</string>
@@ -29,4 +30,9 @@
     <string name="items">以后不再确认</string>
     <string name="show_title">显示通知</string>
     <string name="show_tip">安装结束后显示通知，点击通知可打开应用</string>
+    <string name="confirm_title">安装前确认</string>
+    <string name="confirm_tip">安装前显示确认安装的对话框</string>
+    <string name="installer_error_shell">%s 安装器错误:\n\n %s</string>
+    <string name="installer_error_shizuku_unavailable">Unable to access Shizuku Server, please make sure it\'s running and SAI is authorized to use it</string>
+    <string name="installer_device">设备</string>
 </resources>
