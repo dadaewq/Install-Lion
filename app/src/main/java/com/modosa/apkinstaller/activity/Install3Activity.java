@@ -49,6 +49,7 @@ public class Install3Activity extends Activity implements com.modosa.apkinstalle
     private String[] apkinfo;
     private boolean is_show;
     private long mOngoingSessionId;
+    private File apkFile;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -141,7 +142,7 @@ public class Install3Activity extends Activity implements com.modosa.apkinstalle
     private void startInstall(String apkPath) {
         Log.d("Start install", apkPath + "");
         if (apkPath != null) {
-            final File apkFile = new File(apkPath);
+            apkFile = new File(apkPath);
 
             apkinfo = new ApkInfo(this, apkPath).getApkPkgInfo();
 
@@ -153,10 +154,6 @@ public class Install3Activity extends Activity implements com.modosa.apkinstalle
                     installPackages(files);
                 } catch (Exception e) {
                     e.printStackTrace();
-                }
-
-                if (istemp) {
-                    deleteSingleFile(apkFile);
                 }
                 finish();
             }
@@ -243,6 +240,9 @@ public class Install3Activity extends Activity implements com.modosa.apkinstalle
             case INSTALLING:
                 break;
             case INSTALLATION_SUCCEED:
+                if (istemp) {
+                    deleteSingleFile(apkFile);
+                }
                 showToast(getString(R.string.success_install));
                 if (is_show) {
                     Intent intent = new Intent();
@@ -258,7 +258,9 @@ public class Install3Activity extends Activity implements com.modosa.apkinstalle
                 }
                 break;
             case INSTALLATION_FAILED:
-                finish();
+                if (istemp) {
+                    deleteSingleFile(apkFile);
+                }
                 showToast(getString(R.string.failed_install));
                 break;
             default:
