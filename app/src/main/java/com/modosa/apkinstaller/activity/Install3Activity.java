@@ -101,7 +101,12 @@ public class Install3Activity extends Activity implements com.modosa.apkinstalle
                 startInstall(apkPath);
                 finish();
             });
-            builder.setNegativeButton(android.R.string.no, (dialog, which) -> finish());
+            builder.setNegativeButton(android.R.string.no, (dialog, which) -> {
+                if (istemp) {
+                    deleteSingleFile(new File(apkPath));
+                }
+                finish();
+            });
             builder.setCancelable(false);
             builder.show();
 
@@ -143,7 +148,6 @@ public class Install3Activity extends Activity implements com.modosa.apkinstalle
         Log.d("Start install", apkPath + "");
         if (apkPath != null) {
             apkFile = new File(apkPath);
-
             apkinfo = new ApkInfo(this, apkPath).getApkPkgInfo();
 
             ArrayList<File> files = new ArrayList<>();

@@ -102,7 +102,12 @@ public class Install1Activity extends Activity {
                 startInstall(apkPath);
                 finish();
             });
-            builder.setNegativeButton(android.R.string.no, (dialog, which) -> finish());
+            builder.setNegativeButton(android.R.string.no, (dialog, which) -> {
+                if (istemp) {
+                    deleteSingleFile(new File(apkPath));
+                }
+                finish();
+            });
             builder.setCancelable(false);
             builder.show();
 
