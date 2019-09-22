@@ -26,7 +26,6 @@ import com.modosa.apkinstaller.utils.installer.ApkSourceBuilder;
 import com.modosa.apkinstaller.utils.installer.SAIPackageInstaller;
 import com.modosa.apkinstaller.utils.installer.shizuku.ShizukuSAIPackageInstaller;
 
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

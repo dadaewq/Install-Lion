@@ -9,6 +9,6 @@
             android:title="@string/enable_title" />
         <Preference
             android:key="shizuku_permission"
-            android:title="Shizuku权限状态"/>
+            android:title="Shizuku权限状态" />
     </PreferenceCategory>
 </PreferenceScreen>
