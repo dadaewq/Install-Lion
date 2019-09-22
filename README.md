@@ -6,3 +6,6 @@
 安装狮-DSM-----支持Android8.0以及以上，需要[冰箱](https://www.coolapk.com/apk/com.catchingnow.icebox)或[小黑屋](https://www.coolapk.com/apk/web1n.stopapp)作为设备管理员
 
 安装狮-Shizuku--支持Android6.0以及以上，需要[Shizuku](https://www.coolapk.com/apk/moe.shizuku.privileged.api)服务正常运行
+
+
+感谢[SAI](https://github.com/Aefyr/SAI)
