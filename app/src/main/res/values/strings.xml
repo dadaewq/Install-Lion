@@ -4,7 +4,9 @@
     <string name="name_install2">Install Lion-DSM</string>
     <string name="name_install3">Install Lion-Shizuku</string>
     <string name="request">Available state</string>
+    <string name="av_okokok">Available</string>
     <string name="av_nonono">Unavailable!</string>
+    <string name="go_shizuku">Click to go to Shizuku to check the service</string>
     <string name="av_no">Unavailable!Click to request permissions</string>
     <string name="av_ok">Available</string>
     <string name="notexist">not exist</string>

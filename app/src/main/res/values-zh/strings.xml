@@ -4,7 +4,9 @@
     <string name="name_install2">安装狮-DSM</string>
     <string name="name_install3">安装狮-Shizuku</string>
     <string name="request">可用状态</string>
+    <string name="av_okokok">可用</string>
     <string name="av_nonono">不可用!</string>
+    <string name="go_shizuku">点击前往Shizuku以检查服务</string>
     <string name="av_no">不可用！点击申请权限</string>
     <string name="av_ok">现在可以使用</string>
     <string name="notexist">不存在</string>

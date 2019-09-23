@@ -2,6 +2,7 @@ package com.modosa.apkinstaller.fragment;
 
 import android.app.AlertDialog;
 import android.content.ComponentName;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -23,6 +24,7 @@ import com.modosa.apkinstaller.activity.Install1Activity;
 import com.modosa.apkinstaller.activity.Install2Activity;
 import com.modosa.apkinstaller.activity.Install3Activity;
 import com.modosa.apkinstaller.activity.MainActivity;
+import com.modosa.apkinstaller.utils.shell.ShizukuShell;
 
 import java.util.List;
 import java.util.Objects;
@@ -45,9 +47,11 @@ public class MainFragment extends PreferenceFragment {
     private ComponentName ctInstall3;
     private Preference icebox_supported;
     private Preference icebox_permission;
+    private Preference shizuku_service;
     private Preference shizuku_permission;
     private Preference avInstall1;
     private Preference avInstall2;
+    private Preference avInstall3;
     private Preference getOwnerPackageName;
     private Preference getOwnerSDKVersion;
     private Preference getDelegatedScopes;
@@ -145,19 +149,14 @@ public class MainFragment extends PreferenceFragment {
             changeState("enable3", ctInstall3, !sharedPreferences.getBoolean("enable3", true));
             return true;
         });
+        shizuku_service = getPreferenceScreen().findPreference("shizuku_service");
         shizuku_permission = getPreferenceScreen().findPreference("shizuku_permission");
-        shizuku_permission.setOnPreferenceClickListener(preference -> {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{shizuku_PERMISSION},
-                    0x332);
-            return true;
-        });
+        avInstall3 = getPreferenceScreen().findPreference("avInstall3");
         updateComponentName("enable3");
     }
 
     private void printStatus(boolean avDSM) {
         needconfirm.setChecked(sharedPreferences.getBoolean("needconfirm", true));
-
         IceBox.SilentInstallSupport state = IceBox.querySupportSilentInstall(getActivity());
         String status;
         switch (state) {
@@ -217,9 +216,38 @@ public class MainFragment extends PreferenceFragment {
             }
         }
 
+        boolean avShizuku_service = ShizukuShell.getInstance().isAvailable();
+        String status1 = avShizuku_service ? getString(R.string.av_okokok) : getString(R.string.av_nonono);
+        shizuku_service.setSummary(status1);
+        boolean permission1 = ContextCompat.checkSelfPermission(getActivity(), shizuku_PERMISSION) == 0;
+        shizuku_permission.setSummary(permission1 ? "已授权" : "未授权");
 
-        int permission1 = ContextCompat.checkSelfPermission(getActivity(), shizuku_PERMISSION);
-        shizuku_permission.setSummary(permission1 == PackageManager.PERMISSION_GRANTED ? "已授权" : "未授权,点击申请权限");
+        avInstall3.setOnPreferenceClickListener(preference -> {
+            ActivityCompat.requestPermissions(MainFragment.this.getActivity(),
+                    new String[]{shizuku_PERMISSION},
+                    0x332);
+            return true;
+        });
+        if (avShizuku_service) {
+            avInstall3.setSummary(R.string.av_ok);
+        } else {
+            if (permission1) {
+                avInstall3.setSummary(getString(R.string.av_nonono) + getString(R.string.go_shizuku));
+                avInstall3.setOnPreferenceClickListener(preference -> {
+                    try {
+                        Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage("moe.shizuku.privileged.api");
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return true;
+                });
+            } else {
+                avInstall3.setSummary(R.string.av_no);
+            }
+
+        }
+
     }
 
     private void showHideIconDialog() {

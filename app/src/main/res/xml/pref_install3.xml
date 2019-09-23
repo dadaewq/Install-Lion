@@ -8,7 +8,13 @@
             android:summaryOn="@string/summaryOn"
             android:title="@string/enable_title" />
         <Preference
+            android:key="shizuku_service"
+            android:title="Shizuku服务状态" />
+        <Preference
             android:key="shizuku_permission"
             android:title="Shizuku权限状态" />
+        <Preference
+            android:key="avInstall3"
+            android:title="@string/request" />
     </PreferenceCategory>
 </PreferenceScreen>
