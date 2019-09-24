@@ -6,10 +6,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.catchingnow.icebox.SDK" />
     <uses-permission android:name="com.catchingnow.icebox.STATE" />
-
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
 
 
     <application
@@ -95,6 +92,37 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="com.modosa.apkinstaller.activity.LaunchActivity"
+            android:enabled="true"
+            android:icon="@mipmap/ic_launch"
+            android:label="@string/launch_name"
+            android:launchMode="singleTop"
+            android:noHistory="true"
+            android:roundIcon="@mipmap/ic_launch_round"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.SHOW_APP_INFO" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.modosa.apkinstaller.activity.ShowAppInfoActivity"
+            android:enabled="true"
+            android:exported="false"
+            android:label="@string/launch_name"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.SHOW_APP_INFO" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
 
         <receiver
             android:name=".activity.AdminReceiver"
