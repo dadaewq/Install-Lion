@@ -15,7 +15,7 @@
             android:title="托管应用SDK版本" />
         <Preference
             android:key="getDelegatedScopes"
-            android:title="本应用已授权的 scopes" />
+            android:title="本应用已得到的托管授权" />
         <Preference
             android:key="avInstall2"
             android:title="@string/request" />
