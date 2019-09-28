@@ -216,12 +216,15 @@ public class MainFragment extends PreferenceFragment {
             }
         }
 
-        boolean avShizuku_service = ShizukuShell.getInstance().isAvailable();
-        String status1 = avShizuku_service ? getString(R.string.av_okokok) : getString(R.string.av_nonono);
-        shizuku_service.setSummary(status1);
+        boolean avShizuku_service = false;
+
         boolean permission1 = ContextCompat.checkSelfPermission(getActivity(), shizuku_PERMISSION) == 0;
         shizuku_permission.setSummary(permission1 ? "已授权" : "未授权");
-
+        if (permission1) {
+            avShizuku_service = ShizukuShell.getInstance().isAvailable();
+        }
+        String status1 = avShizuku_service ? getString(R.string.av_okokok) : getString(R.string.av_nonono);
+        shizuku_service.setSummary(status1);
         avInstall3.setOnPreferenceClickListener(preference -> {
             ActivityCompat.requestPermissions(MainFragment.this.getActivity(),
                     new String[]{shizuku_PERMISSION},

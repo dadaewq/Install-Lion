@@ -16,7 +16,7 @@ import com.modosa.apkinstaller.fragment.MainFragment;
  * @author dadaewq
  */
 public class MainActivity extends AppCompatActivity {
-    private final String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    private final String[] permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
     private long exitTime = 0;
 
 
@@ -54,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updatePermissionState() {
-        int permissionWrite = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        boolean judge = (permissionWrite == 0);
+        int permissionRead = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        boolean judge = (permissionRead == 0);
         if (!judge) {
             requestPermission();
         }
