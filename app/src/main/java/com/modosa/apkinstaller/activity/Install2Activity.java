@@ -29,7 +29,6 @@ public class Install2Activity extends AbstractInstallActivity {
 
             new Thread(() -> {
                 showToast(getString(R.string.install_start) + apkinfo[1]);
-
                 try {
                     DSMClient.installApp(this, installuri, null);
                 } catch (Exception e) {

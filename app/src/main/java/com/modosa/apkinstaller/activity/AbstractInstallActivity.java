@@ -186,7 +186,7 @@ public abstract class AbstractInstallActivity extends Activity {
     void deleteSingleFile(File file) {
         if (file.exists() && file.isFile()) {
             if (file.delete()) {
-                Log.e("--DELETE--", "deleteSingleFile" + file.getAbsolutePath() + " OK！");
+                Log.e("-DELETE-", "==>" + file.getAbsolutePath() + " OK！");
             } else {
                 finish();
             }

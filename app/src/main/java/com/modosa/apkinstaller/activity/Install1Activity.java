@@ -35,7 +35,6 @@ public class Install1Activity extends AbstractInstallActivity {
             apkinfo = getApkPkgInfo(apkPath);
             showToast(getString(R.string.install_start) + apkinfo[1]);
 
-
             disposeSafety();
 
             mSubscribe = Single.fromCallable(() -> IceBox.installPackage(this, installuri))
