@@ -7,5 +7,14 @@
 
 安装狮-Shizuku--支持Android6.0以及以上，需要[Shizuku](https://www.coolapk.com/apk/moe.shizuku.privileged.api)服务正常运行
 
+## Download
+[<img src="https://www.coolapk.com/static/images/header-logo.png"
+     alt="Get it on CoolApk"
+     height="80">](https://www.coolapk.com/apk/com.modosa.apkinstaller)
 
-感谢[SAI](https://github.com/Aefyr/SAI)
+## Thanks
+
+
+[PokeInstaller](https://github.com/bavelee/PokeInstaller)  
+
+[SAI](https://github.com/Aefyr/SAI)  
