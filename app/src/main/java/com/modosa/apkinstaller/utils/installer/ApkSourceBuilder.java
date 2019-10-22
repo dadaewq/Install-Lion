@@ -11,15 +11,16 @@ import java.util.List;
 
 public class ApkSourceBuilder {
 
+
     private boolean mSourceSet;
     private List<File> mApkFiles;
+
 
     public ApkSourceBuilder fromApkFiles(List<File> apkFiles) {
         ensureSourceSetOnce();
         mApkFiles = apkFiles;
         return this;
     }
-
 
     public ApkSource build() {
         ApkSource apkSource;
@@ -34,7 +35,6 @@ public class ApkSourceBuilder {
         } else {
             throw new IllegalStateException("No source set");
         }
-
 
         return apkSource;
     }

@@ -8,12 +8,22 @@ import java.util.List;
 
 public class DefaultApkSource implements ApkSource {
 
-    private final FileDescriptor mCurrentApk;
+    private final List<FileDescriptor> mApkFileDescriptors;
+    private FileDescriptor mCurrentApk;
 
     public DefaultApkSource(List<FileDescriptor> apkFileDescriptors) {
-        mCurrentApk = apkFileDescriptors.remove(0);
+        mApkFileDescriptors = apkFileDescriptors;
     }
 
+    @Override
+    public boolean nextApk() {
+        if (mApkFileDescriptors.size() == 0) {
+            return false;
+        }
+
+        mCurrentApk = mApkFileDescriptors.remove(0);
+        return true;
+    }
 
     @Override
     public InputStream openApkInputStream() throws Exception {

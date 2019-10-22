@@ -48,7 +48,6 @@ public class NotifyActivity extends Activity {
 
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-
             if (notificationManager == null) {
                 notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             }
@@ -65,9 +64,10 @@ public class NotifyActivity extends Activity {
         if (notificationManager == null) {
             notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         }
+
         Notification notification = new NotificationCompat.Builder(context, channelId)
                 //设置通知栏标题
-                .setContentTitle(packageLable + " " + getString(R.string.install_over))
+                .setContentTitle(String.format(getString(R.string.install_over), packageLable))
                 //设置通知栏显示内容
                 .setContentText(getString(R.string.click_run))
                 //通知产生的时间，会在通知信息里显示

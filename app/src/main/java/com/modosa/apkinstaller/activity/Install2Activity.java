@@ -22,13 +22,11 @@ public class Install2Activity extends AbstractInstallActivity {
     public void startInstall(String apkPath) {
         Log.d("Start install", apkPath + "");
         if (apkPath != null) {
-            final File apkFile = new File(apkPath);
+            apkFile = new File(apkPath);
             String authority = getPackageName() + ".FILE_PROVIDER";
             Uri installuri = FileProvider.getUriForFile(getApplicationContext(), authority, apkFile);
-            apkinfo = getApkPkgInfo(apkPath);
-
             new Thread(() -> {
-                showToast(getString(R.string.install_start) + apkinfo[1]);
+                showToast0(String.format(getString(R.string.start_install), apkinfo[0]));
                 try {
                     DSMClient.installApp(this, installuri, null);
                 } catch (Exception e) {
@@ -37,28 +35,39 @@ public class Install2Activity extends AbstractInstallActivity {
                     if (show_notification) {
                         Intent intent = new Intent();
                         intent.setComponent(new ComponentName(getPackageName(), getPackageName() + ".activity.NotifyActivity"));
-                        Log.e("packagename", apkinfo[0]);
+                        Log.e("packagename", apkinfo[1]);
 
                         intent.putExtra("channelId", "2");
                         intent.putExtra("channelName", getString(R.string.name_install2));
-                        intent.putExtra("packageName", apkinfo[0]);
-                        intent.putExtra("packageLable", apkinfo[1]);
+                        intent.putExtra("packageName", apkinfo[1]);
+                        intent.putExtra("packageLable", apkinfo[0]);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                     }
                 }
-                showToast(getString(R.string.install_end));
-
-
-                if (istemp) {
-                    deleteSingleFile(apkFile);
-                }
+                showToast1(getString(R.string.install_end));
+                deleteCache();
                 finish();
             }).start();
         } else {
-            showToast(getString(R.string.failed_read));
+            showToast0(getString(R.string.failed_read));
             finish();
         }
+    }
+
+    @Override
+    protected void startUninstall(String pkgname) {
+        Log.d("Start uninstall", pkgname);
+        new Thread(() -> {
+            showToast0(String.format(getString(R.string.start_uninstall), packageLable));
+            try {
+                DSMClient.uninstallApp(this, pkgname);
+            } catch (Exception e) {
+                showToast1(e.toString());
+            }
+            //Todo show result
+        }).start();
+
     }
 
 }

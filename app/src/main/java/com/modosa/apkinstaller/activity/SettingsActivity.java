@@ -15,7 +15,7 @@ import com.modosa.apkinstaller.fragment.MainFragment;
 /**
  * @author dadaewq
  */
-public class MainActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity {
     private final String[] permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
     private long exitTime = 0;
 
@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getFragmentManager().beginTransaction().add(android.R.id.content, new MainFragment()).commit();
-        requestPermission();
+        updatePermissionState();
     }
 
     private void requestPermission() {

@@ -23,7 +23,6 @@ import com.modosa.apkinstaller.R;
 import com.modosa.apkinstaller.activity.Install1Activity;
 import com.modosa.apkinstaller.activity.Install2Activity;
 import com.modosa.apkinstaller.activity.Install3Activity;
-import com.modosa.apkinstaller.activity.MainActivity;
 import com.modosa.apkinstaller.utils.shell.ShizukuShell;
 
 import java.util.List;
@@ -84,14 +83,14 @@ public class MainFragment extends PreferenceFragment {
 
 
     private void initialize(Boolean avDSM) {
-        ctMain = new ComponentName(this.getActivity(), MainActivity.class);
+        ctMain = new ComponentName(this.getActivity(), "com.modosa.apkinstaller.activity.MainActivity");
         ctInstall1 = new ComponentName(this.getActivity(), Install1Activity.class);
         ctInstall2 = new ComponentName(this.getActivity(), Install2Activity.class);
         ctInstall3 = new ComponentName(this.getActivity(), Install3Activity.class);
         if (sharedPreferences.getBoolean(S_first, true)) {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("first", false);
-            editor.putBoolean("hide_icon", false);
+            editor.putBoolean("notificationManager.areNotificationsEnabled()", false);
             editor.putBoolean("show_notification", false);
             editor.putBoolean("needconfirm", true);
             editor.putBoolean("enable1", true);
@@ -108,11 +107,14 @@ public class MainFragment extends PreferenceFragment {
 
         hideIcon = (SwitchPreference) findPreference("hide_icon");
         hideIcon.setOnPreferenceClickListener(preference -> {
-            showHideIconDialog();
+            if (sharedPreferences.getBoolean("hide_icon", false)) {
+                showHideIconDialog();
+            } else {
+                changeState("hide_icon", ctMain, true);
+            }
             return true;
         });
         needconfirm = (SwitchPreference) findPreference("needconfirm");
-
         enable1 = (SwitchPreference) getPreferenceManager().findPreference("enable1");
         Objects.requireNonNull(enable1).setOnPreferenceChangeListener((preference, o) -> {
             changeState("enable1", ctInstall1, !sharedPreferences.getBoolean("enable1", true));

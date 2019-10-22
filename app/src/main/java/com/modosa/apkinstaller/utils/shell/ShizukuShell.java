@@ -1,5 +1,6 @@
 package com.modosa.apkinstaller.utils.shell;
 
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -37,6 +38,7 @@ public class ShizukuShell implements Shell {
         try {
             return exec(new Command("echo", "test")).isSuccessful();
         } catch (Exception e) {
+            Log.w(TAG, "Unable to access shizuku: ");
             Log.w(TAG, e);
             return false;
         }
@@ -52,12 +54,19 @@ public class ShizukuShell implements Shell {
         return execInternal(command, inputPipe);
     }
 
+    @Override
+    public String makeLiteral(String arg) {
+        return "'" + arg.replace("'", "'\\''") + "'";
+    }
+
     private Result execInternal(Command command, @Nullable InputStream inputPipe) {
         StringBuilder stdOutSb = new StringBuilder();
         StringBuilder stdErrSb = new StringBuilder();
 
         try {
-            RemoteProcess process = ShizukuService.newProcess(command.toStringArray(), null, null);
+            Command.Builder shCommand = new Command.Builder("sh", "-c", command.toString());
+
+            RemoteProcess process = ShizukuService.newProcess(shCommand.build().toStringArray(), null, null);
 
             Thread stdOutD = IOUtils.writeStreamToStringBuilder(stdOutSb, process.getInputStream());
             Thread stdErrD = IOUtils.writeStreamToStringBuilder(stdErrSb, process.getErrorStream());
@@ -65,6 +74,17 @@ public class ShizukuShell implements Shell {
             if (inputPipe != null) {
                 try (OutputStream outputStream = process.getOutputStream(); InputStream inputStream = inputPipe) {
                     IOUtils.copyStream(inputStream, outputStream);
+                } catch (Exception e) {
+                    stdOutD.interrupt();
+                    stdErrD.interrupt();
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        process.destroyForcibly();
+                    } else {
+                        process.destroy();
+                    }
+
+                    throw new RuntimeException(e);
                 }
             }
 

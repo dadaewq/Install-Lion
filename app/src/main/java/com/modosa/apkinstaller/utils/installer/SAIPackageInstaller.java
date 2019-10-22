@@ -1,6 +1,5 @@
 package com.modosa.apkinstaller.utils.installer;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -16,7 +15,6 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@SuppressLint("DefaultLocale")
 public abstract class SAIPackageInstaller {
     private static final String TAG = "SAIPI";
     private final Context mContext;
@@ -41,10 +39,6 @@ public abstract class SAIPackageInstaller {
         mListeners.add(listener);
     }
 
-//    public void removeStatusListener(InstallationStatusListener listener) {
-//        mListeners.remove(listener);
-//    }
-
     public long createInstallationSession(ApkSource apkSource) {
         long installationID = mLastInstallationID++;
         mCreatedInstallationSessions.put(installationID, new QueuedInstallation(apkSource, installationID));
@@ -63,7 +57,6 @@ public abstract class SAIPackageInstaller {
         processQueue();
     }
 
-
     private void processQueue() {
         if (mInstallationQueue.size() == 0 || mInstallationInProgress) {
             return;
@@ -74,13 +67,14 @@ public abstract class SAIPackageInstaller {
         mInstallationInProgress = true;
 
         dispatchCurrentSessionUpdate(InstallationStatus.INSTALLING, null);
+
         mExecutor.execute(() -> installApkFiles(installation.getApkSource()));
     }
 
     protected abstract void installApkFiles(ApkSource apkSource);
 
     void installationCompleted() {
-        Log.e(TAG, String.format("%s->installationCompleted(); mOngoingInstallation.id=%d", getClass().getSimpleName(), dbgGetOngoingInstallationId()));
+        Log.d(TAG, String.format("%s->installationCompleted(); mOngoingInstallation.id=%d", getClass().getSimpleName(), dbgGetOngoingInstallationId()));
         mInstallationInProgress = false;
         mOngoingInstallation = null;
         processQueue();
@@ -88,7 +82,7 @@ public abstract class SAIPackageInstaller {
 
     private void dispatchSessionUpdate(long sessionID, InstallationStatus status, String packageNameOrError) {
         mHandler.post(() -> {
-            Log.e(TAG, String.format("%s->dispatchSessionUpdate(%d, %s, %s)", getClass().getSimpleName(), sessionID, status.name(), packageNameOrError));
+            Log.d(TAG, String.format("%s->dispatchSessionUpdate(%d, %s, %s)", getClass().getSimpleName(), sessionID, status.name(), packageNameOrError));
             for (InstallationStatusListener listener : mListeners) {
                 listener.onStatusChanged(sessionID, status, packageNameOrError);
             }
@@ -96,14 +90,13 @@ public abstract class SAIPackageInstaller {
     }
 
     void dispatchCurrentSessionUpdate(InstallationStatus status, String packageNameOrError) {
-        Log.e(TAG, String.format("%s->dispatchCurrentSessionUpdate(%s, %s); mOngoingInstallation.id=%d", getClass().getSimpleName(), status.name(), packageNameOrError, dbgGetOngoingInstallationId()));
+        Log.d(TAG, String.format("%s->dispatchCurrentSessionUpdate(%s, %s); mOngoingInstallation.id=%d", getClass().getSimpleName(), status.name(), packageNameOrError, dbgGetOngoingInstallationId()));
         dispatchSessionUpdate(mOngoingInstallation.getId(), status, packageNameOrError);
     }
 
     private long dbgGetOngoingInstallationId() {
         return mOngoingInstallation != null ? mOngoingInstallation.getId() : -1;
     }
-
 
     public enum InstallationStatus {
         QUEUED, INSTALLING, INSTALLATION_SUCCEED, INSTALLATION_FAILED
@@ -112,4 +105,5 @@ public abstract class SAIPackageInstaller {
     public interface InstallationStatusListener {
         void onStatusChanged(long installationID, InstallationStatus status, @Nullable String packageNameOrErrorDescription);
     }
+
 }

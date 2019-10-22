@@ -29,11 +29,10 @@ public class Install1Activity extends AbstractInstallActivity {
     public void startInstall(String apkPath) {
         Log.d("Start install", apkPath + "");
         if (apkPath != null) {
-            final File apkFile = new File(apkPath);
+            apkFile = new File(apkPath);
             String authority = getPackageName() + ".FILE_PROVIDER";
             Uri installuri = FileProvider.getUriForFile(getApplicationContext(), authority, apkFile);
-            apkinfo = getApkPkgInfo(apkPath);
-            showToast(getString(R.string.install_start) + apkinfo[1]);
+            showToast0(String.format(getString(R.string.start_install), apkinfo[0]));
 
             disposeSafety();
 
@@ -41,18 +40,16 @@ public class Install1Activity extends AbstractInstallActivity {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((Boolean success) -> {
-                        Toast.makeText(this, success ? getString(R.string.success_install) : getString(R.string.failed_install), Toast.LENGTH_SHORT).show();
-                        if (istemp) {
-                            deleteSingleFile(apkFile);
-                        }
+                        Toast.makeText(this, success ? String.format(getString(R.string.success_install), apkinfo[0]) : String.format(getString(R.string.failed_install0), apkinfo[0]), Toast.LENGTH_SHORT).show();
+                        deleteCache();
                         if (success && show_notification) {
                             Intent intent = new Intent();
                             intent.setComponent(new ComponentName(getPackageName(), getPackageName() + ".activity.NotifyActivity"));
-                            Log.e("packagename", apkinfo[0]);
+                            Log.e("packagename", apkinfo[1]);
                             intent.putExtra("channelId", "1");
                             intent.putExtra("channelName", getString(R.string.name_install1));
-                            intent.putExtra("packageName", apkinfo[0]);
-                            intent.putExtra("packageLable", apkinfo[1]);
+                            intent.putExtra("packageName", apkinfo[1]);
+                            intent.putExtra("packageLable", apkinfo[0]);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);
                         }
@@ -60,9 +57,23 @@ public class Install1Activity extends AbstractInstallActivity {
 
             finish();
         } else {
-            showToast(getString(R.string.failed_read));
+            showToast0(getString(R.string.failed_read));
             finish();
         }
+    }
+
+    @Override
+    protected void startUninstall(String pkgname) {
+        Log.d("Start uninstall", pkgname);
+        showToast0(String.format(getString(R.string.start_uninstall), packageLable));
+        disposeSafety();
+
+        mSubscribe = Single.fromCallable(() -> IceBox.uninstallPackage(this, pkgname))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((Boolean success) -> Toast.makeText(this, success ? String.format(getString(R.string.success_uninstall), packageLable) : String.format(getString(R.string.failed_uninstall0), packageLable), Toast.LENGTH_SHORT).show(), Throwable::printStackTrace);
+        finish();
+
     }
 
 

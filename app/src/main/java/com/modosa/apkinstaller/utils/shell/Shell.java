@@ -16,8 +16,10 @@ public interface Shell {
 
     Result exec(Command command, InputStream inputPipe);
 
+    String makeLiteral(String arg);
+
     class Command {
-        final ArrayList<String> mArgs = new ArrayList<>();
+        private final ArrayList<String> mArgs = new ArrayList<>();
 
         public Command(String command, String... args) {
             mArgs.add(command);
@@ -41,13 +43,7 @@ public interface Shell {
 
             for (int i = 0; i < mArgs.size(); i++) {
                 String arg = mArgs.get(i);
-
-                if (arg.contains(" ")) {
-                    sb.append('"').append(arg).append('"');
-                } else {
-                    sb.append(arg);
-                }
-
+                sb.append(arg);
                 if (i < mArgs.size() - 1) {
                     sb.append(" ");
                 }
@@ -56,12 +52,28 @@ public interface Shell {
             return sb.toString();
         }
 
+        public static class Builder {
+            private final Command mCommand;
+
+            Builder(String command, String... args) {
+                mCommand = new Command(command, args);
+            }
+
+            public Builder addArg(String argument) {
+                mCommand.mArgs.add(argument);
+                return this;
+            }
+
+            Command build() {
+                return mCommand;
+            }
+        }
     }
 
     class Result {
+        public final int exitCode;
         public final String out;
-        final int exitCode;
-        final String err;
+        public final String err;
         final Command cmd;
 
         Result(Command cmd, int exitCode, String out, String err) {

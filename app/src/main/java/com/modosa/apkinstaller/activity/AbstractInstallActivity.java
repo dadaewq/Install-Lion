@@ -1,114 +1,333 @@
 package com.modosa.apkinstaller.activity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
+import android.view.View;
+import android.widget.CheckBox;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.modosa.apkinstaller.R;
+import com.modosa.apkinstaller.utils.ApplicationLabelUtils;
+import com.modosa.apkinstaller.utils.FileSizeUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
+import java.util.Objects;
 
 
 /**
  * @author dadaewq
  */
 public abstract class AbstractInstallActivity extends Activity {
+    private static final String ILLEGALPKGNAME = "IL^&IllegalPN*@!128`+=：:,.[";
     private final String[] permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
-    boolean istemp = false;
+    private final String nl = System.getProperty("line.separator");
+    String packageLable;
     String[] apkinfo;
+    StringBuilder alertDialogMessage;
+    File apkFile;
     boolean show_notification;
+    private boolean istemp = false;
+    private String[] source;
     private Uri uri;
     private boolean needrequest;
+    private SharedPreferences sourceSp;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private AlertDialog alertDialog;
     private String cachePath;
-
+    private String pkgname;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        String action = getIntent().getAction();
+        if (Intent.ACTION_DELETE.equals(action) || Intent.ACTION_UNINSTALL_PACKAGE.equals(action)) {
+            pkgname = Objects.requireNonNull(getIntent().getData()).getEncodedSchemeSpecificPart();
+            if (pkgname == null) {
+                showToast0(getString(R.string.failed_prase));
+                finish();
+            } else {
+                initUninstall();
+            }
+        } else {
+            uri = getIntent().getData();
 
-        uri = getIntent().getData();
+            assert uri != null;
+            needrequest = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) && (ContentResolver.SCHEME_FILE.equals(uri.getScheme()));
 
-        assert uri != null;
-        needrequest = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) && (ContentResolver.SCHEME_FILE.equals(uri.getScheme()));
+            sourceSp = getSharedPreferences("allowsource", Context.MODE_PRIVATE);
+            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            if (needrequest) {
+                if (checkPermission()) {
+                    needrequest = false;
+                    initInstall();
+                } else {
+                    requestPermission();
+                }
+            } else {
+                initInstall();
+            }
+        }
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        show_notification = sharedPreferences.getBoolean("show_notification", false);
+    }
 
-        init();
+    private String[] getExistedVersion(String pkgname) {
+        PackageManager pm = getPackageManager();
+        ApplicationInfo applicationInfo = null;
+        try {
+            applicationInfo = pm.getApplicationInfo(pkgname, 0);
+        } catch (Exception ignore) {
+        }
+        if (applicationInfo == null) {
+            return null;
+        } else {
+            String apkPath = applicationInfo.sourceDir;
+            PackageInfo pkgInfo = pm.getPackageArchiveInfo(apkPath, PackageManager.GET_ACTIVITIES);
+            if (pkgInfo != null) {
+                pkgInfo.applicationInfo.sourceDir = apkPath;
+                pkgInfo.applicationInfo.publicSourceDir = apkPath;
+                return new String[]{pkgInfo.versionName,
+                        Build.VERSION.SDK_INT < Build.VERSION_CODES.P ? Integer.toString(pkgInfo.versionCode) : Long.toString(pkgInfo.getLongVersionCode())};
+            } else {
+                return null;
+            }
+        }
+
+    }
+
+    private void initUninstall() {
+        String[] version = getExistedVersion(pkgname);
+
+        packageLable = ApplicationLabelUtils.getApplicationLabel(this, null, null, pkgname);
+        if (ApplicationLabelUtils.UNINSTALLED.equals(packageLable)) {
+            packageLable = "Uninstalled";
+        }
+        alertDialogMessage = new StringBuilder();
+        alertDialogMessage
+                .append(
+                        String.format(
+                                getString(R.string.message_name),
+                                packageLable
+                        )
+                )
+                .append(nl)
+                .append(
+                        String.format(
+                                getString(R.string.message_packagename),
+                                pkgname
+                        )
+                )
+                .append(nl);
+
+        if (version != null) {
+            alertDialogMessage.append(String.format(
+                    getString(R.string.message_version),
+                    version[0],
+                    version[1])
+            )
+                    .append(nl);
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.dialog_uninstall_title));
+        builder.setMessage(alertDialogMessage + nl + nl + getString(R.string.message_uninstalConfirm));
+        builder.setPositiveButton(android.R.string.yes, (dialogInterface, i) -> {
+            startUninstall(pkgname);
+            finish();
+        });
+        builder.setNegativeButton(android.R.string.no, (dialogInterface, i) -> finish());
+        alertDialog = builder.show();
+        alertDialog.setOnCancelListener(dialog -> finish());
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(20);
+        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(20);
 
     }
 
 
-    private void init() {
+    private void initInstall() {
+        source = checkInstallSource();
         boolean needconfirm = sharedPreferences.getBoolean("needconfirm", true);
+        show_notification = sharedPreferences.getBoolean("show_notification", false);
+        boolean allowsource = sourceSp.getBoolean(source[0], false);
         String apkPath = preInstall();
-        apkinfo = getApkPkgInfo(apkPath);
         cachePath = apkPath;
-        if (needconfirm) {
-            Context context = new ContextThemeWrapper(this, android.R.style.Theme_DeviceDefault_Dialog);
-            CharSequence[] items = new CharSequence[]{getString(R.string.items)};
-            boolean[] checkedItems = {false};
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            if (apkinfo == null) {
-                builder.setTitle(getString(R.string.dialog_install_title));
+        if (apkPath == null) {
+            showToast0(getString(R.string.failed_prase));
+            finish();
+        } else if (needconfirm) {
+            if (!source[1].equals(ILLEGALPKGNAME) && allowsource) {
+                startInstall(apkPath);
+                finish();
             } else {
-                builder.setTitle(getString(R.string.dialog_install_title) + " " + apkinfo[1]);
-            }
 
+                String[] version = getExistedVersion(apkinfo[1]);
 
-            builder.setMultiChoiceItems(items, checkedItems, (dialogInterface, i, b) -> {
-                if (b) {
-                    editor = sharedPreferences.edit();
-                    editor.putBoolean("needconfirm", false);
-                    editor.apply();
-                } else {
-                    editor = sharedPreferences.edit();
-                    editor.putBoolean("needconfirm", true);
-                    editor.apply();
+                alertDialogMessage = new StringBuilder();
+                alertDialogMessage
+                        .append(nl)
+                        .append(
+                                String.format(
+                                        getString(R.string.message_name),
+                                        apkinfo[0]
+                                )
+                        )
+                        .append(nl)
+                        .append(
+                                String.format(
+                                        getString(R.string.message_packagename),
+                                        apkinfo[1]
+                                )
+                        )
+                        .append(nl)
+                        .append(
+                                String.format(
+                                        getString(R.string.message_version),
+                                        apkinfo[2],
+                                        apkinfo[3]
+                                )
+                        )
+                        .append(nl);
+
+                if (version != null) {
+                    alertDialogMessage.append(
+                            String.format(
+                                    getString(R.string.message_version_existed),
+                                    version[0],
+                                    version[1]
+                            )
+                    )
+                            .append(nl);
                 }
-            });
-            builder.setPositiveButton(android.R.string.yes, (dialog, which) -> {
-                cachePath = null;
-                AbstractInstallActivity.this.startInstall(apkPath);
-                AbstractInstallActivity.this.finish();
-            });
-            builder.setNegativeButton(android.R.string.no, (dialog, which) -> finish());
-            builder.setCancelable(false);
-            alertDialog = builder.show();
 
+                alertDialogMessage
+                        .append(
+                                String.format(
+                                        getString(R.string.message_size),
+                                        apkinfo[4]
+                                )
+                        )
+                        .append(nl);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(getString(R.string.dialog_install_title));
+
+                builder.setMessage(alertDialogMessage);
+                View checkBoxView = View.inflate(this, R.layout.confirm_checkbox, null);
+                builder.setView(checkBoxView);
+                CheckBox checkBox = checkBoxView.findViewById(R.id.confirm_checkbox);
+                if (source[1].equals(ILLEGALPKGNAME)) {
+                    checkBox.setText(getString(R.string.installsource_unkonwn));
+                    checkBox.setEnabled(false);
+                } else {
+                    checkBox.setText(String.format(getString(R.string.always_allow), source[1]));
+                }
+
+
+                checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    if (isChecked) {
+                        editor = sourceSp.edit();
+                        editor.putBoolean(source[0], true);
+                        editor.apply();
+                    } else {
+                        editor = sourceSp.edit();
+                        editor.putBoolean(source[0], false);
+                        editor.apply();
+                    }
+                });
+                builder.setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                    cachePath = null;
+                    startInstall(apkPath);
+                    finish();
+                });
+                builder.setNegativeButton(android.R.string.no, (dialog, which) -> finish());
+
+
+                builder.setCancelable(false);
+                alertDialog = builder.show();
+                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(20);
+                alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(20);
+            }
         } else {
             startInstall(apkPath);
             finish();
         }
     }
 
+    private String reflectGetReferrer() {
+        try {
+            Class activityClass = Class.forName("android.app.Activity");
+
+            Field refererField = activityClass.getDeclaredField("mReferrer");
+            refererField.setAccessible(true);
+            return (String) refererField.get(this);
+        } catch (ClassNotFoundException | IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private String[] checkInstallSource() {
+        final String fromPkgLabel;
+        final String fromPkgName;
+
+        String referrer = reflectGetReferrer();
+        if (referrer != null) {
+            fromPkgName = referrer;
+        } else {
+            Uri referrerUri = getReferrer();
+            if (referrerUri == null || !"android-app".equals(referrerUri.getScheme())) {
+                fromPkgLabel = ILLEGALPKGNAME;
+                fromPkgName = ILLEGALPKGNAME;
+                return new String[]{fromPkgName, fromPkgLabel};
+            } else {
+                fromPkgName = referrerUri.getEncodedSchemeSpecificPart().substring(2);
+            }
+        }
+        String refererPackageLabel =
+                ApplicationLabelUtils.getApplicationLabel(this, null, null, fromPkgName);
+        if (ApplicationLabelUtils.UNINSTALLED.equals(refererPackageLabel)) {
+            fromPkgLabel = ILLEGALPKGNAME;
+        } else {
+            fromPkgLabel = refererPackageLabel;
+        }
+        return new String[]{fromPkgName, fromPkgLabel};
+    }
+
     @Override
     public void onResume() {
         super.onResume();
         if (needrequest) {
-            confirmPermission();
+            if (checkPermission()) {
+                initInstall();
+            } else {
+                requestPermission();
+            }
         }
     }
 
@@ -118,46 +337,86 @@ public abstract class AbstractInstallActivity extends Activity {
         if (istemp && (cachePath != null)) {
             deleteSingleFile(new File(cachePath));
         }
-        alertDialog.dismiss();
-    }
+        if (alertDialog != null) {
+            alertDialog.dismiss();
+        }
 
+    }
 
     private String preInstall() {
         String apkPath = null;
         if (uri != null) {
             Log.e("--getData--", uri + "");
             if (ContentResolver.SCHEME_FILE.equals(uri.getScheme())) {
-                confirmPermission();
                 apkPath = uri.getPath();
             } else if (ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())) {
                 apkPath = createApkFromUri(this);
             } else {
-                showToast(getString(R.string.failed_prase));
+                showToast0(getString(R.string.failed_prase));
+                finish();
             }
-            return apkPath;
+            apkinfo = getApkPkgInfo(apkPath);
+            if (apkinfo != null) {
+                return apkPath;
+            } else {
+
+                if (ContentResolver.SCHEME_FILE.equals(uri.getScheme()) && apkPath != null && getExistedVersion("moe.shizuku.redirectstorage") != null) {
+                    return checkSR(apkPath);
+                } else {
+                    return null;
+                }
+
+            }
         } else {
             finish();
-            return "";
+            return null;
+        }
+    }
+
+    private String checkSR(@NonNull String apkPath) {
+        String prefix = Environment.getExternalStorageDirectory().getAbsolutePath();
+        if (apkPath.startsWith(prefix)) {
+            StringBuilder stringBuilder = new StringBuilder(apkPath);
+            @SuppressLint("SdCardPath") String toInsert = "/Android/data/" + source[0] + "/sdcard";
+            stringBuilder.insert(prefix.length(), toInsert);
+            apkPath = stringBuilder.toString();
+            Log.e("SRnewpath", apkPath);
+            apkinfo = getApkPkgInfo(apkPath);
+            if (apkinfo != null) {
+                return apkPath;
+            } else {
+                return null;
+            }
+        } else {
+            return null;
         }
     }
 
     protected abstract void startInstall(String apkPath);
 
+    protected abstract void startUninstall(String pkgname);
+
     private void requestPermission() {
         ActivityCompat.requestPermissions(this, permissions, 0x233);
     }
 
-    private void confirmPermission() {
+    private boolean checkPermission() {
         int permissionRead = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-        boolean judge = (permissionRead == 0);
-        if (!judge) {
-            requestPermission();
-        }
+        return (permissionRead == 0);
     }
 
+    void copyErr(String CMD) {
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clipData = ClipData.newPlainText(null, CMD);
+        Objects.requireNonNull(clipboard).setPrimaryClip(clipData);
+    }
 
-    void showToast(final String text) {
+    void showToast0(final String text) {
         runOnUiThread(() -> Toast.makeText(this, text, Toast.LENGTH_SHORT).show());
+    }
+
+    void showToast1(final String text) {
+        runOnUiThread(() -> Toast.makeText(this, text, Toast.LENGTH_LONG).show());
     }
 
     private String createApkFromUri(Context context) {
@@ -182,8 +441,13 @@ public abstract class AbstractInstallActivity extends Activity {
         return tempFile.getAbsolutePath();
     }
 
+    void deleteCache() {
+        if (istemp) {
+            deleteSingleFile(apkFile);
+        }
+    }
 
-    void deleteSingleFile(File file) {
+    private void deleteSingleFile(File file) {
         if (file.exists() && file.isFile()) {
             if (file.delete()) {
                 Log.e("-DELETE-", "==>" + file.getAbsolutePath() + " OK！");
@@ -195,17 +459,20 @@ public abstract class AbstractInstallActivity extends Activity {
         }
     }
 
-    String[] getApkPkgInfo(String apkPath) {
+    private String[] getApkPkgInfo(String apkPath) {
         if (apkPath == null) {
             return null;
         } else {
             PackageManager pm = this.getPackageManager();
             PackageInfo pkgInfo = pm.getPackageArchiveInfo(apkPath, PackageManager.GET_ACTIVITIES);
+
             if (pkgInfo != null) {
                 pkgInfo.applicationInfo.sourceDir = apkPath;
                 pkgInfo.applicationInfo.publicSourceDir = apkPath;
 
-                return new String[]{pkgInfo.packageName, pm.getApplicationLabel(pkgInfo.applicationInfo).toString() + "_" + pkgInfo.versionName + "(" + pkgInfo.versionCode + ")"};
+                return new String[]{pm.getApplicationLabel(pkgInfo.applicationInfo).toString(), pkgInfo.packageName, pkgInfo.versionName,
+                        Build.VERSION.SDK_INT < Build.VERSION_CODES.P ?
+                                Integer.toString(pkgInfo.versionCode) : Long.toString(pkgInfo.getLongVersionCode()), FileSizeUtils.getAutoFolderOrFileSize(apkPath)};
             }
             return null;
         }
