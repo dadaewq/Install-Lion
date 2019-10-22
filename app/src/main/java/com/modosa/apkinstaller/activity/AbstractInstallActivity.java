@@ -405,9 +405,9 @@ public abstract class AbstractInstallActivity extends Activity {
         return (permissionRead == 0);
     }
 
-    void copyErr(String CMD) {
+    void copyErr(String Err) {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clipData = ClipData.newPlainText(null, CMD);
+        ClipData clipData = ClipData.newPlainText(null, Err);
         Objects.requireNonNull(clipboard).setPrimaryClip(clipData);
     }
 
