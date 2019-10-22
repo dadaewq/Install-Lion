@@ -1,6 +1,5 @@
 package com.modosa.apkinstaller.utils.apksource;
 
-
 import com.modosa.apkinstaller.utils.filedescriptor.FileDescriptor;
 
 import java.io.InputStream;
@@ -35,8 +34,4 @@ public class DefaultApkSource implements ApkSource {
         return mCurrentApk.length();
     }
 
-    @Override
-    public String getApkName() {
-        return mCurrentApk.name();
-    }
 }

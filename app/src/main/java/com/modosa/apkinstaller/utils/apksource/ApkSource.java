@@ -10,8 +10,6 @@ public interface ApkSource extends AutoCloseable {
 
     long getApkLength();
 
-    String getApkName();
-
     @Override
     default void close() {
 

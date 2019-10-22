@@ -12,10 +12,6 @@ public class NormalFileDescriptor implements FileDescriptor {
         mFile = file;
     }
 
-    @Override
-    public String name() {
-        return mFile.getName();
-    }
 
     @Override
     public long length() {
