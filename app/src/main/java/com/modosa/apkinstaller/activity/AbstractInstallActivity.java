@@ -259,6 +259,7 @@ public abstract class AbstractInstallActivity extends Activity {
         try {
             Class activityClass = Class.forName("android.app.Activity");
 
+            //noinspection JavaReflectionMemberAccess
             Field refererField = activityClass.getDeclaredField("mReferrer");
             refererField.setAccessible(true);
             return (String) refererField.get(this);
@@ -381,9 +382,9 @@ public abstract class AbstractInstallActivity extends Activity {
         return (permissionRead == 0);
     }
 
-    void copyErr(String Err) {
+    void copyErr(String err) {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clipData = ClipData.newPlainText(null, Err);
+        ClipData clipData = ClipData.newPlainText(null, err);
         Objects.requireNonNull(clipboard).setPrimaryClip(clipData);
     }
 
