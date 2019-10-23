@@ -47,7 +47,7 @@
     <string name="dialog_title">隐藏图标并退出应用</string>
     <string name="hide_tip">隐藏后可以通过系统应用设置-管理空间-打开设置</string>
     <string name="enable_title">启用安装器</string>
-    <string name="click_run">点击打开应用</string>
+    <string name="click_run"> 点击打开应用, %1$s</string>
     <string name="show_title">显示通知</string>
     <string name="show_tip">安装结束后显示通知，点击通知可打开应用</string>
     <string name="confirm_title">安装前确认(全局开关)</string>

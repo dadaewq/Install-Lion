@@ -7,11 +7,13 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import androidx.core.app.NotificationCompat;
 
 import com.modosa.apkinstaller.R;
+import com.modosa.apkinstaller.utils.AppInfoUtils;
 
 /**
  * @author dadaewq
@@ -20,7 +22,10 @@ public class NotifyActivity extends Activity {
     private String packageLable;
     private String channelId;
     private String channelName;
+    private String versionName = "";
     private NotificationManager notificationManager;
+    private Bitmap LargeIcon;
+    private boolean avLaunch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,16 +33,24 @@ public class NotifyActivity extends Activity {
 
         channelId = getIntent().getStringExtra("channelId");
         channelName = getIntent().getStringExtra("channelName");
-        String packageName = getIntent().getStringExtra("packageName");
         packageLable = getIntent().getStringExtra("packageLable");
+        String packageName = getIntent().getStringExtra("packageName");
 
+        LargeIcon = AppInfoUtils.getApplicationIcon(this, packageName);
+
+        String[] version = AppInfoUtils.getApplicationVersion(this, packageName);
+        if (version != null) {
+            versionName = version[0];
+        }
+
+//        //如果使用 AppInfoUtils.getApkIcon()在InstallActivity用Bundle传LargeIcon
+//        LargeIcon = getIntent().getParcelableExtra("LargeIcon");
 
         int id = (int) System.currentTimeMillis();
 
-
         PendingIntent clickIntent = getContentIntent(this, id, packageName);
-        notifyLiveStart(this, clickIntent, id);
 
+        notifyLiveStart(this, clickIntent, id);
         finish();
 
     }
@@ -65,22 +78,30 @@ public class NotifyActivity extends Activity {
             notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         }
 
-        Notification notification = new NotificationCompat.Builder(context, channelId)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
                 //设置通知栏标题
                 .setContentTitle(String.format(getString(R.string.install_over), packageLable))
-                //设置通知栏显示内容
-                .setContentText(getString(R.string.click_run))
                 //通知产生的时间，会在通知信息里显示
                 .setWhen(System.currentTimeMillis())
                 //设置小图标（通知栏没有下拉的图标）
-                .setSmallIcon(android.R.mipmap.sym_def_app_icon)
-                //设置右侧大图标
-//                .setLargeIcon(BitmapFactory.decodeResource(getResources(),
-//                        R.drawable.ic_launcher_background))
-                //设置点击通知后自动删除通知
+                .setSmallIcon(R.drawable.ic_filter_vintage_black_24dp)
                 .setAutoCancel(true)
-                .setContentIntent(intent)
-                .build();
+                .setContentIntent(intent);
+
+        if (avLaunch) {
+            //设置通知栏显示内容
+            builder.setContentText(String.format(getString(R.string.click_run), versionName));
+        } else {
+            builder.setContentText(versionName);
+        }
+
+        if (LargeIcon != null) {
+            //设置右侧大图标
+            builder.setLargeIcon(LargeIcon);
+        }
+        //设置点击通知后自动删除通知
+
+        Notification notification = builder.build();
 //        .setPriority(Notification.PRIORITY_DEFAULT) //设置该通知优先级
 //
 //        .setAutoCancel(true)//设置这个标志当用户单击面板就可以让通知将自动取消
@@ -97,10 +118,12 @@ public class NotifyActivity extends Activity {
     private PendingIntent getContentIntent(Activity context, int id, String packageName) {
 
         try {
+            avLaunch = true;
             Intent intent = getPackageManager().getLaunchIntentForPackage(packageName);
-
             return PendingIntent.getActivity(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         } catch (Exception e) {
+            avLaunch = false;
+            e.printStackTrace();
             return null;
         }
 

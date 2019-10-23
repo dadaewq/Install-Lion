@@ -13,7 +13,7 @@ import java.text.DecimalFormat;
  * @
  * @modifiedFrom https://github.com/haiyuKing/FileSizeUtilDemo/blob/master/app/src/main/java/com/why/project/filesizeutildemo/utils/FileSizeUtil.java
  */
-public class FileSizeUtils {
+class FileSizeUtils {
 
     private static final int SIZETYPE_B = 1;//获取文件大小单位为B的double值
     private static final int SIZETYPE_KB = 2;//获取文件大小单位为KB的double值
@@ -49,7 +49,7 @@ public class FileSizeUtils {
      * @param filePath 文件路径
      * @return 计算好的带B、KB、MB、GB的字符串
      */
-    public static String getAutoFolderOrFileSize(String filePath) {
+    static String getAutoFolderOrFileSize(String filePath) {
         File file = new File(filePath);
         long blockSize = 0;
         try {

@@ -59,15 +59,15 @@ public class Install3Activity extends AbstractInstallActivity implements SAIPack
 
 
     @Override
-    protected void startUninstall(String pkgname) {
-        Log.d("Start uninstall", pkgname);
+    protected void startUninstall(String pkgName) {
+        Log.d("Start uninstall", pkgName);
         new Thread(() -> {
             Looper.prepare();
             if (!ShizukuShell.getInstance().isAvailable()) {
                 copyErr(String.format("%s\n\n%s\n%s", getString(R.string.dialog_uninstall_title), alertDialogMessage, getString(R.string.installer_error_shizuku_unavailable)));
                 showToast1(String.format(getString(R.string.failed_uninstall), packageLable, getString(R.string.installer_error_shizuku_unavailable)));
             } else {
-                Shell.Result uninstallationResult = ShizukuShell.getInstance().exec(new Shell.Command("pm", "uninstall", pkgname));
+                Shell.Result uninstallationResult = ShizukuShell.getInstance().exec(new Shell.Command("pm", "uninstall", pkgName));
                 if (0 == uninstallationResult.exitCode) {
                     showToast0(String.format(getString(R.string.success_uninstall), packageLable));
                 } else {
@@ -113,15 +113,14 @@ public class Install3Activity extends AbstractInstallActivity implements SAIPack
                 deleteCache();
                 showToast0(String.format(getString(R.string.success_install), apkinfo[0]));
                 if (show_notification) {
-                    Intent intent = new Intent();
-                    intent.setComponent(new ComponentName(getPackageName(), getPackageName() + ".activity.NotifyActivity"));
                     Log.e("packagename", apkinfo[1]);
-
-                    intent.putExtra("channelId", "3");
-                    intent.putExtra("channelName", getString(R.string.name_install3));
-                    intent.putExtra("packageName", apkinfo[1]);
-                    intent.putExtra("packageLable", apkinfo[0]);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    Intent intent = new Intent()
+                            .setComponent(new ComponentName(getPackageName(), getPackageName() + ".activity.NotifyActivity"))
+                            .putExtra("channelId", "3")
+                            .putExtra("channelName", getString(R.string.name_install3))
+                            .putExtra("packageName", apkinfo[1])
+                            .putExtra("packageLable", apkinfo[0])
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 }
                 break;

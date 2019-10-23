@@ -43,14 +43,14 @@ public class Install1Activity extends AbstractInstallActivity {
                         Toast.makeText(this, success ? String.format(getString(R.string.success_install), apkinfo[0]) : String.format(getString(R.string.failed_install0), apkinfo[0]), Toast.LENGTH_SHORT).show();
                         deleteCache();
                         if (success && show_notification) {
-                            Intent intent = new Intent();
-                            intent.setComponent(new ComponentName(getPackageName(), getPackageName() + ".activity.NotifyActivity"));
                             Log.e("packagename", apkinfo[1]);
-                            intent.putExtra("channelId", "1");
-                            intent.putExtra("channelName", getString(R.string.name_install1));
-                            intent.putExtra("packageName", apkinfo[1]);
-                            intent.putExtra("packageLable", apkinfo[0]);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            Intent intent = new Intent()
+                                    .setComponent(new ComponentName(getPackageName(), getPackageName() + ".activity.NotifyActivity"))
+                                    .putExtra("channelId", "1")
+                                    .putExtra("channelName", getString(R.string.name_install1))
+                                    .putExtra("packageName", apkinfo[1])
+                                    .putExtra("packageLable", apkinfo[0])
+                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);
                         }
                     }, Throwable::printStackTrace);
@@ -63,12 +63,12 @@ public class Install1Activity extends AbstractInstallActivity {
     }
 
     @Override
-    protected void startUninstall(String pkgname) {
-        Log.d("Start uninstall", pkgname);
+    protected void startUninstall(String pkgName) {
+        Log.d("Start uninstall", pkgName);
         showToast0(String.format(getString(R.string.start_uninstall), packageLable));
         disposeSafety();
 
-        mSubscribe = Single.fromCallable(() -> IceBox.uninstallPackage(this, pkgname))
+        mSubscribe = Single.fromCallable(() -> IceBox.uninstallPackage(this, pkgName))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((Boolean success) -> Toast.makeText(this, success ? String.format(getString(R.string.success_uninstall), packageLable) : String.format(getString(R.string.failed_uninstall0), packageLable), Toast.LENGTH_SHORT).show(), Throwable::printStackTrace);

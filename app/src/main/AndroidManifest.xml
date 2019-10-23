@@ -6,7 +6,6 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.catchingnow.icebox.SDK" />
     <uses-permission android:name="com.catchingnow.icebox.STATE" />
-    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
@@ -31,7 +30,9 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-
+            <intent-filter>
+                <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
+            </intent-filter>
         </activity>
         <activity-alias
             android:name=".activity.MainActivity"

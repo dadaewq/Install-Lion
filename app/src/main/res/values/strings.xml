@@ -47,7 +47,7 @@
     <string name="dialog_title">Hidden icon in launcher and Exit</string>
     <string name="hide_tip">After hiding, you can open settings via the system application settings - manage space</string>
     <string name="enable_title">Enable installer</string>
-    <string name="click_run">Click to run the app</string>
+    <string name="click_run"> Click to run the app, %1$s</string>
     <string name="show_title">Show notification</string>
     <string name="show_tip">Show notification after installation\nYou can run the app by clicking the notification</string>
     <string name="confirm_title">Confirmation before installation(Global switch)</string>

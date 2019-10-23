@@ -33,15 +33,14 @@ public class Install2Activity extends AbstractInstallActivity {
                     e.printStackTrace();
                 } finally {
                     if (show_notification) {
-                        Intent intent = new Intent();
-                        intent.setComponent(new ComponentName(getPackageName(), getPackageName() + ".activity.NotifyActivity"));
                         Log.e("packagename", apkinfo[1]);
-
-                        intent.putExtra("channelId", "2");
-                        intent.putExtra("channelName", getString(R.string.name_install2));
-                        intent.putExtra("packageName", apkinfo[1]);
-                        intent.putExtra("packageLable", apkinfo[0]);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        Intent intent = new Intent()
+                                .setComponent(new ComponentName(getPackageName(), getPackageName() + ".activity.NotifyActivity"))
+                                .putExtra("channelId", "2")
+                                .putExtra("channelName", getString(R.string.name_install2))
+                                .putExtra("packageName", apkinfo[1])
+                                .putExtra("packageLable", apkinfo[0])
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                     }
                 }
@@ -56,12 +55,12 @@ public class Install2Activity extends AbstractInstallActivity {
     }
 
     @Override
-    protected void startUninstall(String pkgname) {
-        Log.d("Start uninstall", pkgname);
+    protected void startUninstall(String pkgName) {
+        Log.d("Start uninstall", pkgName);
         new Thread(() -> {
             showToast0(String.format(getString(R.string.start_uninstall), packageLable));
             try {
-                DSMClient.uninstallApp(this, pkgname);
+                DSMClient.uninstallApp(this, pkgName);
             } catch (Exception e) {
                 showToast1(e.toString());
             }
