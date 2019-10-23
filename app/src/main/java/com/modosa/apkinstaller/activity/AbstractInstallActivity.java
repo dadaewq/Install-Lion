@@ -225,15 +225,9 @@ public abstract class AbstractInstallActivity extends Activity {
 
 
                     checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                        if (isChecked) {
                             editor = sourceSp.edit();
-                            editor.putBoolean(source[0], true);
+                        editor.putBoolean(source[0], isChecked);
                             editor.apply();
-                        } else {
-                            editor = sourceSp.edit();
-                            editor.putBoolean(source[0], false);
-                            editor.apply();
-                        }
                     });
                     builder.setPositiveButton(android.R.string.yes, (dialog, which) -> {
                         cachePath = null;
