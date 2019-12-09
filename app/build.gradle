@@ -28,7 +28,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.catchingnow.icebox:SDK:1.0.5'
-    implementation 'io.reactivex.rxjava2:rxjava:2.2.9'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.13'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
     implementation 'com.github.heruoxin.Delegated-Scopes-Manager:client:-SNAPSHOT'
     implementation 'moe.shizuku.privilege:api:3.1.0-alpha1'

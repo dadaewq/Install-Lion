@@ -115,7 +115,7 @@ public abstract class ShellSAIPackageInstaller extends SAIPackageInstaller {
         } catch (PackageManager.NameNotFoundException e) {
             Log.wtf(TAG, "Unable to get SAI version", e);
         }
-        return String.format("%s: %s %s | %s | Android %s | Install Lion-Root %s", getContext().getString(R.string.installer_device), Build.BRAND, Build.MODEL, Utils.isMiui() ? "MIUI" : "Not MIUI", Build.VERSION.RELEASE, ILVersion);
+        return String.format("%s: %s %s | %s | Android %s | Install Lion %s", getContext().getString(R.string.installer_device), Build.BRAND, Build.MODEL, Utils.isMiui() ? "MIUI" : "Not MIUI", Build.VERSION.RELEASE, ILVersion);
     }
 
     private int createSession() throws RuntimeException {
