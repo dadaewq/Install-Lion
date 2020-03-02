@@ -2,14 +2,14 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 29
-    buildToolsVersion "29.0.2"
+    buildToolsVersion "29.0.3"
     defaultConfig {
         resConfig 'zh'
         applicationId "com.modosa.apkinstaller"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 18
-        versionName "2.91"
+        versionCode 19
+        versionName "3.0"
     }
     buildTypes {
         release {
@@ -30,6 +30,6 @@ dependencies {
     implementation 'com.catchingnow.icebox:SDK:1.0.5'
     implementation 'io.reactivex.rxjava2:rxjava:2.2.13'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    implementation 'com.github.heruoxin.Delegated-Scopes-Manager:client:-SNAPSHOT'
+    implementation 'com.github.heruoxin.Delegated-Scopes-Manager:client:master-SNAPSHOT'
     implementation 'moe.shizuku.privilege:api:3.1.0-alpha1'
 }
