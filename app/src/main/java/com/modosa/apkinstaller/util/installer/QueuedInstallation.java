@@ -1,6 +1,6 @@
-package com.modosa.apkinstaller.utils.installer;
+package com.modosa.apkinstaller.util.installer;
 
-import com.modosa.apkinstaller.utils.apksource.ApkSource;
+import com.modosa.apkinstaller.util.apksource.ApkSource;
 
 class QueuedInstallation {
 

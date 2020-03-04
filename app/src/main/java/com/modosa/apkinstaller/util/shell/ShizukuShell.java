@@ -1,12 +1,12 @@
-package com.modosa.apkinstaller.utils.shell;
+package com.modosa.apkinstaller.util.shell;
 
 import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.modosa.apkinstaller.utils.IOUtils;
-import com.modosa.apkinstaller.utils.Utils;
+import com.modosa.apkinstaller.util.IOUtils;
+import com.modosa.apkinstaller.util.Utils;
 
 import java.io.InputStream;
 import java.io.OutputStream;

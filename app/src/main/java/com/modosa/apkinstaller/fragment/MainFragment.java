@@ -23,7 +23,7 @@ import com.modosa.apkinstaller.R;
 import com.modosa.apkinstaller.activity.Install1Activity;
 import com.modosa.apkinstaller.activity.Install2Activity;
 import com.modosa.apkinstaller.activity.Install3Activity;
-import com.modosa.apkinstaller.utils.shell.ShizukuShell;
+import com.modosa.apkinstaller.util.shell.ShizukuShell;
 
 import java.util.List;
 import java.util.Objects;

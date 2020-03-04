@@ -1,4 +1,4 @@
-package com.modosa.apkinstaller.utils;
+package com.modosa.apkinstaller.util;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -14,7 +14,7 @@ import android.os.Build;
 import static android.content.pm.PackageManager.GET_UNINSTALLED_PACKAGES;
 import static android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES;
 
-public final class AppInfoUtils {
+public final class AppInfoUtil {
     public static final String UNINSTALLED = "IL^&UninstalledPN*@!128`+=：:,.[";
 
     public static String getApplicationLabel(Context context, String pkgName) {
@@ -94,7 +94,7 @@ public final class AppInfoUtils {
                     pm.getApplicationLabel(pkgInfo.applicationInfo).toString(),
                     pkgInfo.packageName,
                     pkgInfo.versionName,
-                    Build.VERSION.SDK_INT < Build.VERSION_CODES.P ? Integer.toString(pkgInfo.versionCode) : Long.toString(pkgInfo.getLongVersionCode()), FileSizeUtils.getAutoFolderOrFileSize(apkPath)
+                    Build.VERSION.SDK_INT < Build.VERSION_CODES.P ? Integer.toString(pkgInfo.versionCode) : Long.toString(pkgInfo.getLongVersionCode()), FileSizeUtil.getAutoFolderOrFileSize(apkPath)
             };
         } else {
             return null;

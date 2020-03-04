@@ -1,4 +1,4 @@
-package com.modosa.apkinstaller.utils.filedescriptor;
+package com.modosa.apkinstaller.util.filedescriptor;
 
 import java.io.File;
 import java.io.FileInputStream;

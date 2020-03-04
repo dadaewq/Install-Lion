@@ -11,13 +11,13 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.modosa.apkinstaller.R;
-import com.modosa.apkinstaller.utils.Utils;
-import com.modosa.apkinstaller.utils.apksource.ApkSource;
-import com.modosa.apkinstaller.utils.installer.ApkSourceBuilder;
-import com.modosa.apkinstaller.utils.installer.SAIPackageInstaller;
-import com.modosa.apkinstaller.utils.installer.shizuku.ShizukuSAIPackageInstaller;
-import com.modosa.apkinstaller.utils.shell.Shell;
-import com.modosa.apkinstaller.utils.shell.ShizukuShell;
+import com.modosa.apkinstaller.util.Utils;
+import com.modosa.apkinstaller.util.apksource.ApkSource;
+import com.modosa.apkinstaller.util.installer.ApkSourceBuilder;
+import com.modosa.apkinstaller.util.installer.SAIPackageInstaller;
+import com.modosa.apkinstaller.util.installer.shizuku.ShizukuSAIPackageInstaller;
+import com.modosa.apkinstaller.util.shell.Shell;
+import com.modosa.apkinstaller.util.shell.ShizukuShell;
 
 import java.io.File;
 import java.util.ArrayList;

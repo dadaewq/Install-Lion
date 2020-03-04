@@ -1,11 +1,11 @@
-package com.modosa.apkinstaller.utils.installer.shizuku;
+package com.modosa.apkinstaller.util.installer.shizuku;
 
 import android.content.Context;
 
 import com.modosa.apkinstaller.R;
-import com.modosa.apkinstaller.utils.installer.ShellSAIPackageInstaller;
-import com.modosa.apkinstaller.utils.shell.Shell;
-import com.modosa.apkinstaller.utils.shell.ShizukuShell;
+import com.modosa.apkinstaller.util.installer.ShellSAIPackageInstaller;
+import com.modosa.apkinstaller.util.shell.Shell;
+import com.modosa.apkinstaller.util.shell.ShizukuShell;
 
 public class ShizukuSAIPackageInstaller extends ShellSAIPackageInstaller {
     private static ShizukuSAIPackageInstaller sInstance;

@@ -13,7 +13,7 @@ import android.os.Bundle;
 import androidx.core.app.NotificationCompat;
 
 import com.modosa.apkinstaller.R;
-import com.modosa.apkinstaller.utils.AppInfoUtils;
+import com.modosa.apkinstaller.util.AppInfoUtil;
 
 /**
  * @author dadaewq
@@ -36,9 +36,9 @@ public class NotifyActivity extends Activity {
         packageLable = getIntent().getStringExtra("packageLable");
         String packageName = getIntent().getStringExtra("packageName");
 
-        LargeIcon = AppInfoUtils.getApplicationIcon(this, packageName);
+        LargeIcon = AppInfoUtil.getApplicationIcon(this, packageName);
 
-        String[] version = AppInfoUtils.getApplicationVersion(this, packageName);
+        String[] version = AppInfoUtil.getApplicationVersion(this, packageName);
         if (version != null) {
             versionName = version[0];
         }

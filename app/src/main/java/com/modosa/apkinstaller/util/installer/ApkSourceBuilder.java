@@ -1,9 +1,9 @@
-package com.modosa.apkinstaller.utils.installer;
+package com.modosa.apkinstaller.util.installer;
 
-import com.modosa.apkinstaller.utils.apksource.ApkSource;
-import com.modosa.apkinstaller.utils.apksource.DefaultApkSource;
-import com.modosa.apkinstaller.utils.filedescriptor.FileDescriptor;
-import com.modosa.apkinstaller.utils.filedescriptor.NormalFileDescriptor;
+import com.modosa.apkinstaller.util.apksource.ApkSource;
+import com.modosa.apkinstaller.util.apksource.DefaultApkSource;
+import com.modosa.apkinstaller.util.filedescriptor.FileDescriptor;
+import com.modosa.apkinstaller.util.filedescriptor.NormalFileDescriptor;
 
 import java.io.File;
 import java.util.ArrayList;

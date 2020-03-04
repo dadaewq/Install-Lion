@@ -1,4 +1,4 @@
-package com.modosa.apkinstaller.utils;
+package com.modosa.apkinstaller.util;
 
 import android.util.Log;
 

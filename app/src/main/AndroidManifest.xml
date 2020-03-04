@@ -140,7 +140,8 @@
             android:enabled="true"
             android:label="@string/launch_name"
             android:launchMode="singleTop"
-            android:noHistory="true">
+            android:noHistory="true"
+            android:theme="@style/Translucent">
             <intent-filter>
                 <action android:name="android.intent.action.SHOW_APP_INFO" />
 

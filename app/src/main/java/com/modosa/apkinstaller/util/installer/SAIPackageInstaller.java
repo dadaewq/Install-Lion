@@ -1,4 +1,4 @@
-package com.modosa.apkinstaller.utils.installer;
+package com.modosa.apkinstaller.util.installer;
 
 import android.content.Context;
 import android.os.Handler;
@@ -8,7 +8,7 @@ import android.util.LongSparseArray;
 
 import androidx.annotation.Nullable;
 
-import com.modosa.apkinstaller.utils.apksource.ApkSource;
+import com.modosa.apkinstaller.util.apksource.ApkSource;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
