@@ -30,7 +30,7 @@ public class PraseContentUtil {
     private static String uriPath;
     private static String authority;
     private static String SDCARD;
-    private static String getExternalStoragePublicDirectory;
+    private static String getExternalStorageDirectory;
     private static String getExternalRootDir;
     private static String getExternalFilesDir;
     private static String getExternalCacheDir;
@@ -223,7 +223,7 @@ public class PraseContentUtil {
             uriPath = uri.getPath();
             authority = uri.getAuthority();
             //"/storage/emulated/0"
-            getExternalStoragePublicDirectory = Environment.getExternalStoragePublicDirectory("").getPath();
+            getExternalStorageDirectory = Environment.getExternalStorageDirectory().getPath();
             SDCARD = "/sdcard";
             getExternalRootDir = "/Android/data/" + referrer;
             getExternalFilesDir = "/Android/data/" + referrer + "/files";
@@ -266,7 +266,7 @@ public class PraseContentUtil {
         switch (authority) {
             case "com.taptap.fileprovider":
                 if ("downloads_external".equals(getfirstPathSegment)) {
-                    path = getExternalStoragePublicDirectory + getExternalFilesDir + "/Download" + getPathExcludeFirstPathSegment;
+                    path = getExternalStorageDirectory + getExternalFilesDir + "/Download" + getPathExcludeFirstPathSegment;
                 }
             case "com.coolapk.market.fileprovider":
                 switch (getfirstPathSegment) {
@@ -275,38 +275,38 @@ public class PraseContentUtil {
                         //content://com.coolapk.market.fileprovider/files_root/files/Download/file.apk
 
                         //删索引0路径段和其前面的"/",前面加"/storage/emulated/0"+"/Android/data/com.referrer"
-                        path = getExternalStoragePublicDirectory + getExternalRootDir + getPathExcludeFirstPathSegment;
+                        path = getExternalStorageDirectory + getExternalRootDir + getPathExcludeFirstPathSegment;
                         break;
                     case "external_files_path":
                         //content://com.coolapk.market.fileprovider/external_files_path/file.apk
                         //content://com.coolapk.market.fileprovider/external_files_path/files/Download/file.apk
 
                         //删索引0路径段和其前面的"/",前面加"/storage/emulated/0"+"/Android/data/com.referrer/files"+"/Download"
-                        path = getExternalStoragePublicDirectory + getExternalFilesDir + "/Download" + getPathExcludeFirstPathSegment;
+                        path = getExternalStorageDirectory + getExternalFilesDir + "/Download" + getPathExcludeFirstPathSegment;
                         break;
                     case "gdt_sdk_download_path":
                         //content://com.coolapk.market.fileprovider/gdt_sdk_download_path/file.apk
 
                         //删索引0路径段和其前面的"/",前面加"/storage/emulated/0"+"/GDTDOWNLOAD"
-                        path = getExternalStoragePublicDirectory + "/GDTDOWNLOAD" + getPathExcludeFirstPathSegment;
+                        path = getExternalStorageDirectory + "/GDTDOWNLOAD" + getPathExcludeFirstPathSegment;
                         break;
                     case "external_storage_root":
                         //content://com.coolapk.market.fileprovider/external_storage_root/6/file.apk
 
                         //删索引0路径段和其前面的"/",前面加"/storage/emulated/0"
-                        path = getExternalStoragePublicDirectory + getPathExcludeFirstPathSegment;
+                        path = getExternalStorageDirectory + getPathExcludeFirstPathSegment;
                         break;
                     default:
                 }
                 pathList.add(path);
 
                 //删索引0路径段和其前面的"/",前面加"/storage/emulated/0"+"/Android/data/com.referrer/sdcard"
-                path = getExternalStoragePublicDirectory + getStorageIsolationDir + getPathExcludeFirstPathSegment;
+                path = getExternalStorageDirectory + getStorageIsolationDir + getPathExcludeFirstPathSegment;
                 pathList.add(path);
 
 
                 //删索引0路径段和其前面的"/",前面加"/storage/emulated/0"+"/Android/data/com.referrer/sdcard"+"/GDTDOWNLOAD"
-                path = getExternalStoragePublicDirectory + getStorageIsolationDir + "/GDTDOWNLOAD" + getPathExcludeFirstPathSegment;
+                path = getExternalStorageDirectory + getStorageIsolationDir + "/GDTDOWNLOAD" + getPathExcludeFirstPathSegment;
                 pathList.add(path);
 
                 break;
@@ -317,20 +317,20 @@ public class PraseContentUtil {
                         //content://com.coolapk.market.vn.fileProvider/files_root/files/Download/file.apk
 
                         //删索引0路径段和其前面的"/",前面加"/storage/emulated/0"+"/Android/data/com.referrer"
-                        path = getExternalStoragePublicDirectory + getExternalRootDir + getPathExcludeFirstPathSegment;
+                        path = getExternalStorageDirectory + getExternalRootDir + getPathExcludeFirstPathSegment;
                         break;
                     case "external_storage_root":
                         //content://com.coolapk.market.vn.fileProvider/external_storage_root/6/file.apk
 
                         //删索引0路径段和其前面的"/",前面加"/storage/emulated/0"
-                        path = getExternalStoragePublicDirectory + getPathExcludeFirstPathSegment;
+                        path = getExternalStorageDirectory + getPathExcludeFirstPathSegment;
                         break;
                     default:
                 }
                 pathList.add(path);
 
                 //删索引0路径段和其前面的"/",前面加"/storage/emulated/0"+"/Android/data/com.referrer/sdcard"
-                path = getExternalStoragePublicDirectory + getStorageIsolationDir + getPathExcludeFirstPathSegment;
+                path = getExternalStorageDirectory + getStorageIsolationDir + getPathExcludeFirstPathSegment;
                 pathList.add(path);
 
                 break;
@@ -353,11 +353,11 @@ public class PraseContentUtil {
 //                //content://com.tencent.mm.external.fileprovider/external/tencent/MicroMsg/Download/file.apk
 //
 //                //删索引0路径段和其前面的"/",前面加"/storage/emulated/0"
-//                path = getExternalStoragePublicDirectory + getPathExcludeFirstPathSegment;
+//                path = getExternalStorageDirectory + getPathExcludeFirstPathSegment;
 //                pathList.add(path);
 //
 //                //删索引0路径段和其前面的"/",前面加"/storage/emulated/0"+"/Android/data/com.referrer/sdcard"
-//                path = getExternalStoragePublicDirectory + getStorageIsolationDir + getPathExcludeFirstPathSegment;
+//                path = getExternalStorageDirectory + getStorageIsolationDir + getPathExcludeFirstPathSegment;
 //                pathList.add(path);
 
 //                pathList = getPathListAboutExternalStoragePublicDirectory();
@@ -400,16 +400,16 @@ public class PraseContentUtil {
         } else {
             ArrayList<String> pathList = new ArrayList<>();
             int size = uri.getPathSegments().size();
-            if (uriPath.startsWith(getExternalStoragePublicDirectory)) {
+            if (uriPath.startsWith(getExternalStorageDirectory)) {
                 if (size > 3) {
                     //content://in.mfile.files/storage/emulated/0/file.apk
-                    pathList = getPathListStartWith(getExternalStoragePublicDirectory, uriPath);
+                    pathList = getPathListStartWith(getExternalStorageDirectory, uriPath);
                 }
-            } else if (getPathExcludeFirstPathSegment.startsWith(getExternalStoragePublicDirectory)) {
+            } else if (getPathExcludeFirstPathSegment.startsWith(getExternalStorageDirectory)) {
 
                 if (size > 4) {
                     //content://com.tencent.mobileqq.fileprovider/external_files/storage/emulated/0/Tencent/QQfile_recv/file.apk
-                    pathList = getPathListStartWith(getExternalStoragePublicDirectory, getPathExcludeFirstPathSegment);
+                    pathList = getPathListStartWith(getExternalStorageDirectory, getPathExcludeFirstPathSegment);
                 }
             } else if (uriPath.startsWith(SDCARD)) {
                 if (size > 1) {
@@ -422,15 +422,15 @@ public class PraseContentUtil {
                     pathList = getPathListStartWith(SDCARD, getPathExcludeFirstPathSegment);
                 }
             } else {
-                String path0 = getExternalStoragePublicDirectory + uriPath;
-                String path1 = getExternalStoragePublicDirectory + getPathExcludeFirstPathSegment;
+                String path0 = getExternalStorageDirectory + uriPath;
+                String path1 = getExternalStorageDirectory + getPathExcludeFirstPathSegment;
                 if (size > 0) {
                     //content://com.referrer.fileprovider/file.apk
-                    pathList = getPathListStartWith(getExternalStoragePublicDirectory, path0);
+                    pathList = getPathListStartWith(getExternalStorageDirectory, path0);
                 }
                 if (size > 1) {
                     //content://com.tencent.mm.external.fileprovider/external/tencent/MicroMsg/Download/file.apk
-                    pathList.addAll(getPathListStartWith(getExternalStoragePublicDirectory, path1));
+                    pathList.addAll(getPathListStartWith(getExternalStorageDirectory, path1));
                 }
             }
             return pathList;
