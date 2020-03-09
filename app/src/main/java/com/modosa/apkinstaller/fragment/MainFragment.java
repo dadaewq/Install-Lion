@@ -173,7 +173,7 @@ public class MainFragment extends PreferenceFragmentCompat {
         if (ifsdkge26) {
             enable2.setOnPreferenceClickListener(preference -> {
                 setComponentState(context, ctInstall2, !getComponentState(context, ctInstall2));
-                enable1.setChecked(getComponentState(context, ctInstall2));
+                enable2.setChecked(getComponentState(context, ctInstall2));
                 return true;
             });
             enable2.setChecked(getComponentState(context, ctInstall2));
