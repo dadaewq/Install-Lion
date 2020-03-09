@@ -1,35 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <SwitchPreference
-        android:defaultValue="false"
-        android:key="hide_icon"
-        android:summary="@string/hide_tip"
-        android:title="@string/hide_title" />
-    <SwitchPreference
-        android:defaultValue="false"
-        android:key="show_notification"
-        android:summary="@string/show_tip"
-        android:title="@string/show_title" />
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="needconfirm"
-        android:summary="@string/confirm_tip"
-        android:title="@string/confirm_title" />
-    <PreferenceCategory android:title="@string/name_install1">
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="enable1"
-            android:summaryOff="@string/summaryOff"
-            android:summaryOn="@string/summaryOn"
-            android:title="@string/enable_title" />
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+    <SwitchPreferenceCompat
+        app:defaultValue="false"
+        app:key="show_notification"
+        app:summary="@string/show_tip"
+        app:title="@string/show_title" />
+    <SwitchPreferenceCompat
+        app:defaultValue="true"
+        app:key="needconfirm"
+        app:summary="@string/confirm_tip"
+        app:title="@string/confirm_title" />
+    <Preference
+        app:key="manualAuthorize"
+        app:summary="@string/summary_manualAuthorize"
+        app:title="@string/title_manualAuthorize" />
+    <PreferenceCategory app:title="@string/name_install1">
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="enable1"
+            app:summaryOff="@string/summaryOff"
+            app:summaryOn="@string/summaryOn"
+            app:title="@string/enable_title" />
         <Preference
-            android:key="icebox_supported"
-            android:title="冰箱支持状态" />
+            app:key="icebox_supported"
+            app:title="冰箱支持状态" />
         <Preference
-            android:key="icebox_permission"
-            android:title="冰箱权限状态" />
+            app:key="icebox_permission"
+            app:title="冰箱权限状态" />
         <Preference
-            android:key="avInstall1"
-            android:title="@string/request" />
+            app:key="avInstall1"
+            app:title="@string/request" />
+    </PreferenceCategory>
+    <PreferenceCategory app:title="@string/name_install3">
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="enable3"
+            app:summaryOff="@string/summaryOff"
+            app:summaryOn="@string/summaryOn"
+            app:title="@string/enable_title" />
+        <Preference
+            app:key="shizuku_service"
+            app:title="Shizuku服务状态" />
+        <Preference
+            app:key="shizuku_permission"
+            app:title="Shizuku权限状态" />
+        <Preference
+            app:key="avInstall3"
+            app:title="@string/request" />
+    </PreferenceCategory>
+    <PreferenceCategory app:title="@string/name_install2">
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="enable2"
+            app:summaryOff="@string/summaryOff"
+            app:summaryOn="@string/summaryOn"
+            app:title="@string/enable_title" />
+        <Preference
+            app:key="getOwnerPackageNameAndSDKVersion"
+            app:title="已安装的托管主应用包名以及SDK版本" />
+        <Preference
+            app:key="getDelegatedScopes"
+            app:title="托管权限状态" />
+        <Preference
+            app:key="avInstall2"
+            app:title="@string/request" />
     </PreferenceCategory>
 </PreferenceScreen>

@@ -80,7 +80,7 @@ public class NotifyActivity extends Activity {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
                 //设置通知栏标题
-                .setContentTitle(String.format(getString(R.string.install_over), packageLable))
+                .setContentTitle(String.format(getString(R.string.tip_install_over), packageLable))
                 //通知产生的时间，会在通知信息里显示
                 .setWhen(System.currentTimeMillis())
                 //设置小图标（通知栏没有下拉的图标）

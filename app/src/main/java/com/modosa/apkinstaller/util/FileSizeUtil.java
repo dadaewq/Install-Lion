@@ -15,10 +15,10 @@ import java.text.DecimalFormat;
  */
 class FileSizeUtil {
 
-    private static final int SIZETYPE_B = 1;//获取文件大小单位为B的double值
-    private static final int SIZETYPE_KB = 2;//获取文件大小单位为KB的double值
-    private static final int SIZETYPE_MB = 3;//获取文件大小单位为MB的double值
-    private static final int SIZETYPE_GB = 4;//获取文件大小单位为GB的double值
+    private static final int SIZETYPE_B = 1;
+    private static final int SIZETYPE_KB = 2;
+    private static final int SIZETYPE_MB = 3;
+    private static final int SIZETYPE_GB = 4;
 
     /**
      * 获取指定文件或指定文件夹的的指定单位的大小
@@ -38,9 +38,9 @@ class FileSizeUtil {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("获取文件夹大小", "获取失败!");
+            Log.e("getFolderOrFileSize", "Fail !");
         }
-        return FormetFileSize(blockSize, sizeType);
+        return formetFileSize(blockSize, sizeType);
     }
 
     /**
@@ -60,9 +60,9 @@ class FileSizeUtil {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("获取文件大小", "获取失败!");
+            Log.e("getAutoFolderOrFileSize", "Fail !");
         }
-        return FormetFileSize(blockSize);
+        return formetFileSize(blockSize);
     }
 
     /**
@@ -80,7 +80,7 @@ class FileSizeUtil {
             size = fis.available();
             fis.close();
         } else {
-            Log.e("获取文件大小", "文件不存在!");
+            Log.e("getFileSize", "notExist!");
             throw new Exception("FileNotFound");
         }
 
@@ -98,7 +98,7 @@ class FileSizeUtil {
         long size = 0;
         File[] flist = file.listFiles();
         if (flist == null) {
-            Log.e("获取文件夹大小", "文件夹不存在!");
+            Log.e("getFolderSize", "notExist!");
             throw new Exception("FolderNotFound");
         } else {
             for (File value : flist) {
@@ -119,7 +119,7 @@ class FileSizeUtil {
      * @param fileSize 文件大小
      * @return 格式化显示
      */
-    private static String FormetFileSize(long fileSize) {
+    private static String formetFileSize(long fileSize) {
         DecimalFormat df = new DecimalFormat("#.00");
         String fileSizeString;
         String wrongSize = "0B";
@@ -145,7 +145,7 @@ class FileSizeUtil {
      * @param sizeType 指定转换的类型
      * @return 格式化显示
      */
-    private static double FormetFileSize(long fileSize, int sizeType) {
+    private static double formetFileSize(long fileSize, int sizeType) {
         DecimalFormat df = new DecimalFormat("#.00");
         double fileSizeLong = 0;
         switch (sizeType) {

@@ -1,21 +1,25 @@
 package com.modosa.apkinstaller.fragment;
 
-import android.app.AlertDialog;
+import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
-import android.preference.SwitchPreference;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.SwitchPreferenceCompat;
 
 import com.catchingnow.delegatedscopeclient.DSMClient;
 import com.catchingnow.icebox.sdk_client.IceBox;
@@ -26,21 +30,23 @@ import com.modosa.apkinstaller.activity.Install3Activity;
 import com.modosa.apkinstaller.util.shell.ShizukuShell;
 
 import java.util.List;
-import java.util.Objects;
+
+import moe.shizuku.api.ShizukuApiConstants;
+import moe.shizuku.api.ShizukuService;
+
+import static com.modosa.apkinstaller.util.OpUtil.getComponentState;
+import static com.modosa.apkinstaller.util.OpUtil.setComponentState;
 
 /**
  * @author dadaewq
  */
-public class MainFragment extends PreferenceFragment {
-    private final String S_first = "first";
-    private final String shizuku_PERMISSION = "moe.shizuku.manager.permission.API_V23";
-    private SwitchPreference hideIcon;
-    private SwitchPreference needconfirm;
-    private SwitchPreference enable1;
-    private SwitchPreference enable2;
-    private SwitchPreference enable3;
+public class MainFragment extends PreferenceFragmentCompat {
+    private SwitchPreferenceCompat needconfirm;
+    private SwitchPreferenceCompat show_notification;
+    private SwitchPreferenceCompat enable1;
+    private SwitchPreferenceCompat enable2;
+    private SwitchPreferenceCompat enable3;
     private SharedPreferences sharedPreferences;
-    private ComponentName ctMain;
     private ComponentName ctInstall1;
     private ComponentName ctInstall2;
     private ComponentName ctInstall3;
@@ -51,115 +57,200 @@ public class MainFragment extends PreferenceFragment {
     private Preference avInstall1;
     private Preference avInstall2;
     private Preference avInstall3;
-    private Preference getOwnerPackageName;
-    private Preference getOwnerSDKVersion;
+    private Preference getOwnerPackageNameAndSDKVersion;
     private Preference getDelegatedScopes;
-    private boolean avDSM;
+    private boolean ifsdkge26;
+    private Context context;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.pref_install1);
-        avDSM = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
+        ifsdkge26 = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
         sharedPreferences = getPreferenceManager().getSharedPreferences();
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        if (sharedPreferences.getBoolean(S_first, true)) {
-            editor.putBoolean(S_first, true);
-        }
-        editor.apply();
-        if (avDSM) {
-            addPreferencesFromResource(R.xml.pref_install2);
-        }
-        addPreferencesFromResource(R.xml.pref_install3);
-        initialize(avDSM);
+        init();
+    }
+
+    @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        setPreferencesFromResource(R.xml.pref_install1, rootKey);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
-        Objects.requireNonNull(view).setBackgroundResource(R.color.Background);
-        return view;
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        this.context = context;
 
-    private void initialize(Boolean avDSM) {
-        ctMain = new ComponentName(this.getActivity(), "com.modosa.apkinstaller.activity.MainActivity");
-        ctInstall1 = new ComponentName(this.getActivity(), Install1Activity.class);
-        ctInstall2 = new ComponentName(this.getActivity(), Install2Activity.class);
-        ctInstall3 = new ComponentName(this.getActivity(), Install3Activity.class);
-        if (sharedPreferences.getBoolean(S_first, true)) {
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("first", false);
-            editor.putBoolean("notificationManager.areNotificationsEnabled()", false);
-            editor.putBoolean("show_notification", false);
-            editor.putBoolean("needconfirm", true);
-            editor.putBoolean("enable1", true);
-            editor.putBoolean("enable2", true);
-            editor.putBoolean("enable3", true);
-            editor.apply();
-            if (!avDSM) {
-                PackageManager pm = this.getActivity().getPackageManager();
-                pm.setComponentEnabledSetting(ctInstall2,
-                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                        PackageManager.DONT_KILL_APP);
-            }
-        }
+    }
 
-        hideIcon = (SwitchPreference) findPreference("hide_icon");
-        hideIcon.setOnPreferenceClickListener(preference -> {
-            if (sharedPreferences.getBoolean("hide_icon", false)) {
-                showHideIconDialog();
-            } else {
-                changeState("hide_icon", ctMain, true);
-            }
+    @Override
+    public void onResume() {
+        super.onResume();
+        refreshStatus();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void init() {
+
+        ctInstall1 = new ComponentName(context, Install1Activity.class);
+        ctInstall2 = new ComponentName(context, Install2Activity.class);
+        ctInstall3 = new ComponentName(context, Install3Activity.class);
+
+        needconfirm = findPreference("needconfirm");
+        show_notification = findPreference("show_notification");
+
+
+        Preference manualAuthorize = getPreferenceScreen().findPreference("manualAuthorize");
+        assert manualAuthorize != null;
+        manualAuthorize.setOnPreferenceClickListener(preference -> {
+            manualuthorize();
             return true;
         });
-        needconfirm = (SwitchPreference) findPreference("needconfirm");
-        enable1 = (SwitchPreference) getPreferenceManager().findPreference("enable1");
-        Objects.requireNonNull(enable1).setOnPreferenceChangeListener((preference, o) -> {
-            changeState("enable1", ctInstall1, !sharedPreferences.getBoolean("enable1", true));
+
+        //IceBox
+        enable1 = getPreferenceManager().findPreference("enable1");
+        assert enable1 != null;
+        enable1.setOnPreferenceClickListener(preference -> {
+            setComponentState(context, ctInstall1, !getComponentState(context, ctInstall1));
+            enable1.setChecked(getComponentState(context, ctInstall1));
             return true;
         });
+        enable1.setChecked(getComponentState(context, ctInstall1));
+
         icebox_supported = getPreferenceScreen().findPreference("icebox_supported");
         icebox_permission = getPreferenceScreen().findPreference("icebox_permission");
+        assert icebox_permission != null;
+        icebox_permission.setOnPreferenceClickListener(preference -> {
+            try {
+                ActivityCompat.requestPermissions((Activity) context,
+                        new String[]{IceBox.SDK_PERMISSION},
+                        0x2331);
+            } catch (Exception e) {
+                Toast.makeText(context, e + "", Toast.LENGTH_SHORT).show();
+            }
+
+            return true;
+        });
+
         avInstall1 = getPreferenceScreen().findPreference("avInstall1");
-        avInstall1.setOnPreferenceClickListener(preference -> {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{IceBox.SDK_PERMISSION},
-                    0x333);
+
+
+        //Shizuku
+        enable3 = getPreferenceManager().findPreference("enable3");
+        assert enable3 != null;
+        enable3.setOnPreferenceClickListener(preference -> {
+            setComponentState(context, ctInstall3, !getComponentState(context, ctInstall3));
+            enable3.setChecked(getComponentState(context, ctInstall3));
             return true;
         });
-        updateComponentName("enable1");
-        if (avDSM) {
-            enable2 = (SwitchPreference) getPreferenceManager().findPreference("enable2");
-            Objects.requireNonNull(enable2).setOnPreferenceChangeListener((preference, o) -> {
-                changeState("enable2", ctInstall2, !sharedPreferences.getBoolean("enable2", true));
-                return true;
-            });
-            getOwnerPackageName = getPreferenceScreen().findPreference("getOwnerPackageName");
-            getOwnerSDKVersion = getPreferenceScreen().findPreference("getOwnerSDKVersion");
-            getDelegatedScopes = getPreferenceScreen().findPreference("getDelegatedScopes");
-            avInstall2 = getPreferenceScreen().findPreference("avInstall2");
-            avInstall2.setOnPreferenceClickListener(preference -> {
-                DSMClient.requestScopes(getActivity(), 0x52, "dsm-delegation-install-uninstall-app");
-                return true;
-            });
-            updateComponentName("enable2");
-        }
-        enable3 = (SwitchPreference) getPreferenceManager().findPreference("enable3");
-        Objects.requireNonNull(enable3).setOnPreferenceChangeListener((preference, o) -> {
-            changeState("enable3", ctInstall3, !sharedPreferences.getBoolean("enable3", true));
-            return true;
-        });
+        enable3.setChecked(getComponentState(context, ctInstall3));
         shizuku_service = getPreferenceScreen().findPreference("shizuku_service");
+
         shizuku_permission = getPreferenceScreen().findPreference("shizuku_permission");
+        assert shizuku_permission != null;
+        shizuku_permission.setOnPreferenceClickListener(preference -> {
+            try {
+                ActivityCompat.requestPermissions((Activity) context,
+                        new String[]{ShizukuApiConstants.PERMISSION},
+                        0x2333);
+            } catch (Exception e) {
+                Toast.makeText(context, e + "", Toast.LENGTH_SHORT).show();
+            }
+
+            return true;
+        });
+
         avInstall3 = getPreferenceScreen().findPreference("avInstall3");
-        updateComponentName("enable3");
+
+        //DSM
+        enable2 = getPreferenceManager().findPreference("enable2");
+        avInstall2 = getPreferenceScreen().findPreference("avInstall2");
+        if (ifsdkge26) {
+            enable2.setOnPreferenceClickListener(preference -> {
+                setComponentState(context, ctInstall2, !getComponentState(context, ctInstall2));
+                enable1.setChecked(getComponentState(context, ctInstall2));
+                return true;
+            });
+            enable2.setChecked(getComponentState(context, ctInstall2));
+
+            getOwnerPackageNameAndSDKVersion = getPreferenceScreen().findPreference("getOwnerPackageNameAndSDKVersion");
+            getDelegatedScopes = getPreferenceScreen().findPreference("getDelegatedScopes");
+            assert getDelegatedScopes != null;
+            getDelegatedScopes.setOnPreferenceClickListener(preference -> {
+                try {
+                    DSMClient.requestScopes((Activity) context, 0x52, "dsm-delegation-install-uninstall-app");
+                } catch (Exception e) {
+                    Toast.makeText(context, e + "", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            });
+
+        } else {
+            enable2.setEnabled(false);
+            enable2.setSummaryOff(R.string.tip_ltsdk26);
+            avInstall2.setSummary(R.string.av_no);
+        }
+
     }
 
-    private void printStatus(boolean avDSM) {
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void manualuthorize() {
+        String targetPackage = "com.android.settings";
+        Intent intentManageAppPermissions, intentManageAll;
+        intentManageAppPermissions = new Intent("android.intent.action.MANAGE_APP_PERMISSIONS")
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .putExtra(Intent.EXTRA_PACKAGE_NAME, context.getPackageName());
+//      intentManageAppPermissions.setComponent(new ComponentName("com.android.packageinstaller","com.android.packageinstaller.permission.ui.ManagePermissionsActivity"))
+
+        //MIUI等不能用
+//        intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + context.getPackageName()))
+//        ComponentName componentName = new ComponentName(targetPackage, targetPackage + ".applications.InstalledAppDetails");
+//        intent2.setComponent(componentName);
+
+//        intent = new Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS, packageUri);
+//
+//        intent = new Intent("com.android.settings.APP_OPEN_BY_DEFAULT_SETTINGS", Uri.parse("package:" + context.getPackageName()))
+
+
+        ComponentName componentName = new ComponentName(targetPackage, targetPackage + ".applications.Mana4geApplications");
+        intentManageAll = new Intent(Intent.ACTION_VIEW)
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .setComponent(componentName);
+
+        try {
+            startActivity(intentManageAppPermissions);
+            Log.e("start", "intentManageAppPermissions");
+        } catch (Exception e1) {
+            e1.printStackTrace();
+            Log.e("Wrong intentMAP", e1 + "");
+            try {
+                startActivity(intentManageAll);
+                Log.e("start intent", "intentManageAll");
+                Toast.makeText(context, R.string.tip_manualAuthorize, Toast.LENGTH_SHORT).show();
+            } catch (Exception e2) {
+                e2.printStackTrace();
+                Toast.makeText(context, getString(R.string.av_no) + "\n" + e2, Toast.LENGTH_SHORT).show();
+            }
+        }
+
+    }
+
+
+    private void refreshStatus() {
+        show_notification.setChecked(sharedPreferences.getBoolean("needconfirm", true));
         needconfirm.setChecked(sharedPreferences.getBoolean("needconfirm", true));
-        IceBox.SilentInstallSupport state = IceBox.querySupportSilentInstall(getActivity());
+
+        //IceBox
+        enable1.setChecked(getComponentState(context, ctInstall1));
+
+        IceBox.SilentInstallSupport state = IceBox.querySupportSilentInstall(context);
+
         String status;
         switch (state) {
             case SUPPORTED:
@@ -183,152 +274,121 @@ public class MainFragment extends PreferenceFragment {
             default:
                 status = "未知";
         }
-        int permission0 = ContextCompat.checkSelfPermission(getActivity(), IceBox.SDK_PERMISSION);
+
+        boolean permission0 = (ContextCompat.checkSelfPermission(context, IceBox.SDK_PERMISSION) == PackageManager.PERMISSION_GRANTED);
         icebox_supported.setSummary(status);
-        icebox_permission.setSummary(permission0 == PackageManager.PERMISSION_GRANTED ? "已授权" : "未授权");
-        avInstall1.setSummary(R.string.av_nonono);
+        icebox_permission.setSummary(permission0 ? R.string.permission_yes : R.string.permission_no);
+        avInstall1.setSummary(R.string.av_no);
         String s_SUPPORTED = "SUPPORTED";
-        String s_SR = "PERMISSION_REQUIRED";
         if (s_SUPPORTED.equals(state + "")) {
-            avInstall1.setSummary(R.string.av_ok);
-        } else if (s_SR.equals(state + "")) {
-            avInstall1.setSummary(R.string.av_no);
+            avInstall1.setSummary(R.string.av_ok_installer);
+        } else {
+            if (IceBox.SilentInstallSupport.PERMISSION_REQUIRED == state) {
+                icebox_permission.setSummary(getString(R.string.permission_no) + getString(R.string.click2requestpermission));
+            }
+            avInstall1.setSummary(getString(R.string.av_no) + status);
         }
-        if (avDSM) {
-            String OwnerPkgname = DSMClient.getOwnerPackageName(getActivity());
+
+
+        //Shizuku
+        enable3.setChecked(getComponentState(context, ctInstall3));
+
+        Intent launchShizujuIntent = context.getPackageManager().getLaunchIntentForPackage("moe.shizuku.privileged.api");
+
+        boolean isShizukuExist = (launchShizujuIntent != null);
+        boolean isShizukuRunningService = true;
+
+        try {
+            ShizukuService.getVersion();
+        } catch (Exception e) {
+            Log.e("Exception", e.getClass() + "");
+            if (e.getClass() == IllegalStateException.class) {
+                isShizukuRunningService = false;
+            }
+        }
+
+
+        if (isShizukuRunningService) {
+            shizuku_service.setSummary(R.string.av_yes);
+        } else {
+            shizuku_service.setSummary(R.string.av_no);
+        }
+
+        boolean hasPermission = ContextCompat.checkSelfPermission(context, ShizukuApiConstants.PERMISSION) == 0;
+
+        if (hasPermission) {
+            shizuku_permission.setSummary(R.string.permission_yes);
+        } else {
+            if (isShizukuExist) {
+                shizuku_permission.setSummary(getString(R.string.permission_no) + getString(R.string.click2requestpermission));
+            } else {
+                shizuku_permission.setSummary(R.string.permission_no);
+            }
+        }
+
+        boolean avShizuku = ShizukuShell.getInstance().isAvailable();
+
+        if (avShizuku) {
+            avInstall3.setSummary(R.string.av_yes);
+        } else {
+            if (hasPermission) {
+                if (isShizukuRunningService) {
+                    if (isShizukuExist) {
+                        avInstall3.setSummary(getString(R.string.av_no) + getString(R.string.go_shizuku));
+                        avInstall3.setOnPreferenceClickListener(preference -> {
+                            try {
+                                startActivity(launchShizujuIntent);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            return true;
+                        });
+                    } else {
+                        avInstall3.setSummary(R.string.av_no);
+                    }
+                } else {
+                    avInstall3.setSummary(R.string.av_no);
+                }
+            } else {
+                avInstall3.setSummary(getString(R.string.av_no) + getString(R.string.permission_no));
+            }
+
+        }
+
+
+        if (ifsdkge26) {
+            //DSM
+            enable2.setChecked(getComponentState(context, ctInstall2));
+
+            String OwnerPkgname = DSMClient.getOwnerPackageName(context);
             getDelegatedScopes.setSummary(" ");
             if (OwnerPkgname != null) {
-                getOwnerPackageName.setSummary(OwnerPkgname);
-                getOwnerSDKVersion.setSummary(DSMClient.getOwnerSDKVersion(getActivity()) + "");
-                List<String> scopes = DSMClient.getDelegatedScopes(getActivity());
+                getOwnerPackageNameAndSDKVersion.setSummary(OwnerPkgname + " " + DSMClient.getOwnerSDKVersion(context));
+                List<String> scopes = DSMClient.getDelegatedScopes(context);
                 StringBuilder stringBuilder = new StringBuilder();
                 for (String scope : scopes) {
                     stringBuilder.append(scope);
                 }
-                avInstall2.setSummary(R.string.av_no);
+                getDelegatedScopes.setSummary(getString(R.string.permission_no) + getString(R.string.click2requestpermission));
                 String s_install = "install";
 
                 if (stringBuilder.toString().contains(s_install)) {
-                    getDelegatedScopes.setSummary(stringBuilder.toString());
-                    avInstall2.setSummary(R.string.av_ok);
+                    getDelegatedScopes.setSummary(R.string.permission_yes);
+                    avInstall2.setSummary(R.string.av_ok_installer);
                 }
             } else {
-                getOwnerPackageName.setSummary(R.string.notexist);
-                avInstall2.setSummary(R.string.av_nonono);
+                getOwnerPackageNameAndSDKVersion.setSummary(R.string.notexist);
+                getDelegatedScopes.setSummary(R.string.permission_no);
+                avInstall2.setSummary(R.string.av_no);
             }
-        }
-
-        boolean avShizuku_service = false;
-
-        boolean permission1 = ContextCompat.checkSelfPermission(getActivity(), shizuku_PERMISSION) == 0;
-        shizuku_permission.setSummary(permission1 ? "已授权" : "未授权");
-        if (permission1) {
-            avShizuku_service = ShizukuShell.getInstance().isAvailable();
-        }
-        String status1 = avShizuku_service ? getString(R.string.av_okokok) : getString(R.string.av_nonono);
-        shizuku_service.setSummary(status1);
-        avInstall3.setOnPreferenceClickListener(preference -> {
-            ActivityCompat.requestPermissions(MainFragment.this.getActivity(),
-                    new String[]{shizuku_PERMISSION},
-                    0x332);
-            return true;
-        });
-        if (avShizuku_service) {
-            avInstall3.setSummary(R.string.av_ok);
         } else {
-            if (permission1) {
-                avInstall3.setSummary(getString(R.string.av_nonono) + getString(R.string.go_shizuku));
-                avInstall3.setOnPreferenceClickListener(preference -> {
-                    try {
-                        Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage("moe.shizuku.privileged.api");
-                        startActivity(intent);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    return true;
-                });
-            } else {
-                avInstall3.setSummary(R.string.av_no);
+            if (getComponentState(context, ctInstall2)) {
+                setComponentState(context, ctInstall2, false);
             }
-
+            enable2.setChecked(false);
         }
 
     }
 
-    private void showHideIconDialog() {
-        new AlertDialog.Builder(getActivity()).setCancelable(false)
-                .setTitle(R.string.dialog_title)
-                .setMessage("\n" + getString(R.string.hide_tip))
-                .setCancelable(false)
-                .setNegativeButton(R.string.cancel, (dialog, which) -> {
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putBoolean("hide_icon", false);
-                    editor.apply();
-                    hideIcon.setChecked(false);
-                })
-                .setPositiveButton(R.string.confirm, (dialog, which) -> {
-                    changeState("hide_icon", ctMain, false);
-                    android.os.Process.killProcess(android.os.Process.myPid());
-                })
-                .show();
-    }
-
-    private void changeState(String s, ComponentName c, boolean value) {
-        PackageManager pm = this.getActivity().getPackageManager();
-        if (value) {
-            pm.setComponentEnabledSetting(c,
-                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                    PackageManager.DONT_KILL_APP);
-        } else {
-            pm.setComponentEnabledSetting(c,
-                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                    PackageManager.DONT_KILL_APP);
-        }
-        String s_hide_icon = "hide_icon";
-        if (!s_hide_icon.equals(s)) {
-            updateComponentName(s);
-        }
-    }
-
-    private void updateComponentName(String s) {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        PackageManager pm = this.getActivity().getPackageManager();
-        String s_enable1 = "enable1";
-        String s_enable2 = "enable2";
-        String s_enable3 = "enable3";
-        switch (s) {
-            case "enable1":
-                boolean isEnabled1 = (pm.getComponentEnabledSetting(ctInstall1) == (PackageManager.COMPONENT_ENABLED_STATE_DEFAULT) || pm.getComponentEnabledSetting(ctInstall1) == (PackageManager.COMPONENT_ENABLED_STATE_ENABLED));
-                if (isEnabled1 != sharedPreferences.getBoolean(s_enable1, true)) {
-                    editor.putBoolean("enable1", isEnabled1);
-                    editor.apply();
-                    enable1.setChecked(isEnabled1);
-                }
-                break;
-            case "enable2":
-                boolean isEnabled2 = (pm.getComponentEnabledSetting(ctInstall2) == (PackageManager.COMPONENT_ENABLED_STATE_DEFAULT) || pm.getComponentEnabledSetting(ctInstall2) == (PackageManager.COMPONENT_ENABLED_STATE_ENABLED));
-                if (isEnabled2 != sharedPreferences.getBoolean(s_enable2, true)) {
-                    editor.putBoolean("enable2", isEnabled2);
-                    editor.commit();
-                    enable2.setChecked(isEnabled2);
-                }
-                break;
-            case "enable3":
-                boolean isEnabled3 = (pm.getComponentEnabledSetting(ctInstall3) == (PackageManager.COMPONENT_ENABLED_STATE_DEFAULT) || pm.getComponentEnabledSetting(ctInstall3) == (PackageManager.COMPONENT_ENABLED_STATE_ENABLED));
-                if (isEnabled3 != sharedPreferences.getBoolean(s_enable3, true)) {
-                    editor.putBoolean("enable3", isEnabled3);
-                    editor.commit();
-                    enable3.setChecked(isEnabled3);
-                }
-                break;
-            default:
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        printStatus(avDSM);
-    }
 
 }

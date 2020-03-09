@@ -32,7 +32,7 @@ public class Install1Activity extends AbstractInstallActivity {
             apkFile = new File(apkPath);
             String authority = getPackageName() + ".FILE_PROVIDER";
             Uri installuri = FileProvider.getUriForFile(getApplicationContext(), authority, apkFile);
-            showToast0(String.format(getString(R.string.start_install), apkinfo[0]));
+            showToast0(String.format(getString(R.string.tip_start_install), apkinfo[0]));
 
             disposeSafety();
 
@@ -40,7 +40,7 @@ public class Install1Activity extends AbstractInstallActivity {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((Boolean success) -> {
-                        Toast.makeText(this, success ? String.format(getString(R.string.success_install), apkinfo[0]) : String.format(getString(R.string.failed_install0), apkinfo[0]), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, success ? String.format(getString(R.string.tip_success_install), apkinfo[0]) : String.format(getString(R.string.tip_failed_install0), apkinfo[0]), Toast.LENGTH_SHORT).show();
                         deleteCache();
                         if (success && show_notification) {
                             Log.e("packagename", apkinfo[1]);
@@ -57,7 +57,7 @@ public class Install1Activity extends AbstractInstallActivity {
 
             finish();
         } else {
-            showToast0(getString(R.string.failed_read));
+            showToast0(R.string.tip_failed_read);
             finish();
         }
     }
@@ -65,13 +65,13 @@ public class Install1Activity extends AbstractInstallActivity {
     @Override
     protected void startUninstall(String pkgName) {
         Log.d("Start uninstall", pkgName);
-        showToast0(String.format(getString(R.string.start_uninstall), packageLable));
+        showToast0(String.format(getString(R.string.tip_start_uninstall), packageLable));
         disposeSafety();
 
         mSubscribe = Single.fromCallable(() -> IceBox.uninstallPackage(this, pkgName))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((Boolean success) -> Toast.makeText(this, success ? String.format(getString(R.string.success_uninstall), packageLable) : String.format(getString(R.string.failed_uninstall0), packageLable), Toast.LENGTH_SHORT).show(), Throwable::printStackTrace);
+                .subscribe((Boolean success) -> Toast.makeText(this, success ? String.format(getString(R.string.tip_success_uninstall), packageLable) : String.format(getString(R.string.tip_failed_uninstall0), packageLable), Toast.LENGTH_SHORT).show(), Throwable::printStackTrace);
         finish();
 
     }

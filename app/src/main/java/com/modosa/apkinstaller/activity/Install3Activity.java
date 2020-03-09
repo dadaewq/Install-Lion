@@ -41,7 +41,7 @@ public class Install3Activity extends AbstractInstallActivity implements SAIPack
             ArrayList<File> files = new ArrayList<>();
             files.add(apkFile);
             new Thread(() -> {
-                showToast0(String.format(getString(R.string.start_install), apkinfo[0]));
+                showToast0(String.format(getString(R.string.tip_start_install), apkinfo[0]));
                 try {
                     installPackages(files);
                 } catch (Exception e) {
@@ -52,7 +52,7 @@ public class Install3Activity extends AbstractInstallActivity implements SAIPack
 
             ).start();
         } else {
-            showToast0(getString(R.string.failed_read));
+            showToast0(R.string.tip_failed_read);
             finish();
         }
     }
@@ -64,12 +64,12 @@ public class Install3Activity extends AbstractInstallActivity implements SAIPack
         new Thread(() -> {
             Looper.prepare();
             if (!ShizukuShell.getInstance().isAvailable()) {
-                copyErr(String.format("%s\n\n%s\n%s", getString(R.string.dialog_uninstall_title), alertDialogMessage, getString(R.string.installer_error_shizuku_unavailable)));
-                showToast1(String.format(getString(R.string.failed_uninstall), packageLable, getString(R.string.installer_error_shizuku_unavailable)));
+                copyErr(String.format("%s\n\n%s\n%s", getString(R.string.title_dialog_iuninstall), alertDialogMessage, getString(R.string.installer_error_shizuku_unavailable)));
+                showToast1(String.format(getString(R.string.tip_failed_uninstall), packageLable, getString(R.string.installer_error_shizuku_unavailable)));
             } else {
                 Shell.Result uninstallationResult = ShizukuShell.getInstance().exec(new Shell.Command("pm", "uninstall", pkgName));
                 if (0 == uninstallationResult.exitCode) {
-                    showToast0(String.format(getString(R.string.success_uninstall), packageLable));
+                    showToast0(String.format(getString(R.string.tip_success_uninstall), packageLable));
                 } else {
                     String ILVersion = "???";
                     try {
@@ -78,7 +78,7 @@ public class Install3Activity extends AbstractInstallActivity implements SAIPack
                     }
                     String info = String.format("%s: %s %s | %s | Android %s | Install Lion %s\n\n", getString(R.string.installer_device), Build.BRAND, Build.MODEL, Utils.isMiui() ? "MIUI" : "Not MIUI", Build.VERSION.RELEASE, ILVersion);
                     copyErr(info + uninstallationResult.toString());
-                    showToast1(String.format(getString(R.string.failed_uninstall), packageLable, uninstallationResult.err));
+                    showToast1(String.format(getString(R.string.tip_failed_uninstall), packageLable, uninstallationResult.err));
                 }
             }
             Looper.loop();
@@ -111,7 +111,7 @@ public class Install3Activity extends AbstractInstallActivity implements SAIPack
                 break;
             case INSTALLATION_SUCCEED:
                 deleteCache();
-                showToast0(String.format(getString(R.string.success_install), apkinfo[0]));
+                showToast0(String.format(getString(R.string.tip_success_install), apkinfo[0]));
                 if (show_notification) {
                     Log.e("packagename", apkinfo[1]);
                     Intent intent = new Intent()
@@ -128,10 +128,10 @@ public class Install3Activity extends AbstractInstallActivity implements SAIPack
                 deleteCache();
                 if (packageNameOrErrorDescription != null) {
                     copyErr(packageNameOrErrorDescription);
-                    showToast1(String.format(getString(R.string.failed_install), apkinfo[0], packageNameOrErrorDescription));
+                    showToast1(String.format(getString(R.string.tip_failed_install), apkinfo[0], packageNameOrErrorDescription));
                 } else {
                     copyErr(getString(R.string.unknown));
-                    showToast1(String.format(getString(R.string.failed_install), apkinfo[0], ""));
+                    showToast1(String.format(getString(R.string.tip_failed_install), apkinfo[0], ""));
                 }
                 break;
             default:

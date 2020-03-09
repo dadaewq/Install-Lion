@@ -32,6 +32,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Objects;
 
+import static com.modosa.apkinstaller.util.OpUtil.showAlertDialog;
+
 
 /**
  * @author dadaewq
@@ -62,7 +64,7 @@ public abstract class AbstractInstallActivity extends Activity {
         if (Intent.ACTION_DELETE.equals(action) || Intent.ACTION_UNINSTALL_PACKAGE.equals(action)) {
             pkgName = Objects.requireNonNull(getIntent().getData()).getEncodedSchemeSpecificPart();
             if (pkgName == null) {
-                showToast0(getString(R.string.failed_prase));
+                showToast0(R.string.tip_failed_prase);
                 finish();
             } else {
                 initUninstall();
@@ -74,7 +76,6 @@ public abstract class AbstractInstallActivity extends Activity {
 
             sourceSp = getSharedPreferences("allowsource", Context.MODE_PRIVATE);
             sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
             if (checkPermission()) {
                 initInstall();
             } else {
@@ -119,15 +120,17 @@ public abstract class AbstractInstallActivity extends Activity {
                     .append(nl);
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.dialog_uninstall_title));
-        builder.setMessage(alertDialogMessage + nl + nl + getString(R.string.message_uninstalConfirm));
-        builder.setPositiveButton(android.R.string.yes, (dialogInterface, i) -> {
-            startUninstall(pkgName);
-            finish();
-        });
-        builder.setNegativeButton(android.R.string.no, (dialogInterface, i) -> finish());
-        alertDialog = builder.show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle(R.string.title_dialog_iuninstall)
+                .setMessage(alertDialogMessage + nl + nl + getString(R.string.message_uninstalConfirm))
+                .setNegativeButton(android.R.string.no, (dialogInterface, i) -> finish())
+                .setPositiveButton(android.R.string.yes, (dialogInterface, i) -> {
+                    startUninstall(pkgName);
+                    finish();
+                });
+        alertDialog = builder.create();
+        showAlertDialog(this, alertDialog);
+
         alertDialog.setOnCancelListener(dialog -> finish());
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(20);
         alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(20);
@@ -144,7 +147,7 @@ public abstract class AbstractInstallActivity extends Activity {
         cachePath = apkPath;
         Log.e("cachePath", cachePath + "");
         if (apkPath == null) {
-            showToast0(getString(R.string.failed_prase));
+            showToast0(R.string.tip_failed_prase);
             finish();
         } else {
             if (needconfirm) {
@@ -201,18 +204,16 @@ public abstract class AbstractInstallActivity extends Activity {
                             )
                             .append(nl);
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle(getString(R.string.dialog_install_title));
 
-                    builder.setMessage(alertDialogMessage);
                     View checkBoxView = View.inflate(this, R.layout.confirm_checkbox, null);
-                    builder.setView(checkBoxView);
+
                     CheckBox checkBox = checkBoxView.findViewById(R.id.confirm_checkbox);
+
                     if (source[1].equals(ILLEGALPKGNAME)) {
-                        checkBox.setText(getString(R.string.installsource_unkonwn));
+                        checkBox.setText(R.string.checkbox_installsource_unkonwn);
                         checkBox.setEnabled(false);
                     } else {
-                        checkBox.setText(String.format(getString(R.string.always_allow), source[1]));
+                        checkBox.setText(String.format(getString(R.string.checkbox_always_allow), source[1]));
                     }
 
 
@@ -221,16 +222,23 @@ public abstract class AbstractInstallActivity extends Activity {
                         editor.putBoolean(source[0], isChecked);
                         editor.apply();
                     });
-                    builder.setPositiveButton(android.R.string.yes, (dialog, which) -> {
-                        cachePath = null;
-                        startInstall(apkPath);
-                        finish();
-                    });
-                    builder.setNegativeButton(android.R.string.no, (dialog, which) -> finish());
 
 
-                    builder.setCancelable(false);
-                    alertDialog = builder.show();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                            .setTitle(R.string.title_dialog_install)
+                            .setMessage(alertDialogMessage)
+                            .setView(checkBoxView)
+                            .setCancelable(false)
+                            .setNegativeButton(android.R.string.no, (dialog, which) -> finish())
+                            .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                                cachePath = null;
+                                startInstall(apkPath);
+                                finish();
+                            });
+
+                    alertDialog = builder.create();
+                    showAlertDialog(this, alertDialog);
+
                     alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(20);
                     alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(20);
                 }
@@ -283,6 +291,7 @@ public abstract class AbstractInstallActivity extends Activity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
         if (checkPermission()) {
             initInstall();
         } else {
@@ -304,7 +313,7 @@ public abstract class AbstractInstallActivity extends Activity {
                     apkPath = createApkFromUri(this);
                 }
             } else {
-                showToast0(getString(R.string.failed_prase));
+                showToast0(R.string.tip_failed_prase);
                 finish();
             }
             apkinfo = AppInfoUtil.getApkInfo(this, apkPath);
@@ -324,7 +333,7 @@ public abstract class AbstractInstallActivity extends Activity {
     protected abstract void startUninstall(String pkgName);
 
     private void requestPermission() {
-        ActivityCompat.requestPermissions(this, permissions, 0x233);
+        ActivityCompat.requestPermissions(this, permissions, 0x2330);
     }
 
     private boolean checkPermission() {
@@ -342,8 +351,16 @@ public abstract class AbstractInstallActivity extends Activity {
         runOnUiThread(() -> Toast.makeText(this, text, Toast.LENGTH_SHORT).show());
     }
 
+    void showToast0(final int stringId) {
+        runOnUiThread(() -> Toast.makeText(this, stringId, Toast.LENGTH_SHORT).show());
+    }
+
     void showToast1(final String text) {
         runOnUiThread(() -> Toast.makeText(this, text, Toast.LENGTH_LONG).show());
+    }
+
+    void showToast1(final int stringId) {
+        runOnUiThread(() -> Toast.makeText(this, stringId, Toast.LENGTH_LONG).show());
     }
 
     private String createApkFromUri(Context context) {
@@ -375,7 +392,7 @@ public abstract class AbstractInstallActivity extends Activity {
     }
 
     private void deleteSingleFile(File file) {
-        if (file.exists() && file.isFile()) {
+        if (file != null && file.exists() && file.isFile()) {
             if (file.delete()) {
                 Log.e("-DELETE-", "==>" + file.getAbsolutePath() + " OK！");
             } else {

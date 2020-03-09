@@ -9,6 +9,10 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission
+        android:name="android.permission.GRANT_RUNTIME_PERMISSIONS"
+        tools:ignore="ProtectedPermissions" />
+
 
     <application
         android:allowBackup="true"
@@ -26,7 +30,7 @@
             android:label="@string/setting_name"
             android:launchMode="singleInstance">
             <intent-filter>
-                <action android:name="android.intent.action.SHOW_APP_INFO" />
+                <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -160,6 +164,15 @@
             <meta-data
                 android:name="android.app.develop.delegation"
                 android:resource="@xml/app_delegation" />
+        </receiver>
+
+        <receiver android:name=".receiver.SecretCodeReceiver">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SECRET_CODE" />
+                <data
+                    android:host="297297"
+                    android:scheme="android_secret_code" />
+            </intent-filter>
         </receiver>
 
         <provider
