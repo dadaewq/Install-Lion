@@ -27,6 +27,7 @@ import com.modosa.apkinstaller.R;
 import com.modosa.apkinstaller.activity.Install1Activity;
 import com.modosa.apkinstaller.activity.Install2Activity;
 import com.modosa.apkinstaller.activity.Install3Activity;
+import com.modosa.apkinstaller.util.AppInfoUtil;
 import com.modosa.apkinstaller.util.shell.ShizukuShell;
 
 import java.util.List;
@@ -59,21 +60,21 @@ public class MainFragment extends PreferenceFragmentCompat {
     private Preference avInstall3;
     private Preference getOwnerPackageNameAndSDKVersion;
     private Preference getDelegatedScopes;
-    private boolean ifsdkge26;
+    private boolean issdkge26;
     private Context context;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ifsdkge26 = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
+        issdkge26 = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
         sharedPreferences = getPreferenceManager().getSharedPreferences();
         init();
     }
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        setPreferencesFromResource(R.xml.pref_install1, rootKey);
+        setPreferencesFromResource(R.xml.pref_main, rootKey);
     }
 
     @Override
@@ -170,7 +171,8 @@ public class MainFragment extends PreferenceFragmentCompat {
         //DSM
         enable2 = getPreferenceManager().findPreference("enable2");
         avInstall2 = getPreferenceScreen().findPreference("avInstall2");
-        if (ifsdkge26) {
+        getOwnerPackageNameAndSDKVersion = getPreferenceScreen().findPreference("getOwnerPackageNameAndSDKVersion");
+        if (issdkge26) {
             enable2.setOnPreferenceClickListener(preference -> {
                 setComponentState(context, ctInstall2, !getComponentState(context, ctInstall2));
                 enable2.setChecked(getComponentState(context, ctInstall2));
@@ -178,22 +180,12 @@ public class MainFragment extends PreferenceFragmentCompat {
             });
             enable2.setChecked(getComponentState(context, ctInstall2));
 
-            getOwnerPackageNameAndSDKVersion = getPreferenceScreen().findPreference("getOwnerPackageNameAndSDKVersion");
+
             getDelegatedScopes = getPreferenceScreen().findPreference("getDelegatedScopes");
-            assert getDelegatedScopes != null;
-            getDelegatedScopes.setOnPreferenceClickListener(preference -> {
-                try {
-                    DSMClient.requestScopes((Activity) context, 0x52, "dsm-delegation-install-uninstall-app");
-                } catch (Exception e) {
-                    Toast.makeText(context, e + "", Toast.LENGTH_SHORT).show();
-                }
-                return true;
-            });
 
         } else {
             enable2.setEnabled(false);
-            enable2.setSummaryOff(R.string.tip_ltsdk26);
-            avInstall2.setSummary(R.string.av_no);
+            avInstall2.setSummary(getString(R.string.summary_av_no) + getString(R.string.tip_ltsdk26));
         }
 
     }
@@ -218,7 +210,7 @@ public class MainFragment extends PreferenceFragmentCompat {
 //        intent = new Intent("com.android.settings.APP_OPEN_BY_DEFAULT_SETTINGS", Uri.parse("package:" + context.getPackageName()))
 
 
-        ComponentName componentName = new ComponentName(targetPackage, targetPackage + ".applications.Mana4geApplications");
+        ComponentName componentName = new ComponentName(targetPackage, targetPackage + ".applications.ManageApplications");
         intentManageAll = new Intent(Intent.ACTION_VIEW)
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 .setComponent(componentName);
@@ -235,7 +227,7 @@ public class MainFragment extends PreferenceFragmentCompat {
                 Toast.makeText(context, R.string.tip_manualAuthorize, Toast.LENGTH_SHORT).show();
             } catch (Exception e2) {
                 e2.printStackTrace();
-                Toast.makeText(context, getString(R.string.av_no) + "\n" + e2, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, getString(R.string.summary_av_no) + "\n" + e2, Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -243,7 +235,7 @@ public class MainFragment extends PreferenceFragmentCompat {
 
 
     private void refreshStatus() {
-        show_notification.setChecked(sharedPreferences.getBoolean("needconfirm", true));
+        show_notification.setChecked(sharedPreferences.getBoolean("show_notification", false));
         needconfirm.setChecked(sharedPreferences.getBoolean("needconfirm", true));
 
         //IceBox
@@ -252,41 +244,43 @@ public class MainFragment extends PreferenceFragmentCompat {
         IceBox.SilentInstallSupport state = IceBox.querySupportSilentInstall(context);
 
         String status;
+
+        String[] languages = getResources().getStringArray(R.array.querySupportSilentInstall);
         switch (state) {
             case SUPPORTED:
-                status = "支持";
+                status = languages[0];
                 break;
             case NOT_INSTALLED:
-                status = "未安装冰箱 IceBox";
+                status = languages[1];
                 break;
             case NOT_DEVICE_OWNER:
-                status = "冰箱 IceBox 不是设备管理员";
+                status = languages[2];
                 break;
             case PERMISSION_REQUIRED:
-                status = "未取得权限";
+                status = languages[3];
                 break;
             case SYSTEM_NOT_SUPPORTED:
-                status = "当前系统版本不支持静默安装";
+                status = languages[4];
                 break;
             case UPDATE_REQUIRED:
-                status = "冰箱 IceBox 版本过低";
+                status = languages[5];
                 break;
             default:
-                status = "未知";
+                status = languages[6];
         }
 
         boolean permission0 = (ContextCompat.checkSelfPermission(context, IceBox.SDK_PERMISSION) == PackageManager.PERMISSION_GRANTED);
         icebox_supported.setSummary(status);
         icebox_permission.setSummary(permission0 ? R.string.permission_yes : R.string.permission_no);
-        avInstall1.setSummary(R.string.av_no);
+        avInstall1.setSummary(R.string.summary_av_no);
         String s_SUPPORTED = "SUPPORTED";
         if (s_SUPPORTED.equals(state + "")) {
-            avInstall1.setSummary(R.string.av_ok_installer);
+            avInstall1.setSummary(R.string.summary_av_ok_installer);
         } else {
             if (IceBox.SilentInstallSupport.PERMISSION_REQUIRED == state) {
                 icebox_permission.setSummary(getString(R.string.permission_no) + getString(R.string.click2requestpermission));
             }
-            avInstall1.setSummary(getString(R.string.av_no) + status);
+            avInstall1.setSummary(getString(R.string.summary_av_no) + status);
         }
 
 
@@ -309,9 +303,9 @@ public class MainFragment extends PreferenceFragmentCompat {
 
 
         if (isShizukuRunningService) {
-            shizuku_service.setSummary(R.string.av_yes);
+            shizuku_service.setSummary(R.string.summary_av_yes);
         } else {
-            shizuku_service.setSummary(R.string.av_no);
+            shizuku_service.setSummary(R.string.summary_av_no);
         }
 
         boolean hasPermission = ContextCompat.checkSelfPermission(context, ShizukuApiConstants.PERMISSION) == 0;
@@ -327,14 +321,14 @@ public class MainFragment extends PreferenceFragmentCompat {
         }
 
         boolean avShizuku = ShizukuShell.getInstance().isAvailable();
-
         if (avShizuku) {
-            avInstall3.setSummary(R.string.av_yes);
+            avInstall3.setSummary(R.string.summary_av_ok_installer);
         } else {
-            if (hasPermission) {
-                if (isShizukuRunningService) {
+            if (isShizukuRunningService) {
+                if (hasPermission) {
+                    avInstall3.setSummary(getString(R.string.summary_av_no) + getString(R.string.unknown));
+                } else {
                     if (isShizukuExist) {
-                        avInstall3.setSummary(getString(R.string.av_no) + getString(R.string.go_shizuku));
                         avInstall3.setOnPreferenceClickListener(preference -> {
                             try {
                                 startActivity(launchShizujuIntent);
@@ -343,27 +337,55 @@ public class MainFragment extends PreferenceFragmentCompat {
                             }
                             return true;
                         });
+                        avInstall3.setSummary(getString(R.string.summary_av_no) + getString(R.string.summary_go_shizuku));
                     } else {
-                        avInstall3.setSummary(R.string.av_no);
+                        avInstall3.setSummary(getString(R.string.summary_av_no) + getString(R.string.permission_no));
                     }
-                } else {
-                    avInstall3.setSummary(R.string.av_no);
                 }
             } else {
-                avInstall3.setSummary(getString(R.string.av_no) + getString(R.string.permission_no));
+                if (isShizukuExist) {
+                    avInstall3.setOnPreferenceClickListener(preference -> {
+                        try {
+                            startActivity(launchShizujuIntent);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        return true;
+                    });
+                    avInstall3.setSummary(getString(R.string.summary_av_no) + getString(R.string.summary_go_shizuku));
+                } else {
+                    avInstall3.setSummary(getString(R.string.summary_av_no) + getString(R.string.summary_check_shizuku_service));
+                }
             }
-
         }
 
 
-        if (ifsdkge26) {
-            //DSM
-            enable2.setChecked(getComponentState(context, ctInstall2));
+        //DSM
 
-            String OwnerPkgname = DSMClient.getOwnerPackageName(context);
-            getDelegatedScopes.setSummary(" ");
-            if (OwnerPkgname != null) {
-                getOwnerPackageNameAndSDKVersion.setSummary(OwnerPkgname + " " + DSMClient.getOwnerSDKVersion(context));
+        int OwnerSDKVersion = DSMClient.getOwnerSDKVersion(context);
+
+        if (OwnerSDKVersion != -1) {
+            String OwnerPackageName = DSMClient.getOwnerPackageName(context);
+            String OwnerPackageLable = AppInfoUtil.getApplicationLabel(context, OwnerPackageName);
+
+            if (AppInfoUtil.UNINSTALLED.equals(OwnerPackageLable)) {
+                OwnerPackageLable = OwnerPackageName;
+            }
+            getOwnerPackageNameAndSDKVersion.setSummary(OwnerPackageLable + " - " + DSMClient.getOwnerSDKVersion(context));
+        } else {
+            getOwnerPackageNameAndSDKVersion.setSummary(R.string.notexist);
+        }
+        if (issdkge26) {
+            enable2.setChecked(getComponentState(context, ctInstall2));
+            getDelegatedScopes.setOnPreferenceClickListener(preference -> {
+                try {
+                    DSMClient.requestScopes((Activity) context, 0x52, "dsm-delegation-install-uninstall-app");
+                } catch (Exception e) {
+                    Toast.makeText(context, e + "", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            });
+            if (OwnerSDKVersion != -1) {
                 List<String> scopes = DSMClient.getDelegatedScopes(context);
                 StringBuilder stringBuilder = new StringBuilder();
                 for (String scope : scopes) {
@@ -374,21 +396,19 @@ public class MainFragment extends PreferenceFragmentCompat {
 
                 if (stringBuilder.toString().contains(s_install)) {
                     getDelegatedScopes.setSummary(R.string.permission_yes);
-                    avInstall2.setSummary(R.string.av_ok_installer);
+                    avInstall2.setSummary(R.string.summary_av_ok_installer);
                 }
             } else {
-                getOwnerPackageNameAndSDKVersion.setSummary(R.string.notexist);
                 getDelegatedScopes.setSummary(R.string.permission_no);
-                avInstall2.setSummary(R.string.av_no);
+                avInstall2.setSummary(R.string.summary_av_no);
             }
+
         } else {
             if (getComponentState(context, ctInstall2)) {
                 setComponentState(context, ctInstall2, false);
             }
             enable2.setChecked(false);
         }
-
     }
-
 
 }

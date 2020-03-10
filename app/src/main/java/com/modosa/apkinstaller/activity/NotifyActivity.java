@@ -19,13 +19,12 @@ import com.modosa.apkinstaller.util.AppInfoUtil;
  * @author dadaewq
  */
 public class NotifyActivity extends Activity {
-    private String packageLable;
     private String channelId;
     private String channelName;
     private String versionName = "";
+    private String contentTitle = "";
     private NotificationManager notificationManager;
     private Bitmap LargeIcon;
-    private boolean avLaunch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,29 +32,37 @@ public class NotifyActivity extends Activity {
 
         channelId = getIntent().getStringExtra("channelId");
         channelName = getIntent().getStringExtra("channelName");
-        packageLable = getIntent().getStringExtra("packageLable");
+        contentTitle = getIntent().getStringExtra("contentTitle");
         String packageName = getIntent().getStringExtra("packageName");
 
-        LargeIcon = AppInfoUtil.getApplicationIcon(this, packageName);
 
-        String[] version = AppInfoUtil.getApplicationVersion(this, packageName);
+        int id = (int) System.currentTimeMillis();
+
+        PendingIntent clickIntent;
+
+//        如果使用 AppInfoUtils.getApkIcon()在InstallActivity用Bundle传LargeIcon
+//        LargeIcon = getIntent().getParcelableExtra("LargeIcon");
+        String[] version;
+        if ("4".equals(channelId)) {
+            LargeIcon = AppInfoUtil.getApkIcon(this, getIntent().getStringExtra("realPath"));
+            clickIntent = null;
+            version = AppInfoUtil.getApkVersion(this, getIntent().getStringExtra("realPath"));
+
+        } else {
+            LargeIcon = AppInfoUtil.getApplicationIcon(this, packageName);
+            clickIntent = getContentIntent(this, id, packageName);
+            version = AppInfoUtil.getApplicationVersion(this, packageName);
+        }
         if (version != null) {
             versionName = version[0];
         }
 
-//        //如果使用 AppInfoUtils.getApkIcon()在InstallActivity用Bundle传LargeIcon
-//        LargeIcon = getIntent().getParcelableExtra("LargeIcon");
-
-        int id = (int) System.currentTimeMillis();
-
-        PendingIntent clickIntent = getContentIntent(this, id, packageName);
-
-        notifyLiveStart(this, clickIntent, id);
+        notifyLiveStart(clickIntent, id);
         finish();
 
     }
 
-    private void notifyLiveStart(Activity context, PendingIntent intent, int id) {
+    private void notifyLiveStart(PendingIntent pendingIntent, int id) {
 
         NotificationChannel channel;
 
@@ -67,7 +74,7 @@ public class NotifyActivity extends Activity {
             channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT);
             //是否在桌面icon右上角展示小红点
             channel.enableLights(true);
-            //是否在久按桌面图标时显示此渠道的通知
+            //是否在长按桌面图标时显示此渠道的通知
             channel.setShowBadge(true);
 
             notificationManager.createNotificationChannel(channel);
@@ -80,19 +87,19 @@ public class NotifyActivity extends Activity {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
                 //设置通知栏标题
-                .setContentTitle(String.format(getString(R.string.tip_install_over), packageLable))
+                .setContentTitle(contentTitle)
                 //通知产生的时间，会在通知信息里显示
                 .setWhen(System.currentTimeMillis())
                 //设置小图标（通知栏没有下拉的图标）
                 .setSmallIcon(R.drawable.ic_filter_vintage_black_24dp)
                 .setAutoCancel(true)
-                .setContentIntent(intent);
+                .setContentIntent(pendingIntent);
 
-        if (avLaunch) {
-            //设置通知栏显示内容
-            builder.setContentText(String.format(getString(R.string.click_run), versionName));
-        } else {
+        //设置通知栏显示内容
+        if (pendingIntent == null) {
             builder.setContentText(versionName);
+        } else {
+            builder.setContentText(String.format(getString(R.string.click_run), versionName));
         }
 
         if (LargeIcon != null) {
@@ -118,11 +125,9 @@ public class NotifyActivity extends Activity {
     private PendingIntent getContentIntent(Activity context, int id, String packageName) {
 
         try {
-            avLaunch = true;
             Intent intent = getPackageManager().getLaunchIntentForPackage(packageName);
             return PendingIntent.getActivity(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         } catch (Exception e) {
-            avLaunch = false;
             e.printStackTrace();
             return null;
         }

@@ -43,7 +43,7 @@ public abstract class AbstractInstallActivity extends Activity {
     private final String[] permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
     private final String nl = System.getProperty("line.separator");
     String[] apkinfo;
-    String packageLable;
+    String uninstallPackageLable;
     StringBuilder alertDialogMessage;
     File apkFile;
     boolean show_notification;
@@ -90,16 +90,16 @@ public abstract class AbstractInstallActivity extends Activity {
     private void initUninstall() {
         String[] version = AppInfoUtil.getApplicationVersion(this, pkgName);
 
-        packageLable = AppInfoUtil.getApplicationLabel(this, pkgName);
-        if (AppInfoUtil.UNINSTALLED.equals(packageLable)) {
-            packageLable = "Uninstalled";
+        uninstallPackageLable = AppInfoUtil.getApplicationLabel(this, pkgName);
+        if (AppInfoUtil.UNINSTALLED.equals(uninstallPackageLable)) {
+            uninstallPackageLable = "Uninstalled";
         }
         alertDialogMessage = new StringBuilder();
         alertDialogMessage
                 .append(
                         String.format(
                                 getString(R.string.message_name),
-                                packageLable
+                                uninstallPackageLable
                         )
                 )
                 .append(nl)
@@ -155,7 +155,6 @@ public abstract class AbstractInstallActivity extends Activity {
                     startInstall(apkPath);
                     finish();
                 } else {
-
                     String[] version = AppInfoUtil.getApplicationVersion(this, apkinfo[1]);
 
                     alertDialogMessage = new StringBuilder();
@@ -216,14 +215,6 @@ public abstract class AbstractInstallActivity extends Activity {
                         checkBox.setText(String.format(getString(R.string.checkbox_always_allow), source[1]));
                     }
 
-
-                    checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                        editor = sourceSp.edit();
-                        editor.putBoolean(source[0], isChecked);
-                        editor.apply();
-                    });
-
-
                     AlertDialog.Builder builder = new AlertDialog.Builder(this)
                             .setTitle(R.string.title_dialog_install)
                             .setMessage(alertDialogMessage)
@@ -232,6 +223,10 @@ public abstract class AbstractInstallActivity extends Activity {
                             .setNegativeButton(android.R.string.no, (dialog, which) -> finish())
                             .setPositiveButton(android.R.string.yes, (dialog, which) -> {
                                 cachePath = null;
+                                editor = sourceSp.edit();
+                                editor.putBoolean(source[0], true);
+                                editor.apply();
+
                                 startInstall(apkPath);
                                 finish();
                             });
@@ -306,12 +301,15 @@ public abstract class AbstractInstallActivity extends Activity {
             if (ContentResolver.SCHEME_FILE.equals(uri.getScheme())) {
                 apkPath = uri.getPath();
             } else if (ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())) {
-                File file = PraseContentUtil.getFile(this, uri);
-                if (file != null) {
-                    apkPath = file.getPath();
-                } else {
-                    apkPath = createApkFromUri(this);
-                }
+
+                apkPath = createApkFromUri(this);
+
+//                File file = PraseContentUtil.getFile(this, uri);
+//                if (file != null) {
+//                    apkPath = file.getPath();
+//                } else {
+//                    apkPath = createApkFromUri(this);
+//                }
             } else {
                 showToast0(R.string.tip_failed_prase);
                 finish();

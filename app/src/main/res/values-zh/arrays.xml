@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string-array name="querySupportSilentInstall">
+        <item>"支持"</item>
+        <item>"未安装冰箱 IceBox"</item>
+        <item>"冰箱 IceBox 不是设备管理员"</item>
+        <item>"未取得权限"</item>
+        <item>"当前系统版本不支持静默安装"</item>
+        <item>"冰箱 IceBox 版本过低"</item>
+        <item>"未知"</item>
+    </string-array>
+</resources>

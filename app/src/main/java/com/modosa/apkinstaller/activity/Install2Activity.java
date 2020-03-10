@@ -49,11 +49,12 @@ public class Install2Activity extends AbstractInstallActivity {
                         if (show_notification) {
                             Log.e("packagename", apkinfo[1]);
                             Intent intent = new Intent()
-                                    .setComponent(new ComponentName(getPackageName(), getPackageName() + ".activity.NotifyActivity"))
+                                    .setComponent(new ComponentName(this, NotifyActivity.class))
                                     .putExtra("channelId", "2")
                                     .putExtra("channelName", getString(R.string.name_install2))
+                                    .putExtra("realPath", apkPath)
                                     .putExtra("packageName", apkinfo[1])
-                                    .putExtra("packageLable", apkinfo[0])
+                                    .putExtra("contentTitle", String.format(getString(R.string.tip_install_over), apkinfo[0]))
                                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);
                         }
@@ -77,7 +78,7 @@ public class Install2Activity extends AbstractInstallActivity {
         } else {
             Log.d("Start uninstall", pkgName);
             new Thread(() -> {
-                showToast0(String.format(getString(R.string.tip_start_uninstall), packageLable));
+                showToast0(String.format(getString(R.string.tip_start_uninstall), uninstallPackageLable));
                 try {
                     DSMClient.uninstallApp(this, pkgName);
                 } catch (Exception e) {

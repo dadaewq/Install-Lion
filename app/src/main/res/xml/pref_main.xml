@@ -8,7 +8,8 @@
     <SwitchPreferenceCompat
         app:defaultValue="true"
         app:key="needconfirm"
-        app:summary="@string/confirm_tip"
+        app:summaryOff="@string/summary_off_needconfirm"
+        app:summaryOn="@string/summary_on_needconfirm"
         app:title="@string/confirm_title" />
     <Preference
         app:key="manualAuthorize"
@@ -22,14 +23,15 @@
             app:summaryOn="@string/summaryOn"
             app:title="@string/enable_title" />
         <Preference
+            app:key="avInstall1"
+            app:title="@string/title_installer_available_state" />
+        <Preference
             app:key="icebox_supported"
-            app:title="冰箱支持状态" />
+            app:title="@string/title_icebox_support_state" />
         <Preference
             app:key="icebox_permission"
-            app:title="冰箱权限状态" />
-        <Preference
-            app:key="avInstall1"
-            app:title="@string/request" />
+            app:title="@string/title_icebox__authorization_state" />
+
     </PreferenceCategory>
     <PreferenceCategory app:title="@string/name_install3">
         <SwitchPreferenceCompat
@@ -39,14 +41,15 @@
             app:summaryOn="@string/summaryOn"
             app:title="@string/enable_title" />
         <Preference
+            app:key="avInstall3"
+            app:title="@string/title_installer_available_state" />
+        <Preference
             app:key="shizuku_service"
-            app:title="Shizuku服务状态" />
+            app:title="@string/title_shizuku_service_state" />
         <Preference
             app:key="shizuku_permission"
-            app:title="Shizuku权限状态" />
-        <Preference
-            app:key="avInstall3"
-            app:title="@string/request" />
+            app:title="@string/title_shizuku_authorization_state" />
+
     </PreferenceCategory>
     <PreferenceCategory app:title="@string/name_install2">
         <SwitchPreferenceCompat
@@ -56,13 +59,14 @@
             app:summaryOn="@string/summaryOn"
             app:title="@string/enable_title" />
         <Preference
+            app:key="avInstall2"
+            app:title="@string/title_installer_available_state" />
+        <Preference
             app:key="getOwnerPackageNameAndSDKVersion"
-            app:title="已安装的托管主应用包名以及SDK版本" />
+            app:title="@string/title_delegated_OwnerPackageNameAndSDKVersion" />
         <Preference
             app:key="getDelegatedScopes"
-            app:title="托管权限状态" />
-        <Preference
-            app:key="avInstall2"
-            app:title="@string/request" />
+            app:title="@string/title_delegated_authorization_state" />
+
     </PreferenceCategory>
 </PreferenceScreen>
