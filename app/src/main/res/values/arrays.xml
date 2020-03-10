@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string-array name="querySupportSilentInstall">
+        <item>"supported"</item>
+        <item>"IceBox is not installed"</item>
+        <item>"IceBox is not the devie owner"</item>
+        <item>"No permissions"</item>
+        <item>"Not supported by current system version"</item>
+        <item>"IceBox's version is too low"</item>
+        <item>"Unknown"</item>
+    </string-array>
+</resources>

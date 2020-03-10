@@ -30,6 +30,7 @@ import java.util.List;
 public class Install3Activity extends AbstractInstallActivity implements SAIPackageInstaller.InstallationStatusListener {
 
     private long mOngoingSessionId;
+    private String realPath;
 
 
     @Override
@@ -37,7 +38,7 @@ public class Install3Activity extends AbstractInstallActivity implements SAIPack
         Log.d("Start install", apkPath + "");
         if (apkPath != null) {
             apkFile = new File(apkPath);
-
+            realPath = apkPath;
             ArrayList<File> files = new ArrayList<>();
             files.add(apkFile);
             new Thread(() -> {
@@ -65,11 +66,11 @@ public class Install3Activity extends AbstractInstallActivity implements SAIPack
             Looper.prepare();
             if (!ShizukuShell.getInstance().isAvailable()) {
                 copyErr(String.format("%s\n\n%s\n%s", getString(R.string.title_dialog_iuninstall), alertDialogMessage, getString(R.string.installer_error_shizuku_unavailable)));
-                showToast1(String.format(getString(R.string.tip_failed_uninstall), packageLable, getString(R.string.installer_error_shizuku_unavailable)));
+                showToast1(String.format(getString(R.string.tip_failed_uninstall_witherror), uninstallPackageLable, getString(R.string.installer_error_shizuku_unavailable)));
             } else {
                 Shell.Result uninstallationResult = ShizukuShell.getInstance().exec(new Shell.Command("pm", "uninstall", pkgName));
                 if (0 == uninstallationResult.exitCode) {
-                    showToast0(String.format(getString(R.string.tip_success_uninstall), packageLable));
+                    showToast0(String.format(getString(R.string.tip_success_uninstall), uninstallPackageLable));
                 } else {
                     String ILVersion = "???";
                     try {
@@ -78,7 +79,7 @@ public class Install3Activity extends AbstractInstallActivity implements SAIPack
                     }
                     String info = String.format("%s: %s %s | %s | Android %s | Install Lion %s\n\n", getString(R.string.installer_device), Build.BRAND, Build.MODEL, Utils.isMiui() ? "MIUI" : "Not MIUI", Build.VERSION.RELEASE, ILVersion);
                     copyErr(info + uninstallationResult.toString());
-                    showToast1(String.format(getString(R.string.tip_failed_uninstall), packageLable, uninstallationResult.err));
+                    showToast1(String.format(getString(R.string.tip_failed_uninstall_witherror), uninstallPackageLable, uninstallationResult.err));
                 }
             }
             Looper.loop();
@@ -115,23 +116,37 @@ public class Install3Activity extends AbstractInstallActivity implements SAIPack
                 if (show_notification) {
                     Log.e("packagename", apkinfo[1]);
                     Intent intent = new Intent()
-                            .setComponent(new ComponentName(getPackageName(), getPackageName() + ".activity.NotifyActivity"))
+                            .setComponent(new ComponentName(this, NotifyActivity.class))
                             .putExtra("channelId", "3")
                             .putExtra("channelName", getString(R.string.name_install3))
                             .putExtra("packageName", apkinfo[1])
                             .putExtra("packageLable", apkinfo[0])
+                            .putExtra("contentTitle", String.format(getString(R.string.tip_success_install), apkinfo[0]))
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 }
                 break;
             case INSTALLATION_FAILED:
+
+                if (show_notification) {
+                    Log.e("packagename", apkinfo[1]);
+                    Intent intent = new Intent()
+                            .setComponent(new ComponentName(this, NotifyActivity.class))
+                            .putExtra("channelId", "4")
+                            .putExtra("channelName", getString(R.string.channalname_fail))
+                            .putExtra("realPath", realPath)
+                            .putExtra("packageName", apkinfo[1])
+                            .putExtra("contentTitle", String.format(getString(R.string.tip_failed_install), apkinfo[0]))
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
                 deleteCache();
                 if (packageNameOrErrorDescription != null) {
                     copyErr(packageNameOrErrorDescription);
-                    showToast1(String.format(getString(R.string.tip_failed_install), apkinfo[0], packageNameOrErrorDescription));
+                    showToast1(String.format(getString(R.string.tip_failed_install_witherror), apkinfo[0], packageNameOrErrorDescription));
                 } else {
                     copyErr(getString(R.string.unknown));
-                    showToast1(String.format(getString(R.string.tip_failed_install), apkinfo[0], ""));
+                    showToast1(String.format(getString(R.string.tip_failed_install_witherror), apkinfo[0], ""));
                 }
                 break;
             default:
