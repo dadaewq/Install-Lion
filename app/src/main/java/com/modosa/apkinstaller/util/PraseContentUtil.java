@@ -124,6 +124,10 @@ public class PraseContentUtil {
                         //测试多个设备都无法使用,Android9以上必不能用
                         Uri contentUri = ContentUris.withAppendedId(
                                 Uri.parse("content://downloads/public_downloads"), Long.parseLong(docId));
+                        //TODO
+//                        "content://downloads/public_downloads",
+//                                "content://downloads/my_downloads",
+//                                "content://downloads/all_downloads"
 
                         path = getDataColumn(context, contentUri, null, null);
                     }

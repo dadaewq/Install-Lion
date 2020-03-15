@@ -14,7 +14,7 @@ import androidx.annotation.RequiresApi;
 /**
  * @author dadaewq
  */
-public class LaunchActivity extends Activity {
+public class LaunchAppActivity extends Activity {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override

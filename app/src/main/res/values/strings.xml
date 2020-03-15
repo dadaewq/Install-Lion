@@ -16,26 +16,29 @@
     <string name="installer_error_unknown_apk_size">Installer error unknown apk size</string>
     <string name="launch_name">Run app</string>
     <string name="message_ClearAllowedList">\nClear the list of apps you don\'t need to confirm before installation\n</string>
-    <string name="message_HideIcon">You can open the app settings in the following way\n\n1.Dialer *#*#297297#*#*\n2.System App Info-Manage space\n3.System App Info-Additional settings\n</string>
+    <string name="message_HideIcon">You can open the app settings in the following way\n\n1.System App Info-Manage space\n2.Dialer *#*#297297#*#*\n3.System App Info-Additional settings\n</string>
     <string name="message_name">Name：%1$s</string>
     <string name="message_packagename">Package Name：%1$s</string>
     <string name="message_size">Size：%1$s</string>
-    <string name="message_uninstalConfirm">This operation is irrevocable\nConfirm uninstallation?</string>
+    <string name="message_irrevocableConfirm">This operation is irrevocable\nConfirm uninstallation?</string>
     <string name="message_version">Version：%1$s (%2$s)</string>
     <string name="message_version_existed">Existed：%1$s (%2$s)</string>
     <string name="name_install1">Install Lion-IceBox</string>
     <string name="name_install2">Install Lion-DSM</string>
     <string name="name_install3">Install Lion-Shizuku</string>
+    <string name="name_install4">Install Lion-Root</string>
+    <string name="name_install5">Install Lion-DPM</string>
+
     <string name="notexist">Not exist！</string>
     <string name="permission_no">Unauthorized！</string>
     <string name="permission_yes">Authorized</string>
-    <string name="setting_name">Setting</string>
+    <string name="Settings">Setting</string>
     <string name="show_tip">Show notification after installation,You can run the app by clicking the notification</string>
     <string name="show_title">Show notification</string>
     <string name="summary_av_no">Unavailable！</string>
     <string name="summary_av_yes">Available</string>
     <string name="summary_av_ok_installer">Available now</string>
-    <string name="summary_manualAuthorize">MIUI may need to turn off MIUI optimization</string>
+    <string name="summary_manualAuthorize">MIUI may need to disable MIUI optimization</string>
     <string name="summary_off_needconfirm">Never display a confirmation dialog  before installation</string>
     <string name="summary_on_needconfirm">User selects the application without confirmation before installation</string>
     <string name="summaryOff">Disabled</string>
@@ -57,7 +60,7 @@
     <string name="tip_success_uninstall">%1$s Uninstalled succeed</string>
     <string name="title_delegated_authorization_state">Delegated authorization state</string>
     <string name="title_dialog_install">Installation</string>
-    <string name="title_dialog_iuninstall">Uninstallation</string>
+    <string name="title_dialog_uninstall">Uninstallation</string>
     <string name="title_installer_available_state">Available state</string>
     <string name="title_manualAuthorize">Click to manually authorize</string>
     <string name="title_shizuku_service_state">Shizuku service state</string>
@@ -68,5 +71,59 @@
     <string name="title_icebox__authorization_state">IceBox authorization state</string>
     <string name="title_icebox_support_state">IceBox support state</string>
     <string name="title_shizuku_authorization_state">Shizuku authorization state</string>
+
+
+    <string name="tip_failed_get_content">Get Failed</string>
+
+    <string name="checkbox_deactivate">Confirm Deactivate</string>
+
+    <string name="tip_start_activating">Trying to activate</string>
+    <string name="tip_success_deactivate">Cancel succeed</string>
+    <string name="tip_failed_deactivate">Unable to deactivate</string>
+    <string name="title_is_deviceowner">Is the Device Owner currently</string>
+    <string name="title_not_deviceowner">Not the Device Owner currently</string>
+    <string name="summary_clicktocopycmd">\n%1$sn(Click to copy)</string>
+    <string name="title_deactivate_deviceowner">Deactivate Device Owner</string>
+    <string name="message_deactivate">\nThis operation is irrevocable\n\nMake sure you have unlocked unnecessary default apps\n</string>
+    <string name="tip_ltsdk23">Only supports Android 6.0 and above devices</string>
+    <string name="title_systemSettings">System Settings</string>
+    <string name="DISALLOW_INSTALL_APPS">Disallow install Apps</string>
+    <string name="DISALLOW_UNINSTALL_APPS">Disallow uninstall Apps</string>
+    <string name="DISALLOW_INSTALL_UNKNOWN_SOURCES">Disallow install unknown sources Apps</string>
+
+    <string name="ClearCache">Clear cache</string>
+    <string name="tip_empty_cache">No cache currently, no cleaning required</string>
+    <string name="message_ClearCache">Current cache size is %s\nClear it?</string>
+    <string name="InstallFromGetContent">Pick a file to install</string>
+    <string name="RebootDevice">Reboot device now</string>
+    <string name="dpmSettings">DPM settings</string>
+    <string name="title_lockDefaultApp">Lock Default App</string>
+    <string name="title_others">Others</string>
+    <string name="title_display">Display</string>
+    <string name="SetOrganizationName">Set organization name</string>
+    <string name="title_SetOrganizationName">set the name of the organization under management</string>
+    <string name="SetLockScreenInfo">Set lock screen info</string>
+    <string name="title_SetLockScreenInfo">Set the device owner information to be shown on the lock screen.</string>
+    <string name="LockDefaultLauncher">Lock default launcher</string>
+    <string name="LockDefaultPackageInstaller">Lock default package installer</string>
+    <string name="EnableBackupService">Enable system backup</string>
+    <string name="SetUserRestrictions">Set user restrictions</string>
+    <string name="hint_restrictionkey">Please input the key of the restriction</string>
+    <string name="add">Add</string>
+    <string name="clear">Clear</string>
+    <string name="set">Set</string>
+    <string name="clear_lock">Clear Lock</string>
+    <string name="close">Close</string>
+    <string name="tip_empty_key">The key Cannot be empty</string>
+    <string name="title_lockdefault">Waring！</string>
+    <string name="message_lockdefault">Locking the default app is permanent, even after deactivating the device owner.\nMake sure to cancel unnecessary locks before deactivating the device owner\n\n(Locks cannot be made on some custom rom)\n</string>
+    <string name="checkbox_lockdefault">I am fully aware and at my own risk</string>
+
+    <string name="start_install">Start installing  %1$s</string>
+
+    <string name="installer_error_root_no_root">Unable to acquire root access</string>
+    <!--    <string name="title_show_root_no_click2request">Not granted root permission,click to request</string>-->
+    <string name="title_show_root_no_click2request">Click to request root permission</string>
+    <string name="title_show_root_yes">Have Root permission</string>
 
 </resources>

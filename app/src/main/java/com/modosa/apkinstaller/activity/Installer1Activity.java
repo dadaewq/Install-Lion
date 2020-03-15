@@ -1,7 +1,5 @@
 package com.modosa.apkinstaller.activity;
 
-import android.content.ComponentName;
-import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
@@ -10,6 +8,7 @@ import androidx.core.content.FileProvider;
 
 import com.catchingnow.icebox.sdk_client.IceBox;
 import com.modosa.apkinstaller.R;
+import com.modosa.apkinstaller.util.NotifyUtil;
 
 import java.io.File;
 
@@ -21,7 +20,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * @author dadaewq
  */
-public class Install1Activity extends AbstractInstallActivity {
+public class Installer1Activity extends AbstractInstallerActivity {
 
     private Disposable mSubscribe;
 
@@ -29,10 +28,10 @@ public class Install1Activity extends AbstractInstallActivity {
     public void startInstall(String apkPath) {
         Log.d("Start install", apkPath + "");
         if (apkPath != null) {
-            apkFile = new File(apkPath);
+            installApkFile = new File(apkPath);
             String authority = getPackageName() + ".FILE_PROVIDER";
-            Uri installuri = FileProvider.getUriForFile(getApplicationContext(), authority, apkFile);
-            showToast0(String.format(getString(R.string.tip_start_install), apkinfo[0]));
+            Uri installuri = FileProvider.getUriForFile(getApplicationContext(), authority, installApkFile);
+            showMyToast0(String.format(getString(R.string.tip_start_install), apkinfo[0]));
 
             disposeSafety();
 
@@ -44,29 +43,21 @@ public class Install1Activity extends AbstractInstallActivity {
 
                         if (show_notification) {
                             Log.e("packagename", apkinfo[1]);
-                            Intent intent = new Intent()
-                                    .setComponent(new ComponentName(this, NotifyActivity.class))
-                                    .putExtra("packageName", apkinfo[1])
-                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             if (success) {
-                                intent.putExtra("channelId", "1")
-                                        .putExtra("channelName", getString(R.string.name_install1))
-                                        .putExtra("contentTitle", String.format(getString(R.string.tip_success_install), apkinfo[0]));
+                                deleteCache();
+                                new NotifyUtil(this).sendNotification("1", String.format(getString(R.string.tip_success_install), apkinfo[0]), apkinfo[1]);
                             } else {
-                                intent.putExtra("channelId", "4")
-                                        .putExtra("channelName", getString(R.string.channalname_fail))
-                                        .putExtra("realPath", apkPath)
-                                        .putExtra("contentTitle", String.format(getString(R.string.tip_failed_install), apkinfo[0]));
+                                new NotifyUtil(this).sendNotification("21", String.format(getString(R.string.tip_failed_install), apkinfo[0]), apkinfo[1], apkPath, istemp);
                             }
-
-                            startActivity(intent);
+                        } else {
+                            deleteCache();
                         }
-                        deleteCache();
+
                     }, Throwable::printStackTrace);
 
             finish();
         } else {
-            showToast0(R.string.tip_failed_read);
+            showMyToast0(R.string.tip_failed_read);
             finish();
         }
     }
@@ -74,7 +65,7 @@ public class Install1Activity extends AbstractInstallActivity {
     @Override
     protected void startUninstall(String pkgName) {
         Log.d("Start uninstall", pkgName);
-        showToast0(String.format(getString(R.string.tip_start_uninstall), uninstallPackageLable));
+        showMyToast0(String.format(getString(R.string.tip_start_uninstall), uninstallPackageLable));
         disposeSafety();
 
         mSubscribe = Single.fromCallable(() -> IceBox.uninstallPackage(this, pkgName))

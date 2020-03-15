@@ -16,20 +16,22 @@
     <string name="installer_error_unknown_apk_size">无法获得APK大小</string>
     <string name="launch_name">启动应用</string>
     <string name="message_ClearAllowedList">\n清空安装前无需确认的应用列表\n</string>
-    <string name="message_HideIcon">你可以通过以下方式打开应用设置\n\n1.拨号 *#*#297297#*#*\n2.系统应用信息-管理空间\n3.系统应用信息-其他设置\n</string>
+    <string name="message_HideIcon">你可以通过以下方式打开应用设置\n\n1.系统应用信息-管理空间\n2.拨号 *#*#297297#*#*\n3.系统应用信息-其他设置\n</string>
     <string name="message_name">名称：%1$s</string>
     <string name="message_packagename">包名：%1$s</string>
     <string name="message_size">大小：%1$s</string>
-    <string name="message_uninstalConfirm">此操作不可撤销\n确认卸载吗?</string>
+    <string name="message_irrevocableConfirm">此操作不可撤销\n确认卸载吗?</string>
     <string name="message_version">版本：%1$s(%2$s)</string>
     <string name="message_version_existed">现存：%1$s(%2$s)</string>
     <string name="name_install1">安装狮-IceBox</string>
     <string name="name_install2">安装狮-DSM</string>
     <string name="name_install3">安装狮-Shizuku</string>
+    <string name="name_install4">安装狮-Root</string>
+    <string name="name_install5">安装狮-DPM</string>
     <string name="notexist">不存在！</string>
     <string name="permission_no">未授权！</string>
     <string name="permission_yes">已授权</string>
-    <string name="setting_name">设置</string>
+    <string name="Settings">设置</string>
     <string name="show_tip">安装结束后显示通知，点击通知可打开应用</string>
     <string name="show_title">显示通知</string>
     <string name="summary_av_no">不可用！</string>
@@ -42,7 +44,7 @@
     <string name="summary_on_needconfirm">用户选择安装前无需确认的应用</string>
     <string name="summaryOff">已禁用</string>
     <string name="summaryOn">已启用</string>
-    <string name="tip_exit">再按一次退出程序</string>
+    <string name="tip_exit">再按一次退出</string>
     <string name="tip_failed_install">%1$s 安装失败</string>
     <string name="tip_failed_install_witherror">%1$s 安装失败,错误已复制到剪贴板\n%2$s</string>
     <string name="tip_failed_prase">无法解析</string>
@@ -60,7 +62,7 @@
     <string name="title_delegated_authorization_state">托管权限状态</string>
     <string name="title_delegated_OwnerPackageNameAndSDKVersion">已安装的托管主应用以及SDK版本</string>
     <string name="title_dialog_install">安装</string>
-    <string name="title_dialog_iuninstall">卸载</string>
+    <string name="title_dialog_uninstall">卸载</string>
     <string name="title_icebox__authorization_state">冰箱权限状态</string>
     <string name="title_icebox_support_state">冰箱支持状态</string>
     <string name="title_installer_available_state">可用状态</string>
@@ -68,4 +70,61 @@
     <string name="title_shizuku_authorization_state">Shizuku权限状态</string>
     <string name="title_shizuku_service_state">Shizuku服务状态</string>
     <string name="unknown">未知</string>
+
+
+    <string name="tip_failed_get_content">获取失败</string>
+
+    <string name="tip_ltsdk23">仅支持Android6.0及以上设备</string>
+
+    <string name="tip_start_activating">尝试激活中</string>
+    <string name="tip_success_deactivate">解除成功</string>
+    <string name="tip_failed_deactivate">无法取消</string>
+    <string name="title_is_deviceowner">当前是 设备管理员</string>
+    <string name="title_not_deviceowner">当前不是 设备管理员</string>
+    <string name="summary_clicktocopycmd">\n%1$s\n(点击可复制)</string>
+    <string name="title_deactivate_deviceowner">解除设备管理员权限</string>
+    <string name="message_deactivate">\n此操作不可撤销\n\n请确保已取消锁定不必要的默认应用\n</string>
+    <string name="checkbox_deactivate">确认解除</string>
+
+    <string name="title_systemSettings">系统设置</string>
+    <string name="DISALLOW_INSTALL_APPS">禁止安装应用</string>
+    <string name="DISALLOW_UNINSTALL_APPS">禁止卸载应用</string>
+    <string name="DISALLOW_INSTALL_UNKNOWN_SOURCES">禁止安装未知来源应用</string>
+    <string name="ClearCache">清除缓存</string>
+    <string name="tip_empty_cache">当前无缓存，无需清理</string>
+    <string name="message_ClearCache">当前缓存大小为 %s\n清理吗</string>
+    <string name="InstallFromGetContent">选择文件安装</string>
+    <string name="RebootDevice">立即重启设备</string>
+    <string name="dpmSettings">DPM设置</string>
+    <string name="title_lockDefaultApp">锁定默认应用</string>
+    <string name="title_others">其他</string>
+    <string name="title_display">显示</string>
+    <string name="SetOrganizationName">设置组织名称</string>
+    <string name="title_SetOrganizationName">设置对外显示的组织名称</string>
+    <string name="SetLockScreenInfo">设置锁屏信息</string>
+    <string name="title_SetLockScreenInfo">设置显示在锁屏的信息</string>
+    <string name="LockDefaultLauncher">锁定默认桌面</string>
+    <string name="LockDefaultPackageInstaller">锁定默认安装器</string>
+    <string name="EnableBackupService">启用系统备份</string>
+    <string name="SetUserRestrictions">设置用户限制</string>
+    <string name="hint_restrictionkey">请输入限制关键字</string>
+    <string name="add">增加</string>
+    <string name="clear">清除</string>
+    <string name="set">设置</string>
+    <string name="clear_lock">清除锁定</string>
+    <string name="close">关闭</string>
+    <string name="tip_empty_key">关键字不可为空</string>
+    <string name="title_lockdefault">警告！</string>
+    <string name="message_lockdefault">锁定默认应用是永久生效的，即使在取消激活设备管理员后。\n在取消激活设备管理员前请确保取消不必要的锁定。\n\n(在部分定制系统上无法锁定)\n</string>
+    <string name="checkbox_lockdefault">我已经充分知晓并自行承担风险</string>
+
+
+    <string name="start_install">开始安装  %1$s</string>
+
+    <string name="installer_error_root_no_root">无法获取Root权限</string>
+    <!--    <string name="title_show_root_no_click2request">未获取Root权限,点击申请</string>-->
+    <string name="title_show_root_no_click2request">点击检查Root权限</string>
+    <string name="title_show_root_yes">已获取Root权限</string>
+
+
 </resources>

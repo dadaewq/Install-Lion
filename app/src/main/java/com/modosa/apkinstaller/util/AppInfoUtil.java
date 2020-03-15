@@ -14,6 +14,9 @@ import android.os.Build;
 import static android.content.pm.PackageManager.GET_UNINSTALLED_PACKAGES;
 import static android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES;
 
+/**
+ * @author dadaewq
+ */
 public final class AppInfoUtil {
     public static final String UNINSTALLED = "IL^&UninstalledPN*@!128`+=：:,.[";
 
@@ -64,6 +67,7 @@ public final class AppInfoUtil {
         } catch (Exception ignore) {
         }
 
+
         if (applicationInfo != null) {
             return drawable2Bitmap(applicationInfo.loadIcon(pm));
         } else {
@@ -94,6 +98,7 @@ public final class AppInfoUtil {
         }
     }
 
+
     public static String[] getApkVersion(Context context, String apkPath) {
         PackageManager pm = context.getPackageManager();
         PackageInfo pkgInfo = pm.getPackageArchiveInfo(apkPath, PackageManager.GET_ACTIVITIES);
@@ -101,6 +106,7 @@ public final class AppInfoUtil {
         if (pkgInfo != null) {
             pkgInfo.applicationInfo.sourceDir = apkPath;
             pkgInfo.applicationInfo.publicSourceDir = apkPath;
+
 
             return new String[]{
                     pkgInfo.versionName,

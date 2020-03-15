@@ -12,7 +12,7 @@ import android.util.Pair;
 
 import com.modosa.apkinstaller.BuildConfig;
 import com.modosa.apkinstaller.R;
-import com.modosa.apkinstaller.util.Utils;
+import com.modosa.apkinstaller.util.ResultUtil;
 import com.modosa.apkinstaller.util.apksource.ApkSource;
 import com.modosa.apkinstaller.util.shell.Shell;
 
@@ -96,7 +96,7 @@ public abstract class ShellSAIPackageInstaller extends SAIPackageInstaller {
         } catch (Exception e) {
             //TODO this catches resources close exception causing a crash, same in rootless installer
             Log.w(TAG, e);
-            dispatchCurrentSessionUpdate(InstallationStatus.INSTALLATION_FAILED, getContext().getString(R.string.installer_error_shell, getInstallerName(), getSessionInfo(aApkSource) + "\n\n" + Utils.throwableToString(e)));
+            dispatchCurrentSessionUpdate(InstallationStatus.INSTALLATION_FAILED, getContext().getString(R.string.installer_error_shell, getInstallerName(), getSessionInfo(aApkSource) + "\n\n" + ResultUtil.throwableToString(e)));
             installationCompleted();
         }
     }
@@ -115,7 +115,7 @@ public abstract class ShellSAIPackageInstaller extends SAIPackageInstaller {
         } catch (PackageManager.NameNotFoundException e) {
             Log.wtf(TAG, "Unable to get SAI version", e);
         }
-        return String.format("%s: %s %s | %s | Android %s | Install Lion %s", getContext().getString(R.string.installer_device), Build.BRAND, Build.MODEL, Utils.isMiui() ? "MIUI" : "Not MIUI", Build.VERSION.RELEASE, ILVersion);
+        return String.format("%s: %s %s | %s | Android %s | Install Lion %s", getContext().getString(R.string.installer_device), Build.BRAND, Build.MODEL, ResultUtil.isMiui() ? "MIUI" : "Not MIUI", Build.VERSION.RELEASE, ILVersion);
     }
 
     private int createSession() throws RuntimeException {

@@ -1,7 +1,3 @@
 <resources>
 
-    <style name="DeviceDefault.Dialog" parent="@android:style/Theme.DeviceDefault.Dialog.NoActionBar">
-        <item name="android:colorBackground">@color/Background</item>
-    </style>
-
 </resources>

@@ -1,14 +1,21 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:colorBackground">@color/Background</item>
     </style>
+
+    <style name="AppTheme.Dialog.NoActionbar" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:colorBackground">@color/Background</item>
+    </style>
+
 
     <style name="Translucent" parent="@android:style/Theme.Translucent.NoTitleBar" />
 
-    <style name="DeviceDefault.Dialog" parent="@android:style/Theme.DeviceDefault.Light.Dialog.NoActionBar">
-        <item name="android:colorBackground">@color/Background</item>
-    </style>
+    <!--    <style name="AppTheme.Dialog.NoActionbar" parent="@android:style/Theme.DeviceDefault.Light.Dialog.NoActionBar">-->
+    <!--        <item name="android:colorBackground">@color/Background</item>-->
+    <!--    </style>-->
 
 </resources>

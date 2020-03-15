@@ -10,6 +10,12 @@
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission
+        android:name="android.permission.INSTALL_PACKAGES"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission
+        android:name="android.permission.DELETE_PACKAGES"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission
         android:name="android.permission.GRANT_RUNTIME_PERMISSIONS"
         tools:ignore="ProtectedPermissions" />
 
@@ -18,16 +24,16 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:manageSpaceActivity=".activity.SettingsActivity"
+        android:manageSpaceActivity=".activity.MainUiActivity"
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        tools:ignore="AllowBackup"
+        android:theme="@style/AppTheme.NoActionBar"
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning"
         tools:targetApi="q">
         <activity
-            android:name=".activity.SettingsActivity"
-            android:label="@string/setting_name"
+            android:name=".activity.MainUiActivity"
+
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -38,10 +44,11 @@
                 <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
             </intent-filter>
         </activity>
+
         <activity-alias
             android:name=".activity.MainActivity"
             android:label="@string/app_name"
-            android:targetActivity=".activity.SettingsActivity">
+            android:targetActivity=".activity.MainUiActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -51,87 +58,8 @@
         </activity-alias>
 
         <activity
-            android:name=".activity.Install1Activity"
-            android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
-            android:excludeFromRecents="true"
-            android:label="@string/name_install1"
-            android:noHistory="true"
-            android:theme="@style/DeviceDefault.Dialog">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <action android:name="android.intent.action.INSTALL_PACKAGE" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:scheme="file" />
-                <data android:scheme="content" />
-                <data android:mimeType="application/vnd.android.package-archive" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.DELETE" />
-                <action android:name="android.intent.action.UNINSTALL_PACKAGE" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:scheme="package" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".activity.Install2Activity"
-            android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
-            android:excludeFromRecents="true"
-            android:label="@string/name_install2"
-            android:noHistory="true"
-            android:theme="@style/DeviceDefault.Dialog">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <action android:name="android.intent.action.INSTALL_PACKAGE" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:scheme="file" />
-                <data android:scheme="content" />
-                <data android:mimeType="application/vnd.android.package-archive" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.DELETE" />
-                <action android:name="android.intent.action.UNINSTALL_PACKAGE" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:scheme="package" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".activity.Install3Activity"
-            android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
-            android:excludeFromRecents="true"
-            android:label="@string/name_install3"
-            android:noHistory="true"
-            android:theme="@style/DeviceDefault.Dialog">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <action android:name="android.intent.action.INSTALL_PACKAGE" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:scheme="file" />
-                <data android:scheme="content" />
-                <data android:mimeType="application/vnd.android.package-archive" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.DELETE" />
-                <action android:name="android.intent.action.UNINSTALL_PACKAGE" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:scheme="package" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".activity.NotifyActivity"
-            android:noHistory="true"
-            android:theme="@style/Translucent">
+            android:name=".activity.SettingsActivity"
+            android:label="@string/Settings">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -139,8 +67,150 @@
             </intent-filter>
         </activity>
 
+        <activity-alias
+            android:name=".activity.translucentctivity"
+            android:icon="@drawable/translucent"
+            android:label=""
+            android:roundIcon="@drawable/translucent"
+            android:targetActivity=".activity.MainUiActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity-alias>
+
         <activity
-            android:name=".activity.LaunchActivity"
+            android:name=".activity.Installer1Activity"
+            android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+            android:excludeFromRecents="true"
+            android:label="@string/name_install1"
+            android:theme="@style/AppTheme.Dialog.NoActionbar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.INSTALL_PACKAGE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/vnd.android.package-archive" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.DELETE" />
+                <action android:name="android.intent.action.UNINSTALL_PACKAGE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="package" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.Installer2Activity"
+            android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+            android:excludeFromRecents="true"
+            android:label="@string/name_install2"
+            android:theme="@style/AppTheme.Dialog.NoActionbar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.INSTALL_PACKAGE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/vnd.android.package-archive" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.DELETE" />
+                <action android:name="android.intent.action.UNINSTALL_PACKAGE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="package" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.Installer3Activity"
+            android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+            android:excludeFromRecents="true"
+            android:label="@string/name_install3"
+            android:theme="@style/AppTheme.Dialog.NoActionbar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.INSTALL_PACKAGE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/vnd.android.package-archive" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.DELETE" />
+                <action android:name="android.intent.action.UNINSTALL_PACKAGE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="package" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.Installer4Activity"
+            android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+            android:excludeFromRecents="true"
+            android:icon="@mipmap/ic_root"
+            android:label="@string/name_install4"
+            android:roundIcon="@mipmap/ic_root_round"
+            android:theme="@style/AppTheme.Dialog.NoActionbar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.INSTALL_PACKAGE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/vnd.android.package-archive" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.DELETE" />
+                <action android:name="android.intent.action.UNINSTALL_PACKAGE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="package" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.Installer5Activity"
+            android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+            android:excludeFromRecents="true"
+            android:icon="@mipmap/ic_dpm"
+            android:label="@string/name_install5"
+            android:roundIcon="@mipmap/ic_dpm_round"
+            android:theme="@style/AppTheme.Dialog.NoActionbar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.INSTALL_PACKAGE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/vnd.android.package-archive" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.DELETE" />
+                <action android:name="android.intent.action.UNINSTALL_PACKAGE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="package" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.LaunchAppActivity"
             android:enabled="true"
             android:label="@string/launch_name"
             android:launchMode="singleTop"
@@ -153,18 +223,17 @@
             </intent-filter>
         </activity>
 
-        <receiver
-            android:name=".activity.AdminReceiver"
-            android:permission="android.permission.BIND_DEVICE_ADMIN">
+        <activity-alias
+            android:name=".activity.ShowAppInfoActivity"
+            android:exported="false"
+            android:label="@string/launch_name"
+            android:targetActivity=".activity.LaunchAppActivity">
             <intent-filter>
-                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
-                <action android:name="android.app.develop.action.DEVICE_DELEGATION" />
-            </intent-filter>
+                <action android:name="android.intent.action.SHOW_APP_INFO" />
 
-            <meta-data
-                android:name="android.app.develop.delegation"
-                android:resource="@xml/app_delegation" />
-        </receiver>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity-alias>
 
         <receiver android:name=".receiver.SecretCodeReceiver">
             <intent-filter>
@@ -173,6 +242,17 @@
                     android:host="297297"
                     android:scheme="android_secret_code" />
             </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".receiver.AdminReceiver"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin" />
         </receiver>
 
         <provider

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/title_systemSettings">
+        <SwitchPreferenceCompat
+            android:key="DISALLOW_INSTALL_APPS"
+            android:title="@string/DISALLOW_INSTALL_APPS" />
+        <SwitchPreferenceCompat
+            android:key="DISALLOW_UNINSTALL_APPS"
+            android:title="@string/DISALLOW_UNINSTALL_APPS" />
+        <SwitchPreferenceCompat
+            android:key="DISALLOW_INSTALL_UNKNOWN_SOURCES"
+            android:title="@string/DISALLOW_INSTALL_UNKNOWN_SOURCES" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/title_display">
+        <Preference
+            android:key="SetOrganizationName"
+            android:title="@string/SetOrganizationName" />
+        <Preference
+            android:key="SetLockScreenInfo"
+            android:title="@string/SetLockScreenInfo" />
+    </PreferenceCategory>
+
+
+    <PreferenceCategory android:title="@string/title_lockDefaultApp">
+        <Preference
+            android:key="LockDefaultLauncher"
+            android:title="@string/LockDefaultLauncher" />
+        <Preference
+            android:key="LockDefaultPackageInstaller"
+            android:title="@string/LockDefaultPackageInstaller" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/title_others">
+        <SwitchPreferenceCompat
+            android:key="EnableBackupService"
+            android:title="@string/EnableBackupService"
+            android:visibility="gone" />
+        <Preference
+            android:key="SetUserRestrictions"
+            android:title="@string/SetUserRestrictions" />
+        <Preference
+            android:key="DeactivateDeviceOwner"
+            android:title="@string/title_deactivate_deviceowner" />
+    </PreferenceCategory>
+</PreferenceScreen>

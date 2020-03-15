@@ -4,7 +4,6 @@ package com.modosa.apkinstaller.util;
 import android.util.Log;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.text.DecimalFormat;
 
 /**
@@ -13,7 +12,7 @@ import java.text.DecimalFormat;
  * @
  * @modifiedFrom https://github.com/haiyuKing/FileSizeUtilDemo/blob/master/app/src/main/java/com/why/project/filesizeutildemo/utils/FileSizeUtil.java
  */
-class FileSizeUtil {
+public class FileSizeUtil {
 
     private static final int SIZETYPE_B = 1;
     private static final int SIZETYPE_KB = 2;
@@ -27,7 +26,7 @@ class FileSizeUtil {
      * @param sizeType 获取大小的类型1为B、2为KB、3为MB、4为GB
      * @return double值的大小
      */
-    public static double getFolderOrFileSize(String filePath, int sizeType) {
+    static double getFolderOrFileSize(String filePath, int sizeType) {
         File file = new File(filePath);
         long blockSize = 0;
         try {
@@ -49,7 +48,7 @@ class FileSizeUtil {
      * @param filePath 文件路径
      * @return 计算好的带B、KB、MB、GB的字符串
      */
-    static String getAutoFolderOrFileSize(String filePath) {
+    public static String getAutoFolderOrFileSize(String filePath) {
         File file = new File(filePath);
         long blockSize = 0;
         try {
@@ -72,19 +71,8 @@ class FileSizeUtil {
      * @return longValue
      * @throws Exception FileNotFound
      */
-    private static long getFileSize(File file) throws Exception {
-        long size;
-        if (file.exists()) {
-            FileInputStream fis;
-            fis = new FileInputStream(file);
-            size = fis.available();
-            fis.close();
-        } else {
-            Log.e("getFileSize", "notExist!");
-            throw new Exception("FileNotFound");
-        }
-
-        return size;
+    private static long getFileSize(File file) {
+        return file.length();
     }
 
     /**

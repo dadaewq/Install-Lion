@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.modosa.apkinstaller.activity.SettingsActivity;
+import com.modosa.apkinstaller.activity.MainUiActivity;
 
 /**
  * @author dadaewq
@@ -16,7 +16,7 @@ public class SecretCodeReceiver extends BroadcastReceiver {
 
         if ("android.provider.Telephony.SECRET_CODE".equals(intent.getAction())) {
             Intent settingsIntent1 = new Intent(Intent.ACTION_MAIN)
-                    .setClass(context.getApplicationContext(), SettingsActivity.class)
+                    .setClass(context.getApplicationContext(), MainUiActivity.class)
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(settingsIntent1);
         }

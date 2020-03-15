@@ -9,7 +9,8 @@ import androidx.annotation.Nullable;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-public class Utils {
+public class ResultUtil {
+    private static final String TAG = "ResultUtil";
 
     public static String throwableToString(Throwable throwable) {
         StringWriter sw = new StringWriter(1024);
@@ -38,6 +39,5 @@ public class Utils {
     public static boolean isMiui() {
         return !TextUtils.isEmpty(getSystemProperty());
     }
-
 
 }

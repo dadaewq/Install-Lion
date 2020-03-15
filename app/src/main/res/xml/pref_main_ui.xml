@@ -33,24 +33,6 @@
             app:title="@string/title_icebox__authorization_state" />
 
     </PreferenceCategory>
-    <PreferenceCategory app:title="@string/name_install3">
-        <SwitchPreferenceCompat
-            app:defaultValue="true"
-            app:key="enable3"
-            app:summaryOff="@string/summaryOff"
-            app:summaryOn="@string/summaryOn"
-            app:title="@string/enable_title" />
-        <Preference
-            app:key="avInstall3"
-            app:title="@string/title_installer_available_state" />
-        <Preference
-            app:key="shizuku_service"
-            app:title="@string/title_shizuku_service_state" />
-        <Preference
-            app:key="shizuku_permission"
-            app:title="@string/title_shizuku_authorization_state" />
-
-    </PreferenceCategory>
     <PreferenceCategory app:title="@string/name_install2">
         <SwitchPreferenceCompat
             app:defaultValue="true"
@@ -67,6 +49,53 @@
         <Preference
             app:key="getDelegatedScopes"
             app:title="@string/title_delegated_authorization_state" />
+        <PreferenceCategory app:title="@string/name_install3">
+            <SwitchPreferenceCompat
+                app:defaultValue="true"
+                app:key="enable3"
+                app:summaryOff="@string/summaryOff"
+                app:summaryOn="@string/summaryOn"
+                app:title="@string/enable_title" />
+            <Preference
+                app:key="avInstall3"
+                app:title="@string/title_installer_available_state" />
+            <Preference
+                app:key="shizuku_service"
+                app:title="@string/title_shizuku_service_state" />
+            <Preference
+                app:key="shizuku_permission"
+                app:title="@string/title_shizuku_authorization_state" />
+
+        </PreferenceCategory>
+
+
+    </PreferenceCategory>
+    <PreferenceCategory app:title="@string/name_install4">
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="enable4"
+            app:summaryOff="@string/summaryOff"
+            app:summaryOn="@string/summaryOn"
+            app:title="@string/enable_title" />
+        <Preference
+            app:key="avInstall4"
+            app:title="@string/title_show_root_no_click2request" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/name_install5">
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="enable5"
+            app:summaryOff="@string/summaryOff"
+            app:summaryOn="@string/summaryOn"
+            app:title="@string/enable_title" />
+        <Preference
+            app:key="dpm_settings"
+            app:title="@string/dpmSettings" />
+        <Preference
+            app:key="avInstall5"
+            app:title="@string/title_not_deviceowner" />
 
     </PreferenceCategory>
 </PreferenceScreen>

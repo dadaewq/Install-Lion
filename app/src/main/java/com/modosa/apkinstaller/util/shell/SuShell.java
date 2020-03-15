@@ -11,37 +11,34 @@ import com.modosa.apkinstaller.util.ResultUtil;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import moe.shizuku.api.RemoteProcess;
-import moe.shizuku.api.ShizukuService;
+public class SuShell implements Shell {
+    private static final String TAG = "SuShell";
 
-public class ShizukuShell implements Shell {
-    private static final String TAG = "ShizukuShell";
+    private static SuShell sInstance;
 
-    private static ShizukuShell sInstance;
-
-    private ShizukuShell() {
+    private SuShell() {
         sInstance = this;
     }
 
-    public static ShizukuShell getInstance() {
-        synchronized (ShizukuShell.class) {
-            return sInstance != null ? sInstance : new ShizukuShell();
+    public static SuShell getInstance() {
+        synchronized (SuShell.class) {
+            return sInstance != null ? sInstance : new SuShell();
+        }
+    }
+
+    private boolean requestRoot() {
+        try {
+            return exec(new Command("exit")).isSuccessful();
+        } catch (Exception e) {
+            Log.w(TAG, "Unable to acquire root access: ");
+            Log.w(TAG, e);
+            return false;
         }
     }
 
     @Override
     public boolean isAvailable() {
-        if (!ShizukuService.pingBinder()) {
-            return false;
-        }
-
-        try {
-            return exec(new Command("echo", "test")).isSuccessful();
-        } catch (Exception e) {
-            Log.w(TAG, "Unable to access shizuku: ");
-            Log.w(TAG, e);
-            return false;
-        }
+        return requestRoot();
     }
 
     @Override
@@ -64,9 +61,10 @@ public class ShizukuShell implements Shell {
         StringBuilder stdErrSb = new StringBuilder();
 
         try {
-            Command.Builder shCommand = new Command.Builder("sh", "-c", command.toString());
+            Command.Builder suCommand = new Command.Builder("su", "-c", command.toString());
 
-            RemoteProcess process = ShizukuService.newProcess(shCommand.build().toStringArray(), null, null);
+            Process process = Runtime.getRuntime().exec(suCommand.build().toStringArray());
+
 
             Thread stdOutD = IOUtils.writeStreamToStringBuilder(stdOutSb, process.getInputStream());
             Thread stdErrD = IOUtils.writeStreamToStringBuilder(stdErrSb, process.getErrorStream());
@@ -96,7 +94,7 @@ public class ShizukuShell implements Shell {
         } catch (Exception e) {
             Log.w(TAG, "Unable execute command: ");
             Log.w(TAG, e);
-            return new Result(command, -1, stdOutSb.toString().trim(), stdErrSb.toString() + "\n\n<!> SAI ShizukuShell Java exception: " + ResultUtil.throwableToString(e));
+            return new Result(command, -1, stdOutSb.toString().trim(), stdErrSb.toString() + "\n\n<!> SAI SuShell Java exception: " + ResultUtil.throwableToString(e));
         }
     }
 }
