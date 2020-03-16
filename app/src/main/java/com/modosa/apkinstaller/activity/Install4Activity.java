@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * @author dadaewq
  */
-public class Installer4Activity extends AbstractInstallerActivity implements SAIPackageInstaller.InstallationStatusListener {
+public class Install4Activity extends AbstractInstallerActivity implements SAIPackageInstaller.InstallationStatusListener {
 
     private ArrayList<File> files;
     private long mOngoingSessionId;
@@ -80,23 +80,21 @@ public class Installer4Activity extends AbstractInstallerActivity implements SAI
             case INSTALLING:
                 break;
             case INSTALLATION_SUCCEED:
-                deleteCache();
                 showMyToast0(String.format(getString(R.string.tip_success_install), apkinfo[0]));
-                showNotification(true);
+                showNotificationWithdeleteCache(true);
                 finish();
                 break;
             case INSTALLATION_FAILED:
 
                 if (packageNameOrErrorDescription == null) {
-                    showNotification(false);
+                    showNotificationWithdeleteCache(false);
                     copyErr(getString(R.string.unknown));
                     showMyToast1(String.format(getString(R.string.tip_failed_install_witherror), apkinfo[0], ""));
                 } else {
                     if (packageNameOrErrorDescription.contains(getString(R.string.installer_error_root_no_root))) {
                         installByShellUtil();
                     } else {
-                        showNotification(false);
-//                        deleteCache();
+                        showNotificationWithdeleteCache(false);
                         copyErr(packageNameOrErrorDescription);
                         String err = packageNameOrErrorDescription.substring(packageNameOrErrorDescription.indexOf("Err:") + 4);
                         showMyToast1(String.format(getString(R.string.tip_failed_install_witherror), apkinfo[0], err));
@@ -111,20 +109,6 @@ public class Installer4Activity extends AbstractInstallerActivity implements SAI
         }
     }
 
-    private void showNotification(boolean success) {
-        if (show_notification) {
-            Log.e("packagename", apkinfo[1]);
-            if (success) {
-                deleteCache();
-                new NotifyUtil(this).sendNotification("4", String.format(getString(R.string.tip_success_install), apkinfo[0]), apkinfo[1]);
-            } else {
-                new NotifyUtil(this).sendNotification("21", String.format(getString(R.string.tip_failed_install), apkinfo[0]), apkinfo[1], installApkPath, istemp);
-            }
-        } else {
-            deleteCache();
-        }
-
-    }
 
     private void installByShellUtil() {
         String installcommand = "pm install -r -d --user 0 -i " + getPackageName() + " \"" + installApkPath + "\"";
@@ -139,12 +123,10 @@ public class Installer4Activity extends AbstractInstallerActivity implements SAI
 
 
         if ("0".equals(result[3])) {
-            deleteCache();
-            showNotification(true);
+            showNotificationWithdeleteCache(true);
             showMyToast0(String.format(getString(R.string.tip_success_install), apkinfo[0]));
         } else {
-            showNotification(false);
-//            deleteCache();
+            showNotificationWithdeleteCache(false);
             String installerVersion = "???";
             try {
                 installerVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
@@ -171,12 +153,32 @@ public class Installer4Activity extends AbstractInstallerActivity implements SAI
         }
     }
 
+    private void showNotificationWithdeleteCache(boolean success) {
+        if (success) {
+            isInstalledSuccess = true;
+            deleteCache();
+            if (show_notification) {
+                Log.e("packagename", apkinfo[1]);
+                new NotifyUtil(this).sendNotification("4", String.format(getString(R.string.tip_success_install), apkinfo[0]), apkinfo[1]);
+            }
+
+        } else {
+            isInstalledSuccess = false;
+            if (show_notification) {
+                Log.e("packagename", apkinfo[1]);
+                new NotifyUtil(this).sendNotification("21", String.format(getString(R.string.tip_failed_install), apkinfo[0]), apkinfo[1], installApkPath, istemp);
+            } else {
+                deleteCache();
+            }
+        }
+    }
+
     private class InstallApkTask extends Thread {
         @Override
         public void run() {
             super.run();
             if (SuShell.getInstance().isAvailable()) {
-                showMyToast0(String.format(getString(R.string.start_install), apkinfo[0]));
+                showMyToast0(String.format(getString(R.string.tip_start_install), apkinfo[0]));
                 try {
                     installPackages(files);
                 } catch (Exception e) {
@@ -188,7 +190,6 @@ public class Installer4Activity extends AbstractInstallerActivity implements SAI
             }
         }
     }
-
 
     private class UninstallApkTask extends Thread {
         @Override

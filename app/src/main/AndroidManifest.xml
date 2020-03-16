@@ -6,6 +6,7 @@
     <uses-permission android:name="com.catchingnow.icebox.SDK" />
     <uses-permission android:name="com.catchingnow.icebox.STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
@@ -18,9 +19,10 @@
     <uses-permission
         android:name="android.permission.GRANT_RUNTIME_PERMISSIONS"
         tools:ignore="ProtectedPermissions" />
-
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <application
+        android:name=".base.Application"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -59,7 +61,8 @@
 
         <activity
             android:name=".activity.SettingsActivity"
-            android:label="@string/Settings">
+            android:label="@string/Settings"
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -81,7 +84,7 @@
         </activity-alias>
 
         <activity
-            android:name=".activity.Installer1Activity"
+            android:name=".activity.Install1Activity"
             android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
             android:excludeFromRecents="true"
             android:label="@string/name_install1"
@@ -106,7 +109,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.Installer2Activity"
+            android:name=".activity.Install2Activity"
             android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
             android:excludeFromRecents="true"
             android:label="@string/name_install2"
@@ -131,7 +134,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.Installer3Activity"
+            android:name=".activity.Install3Activity"
             android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
             android:excludeFromRecents="true"
             android:label="@string/name_install3"
@@ -156,7 +159,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.Installer4Activity"
+            android:name=".activity.Install4Activity"
             android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
             android:excludeFromRecents="true"
             android:icon="@mipmap/ic_root"
@@ -183,7 +186,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.Installer5Activity"
+            android:name=".activity.Install5Activity"
             android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
             android:excludeFromRecents="true"
             android:icon="@mipmap/ic_dpm"

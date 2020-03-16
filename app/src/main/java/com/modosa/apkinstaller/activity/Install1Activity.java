@@ -20,15 +20,17 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * @author dadaewq
  */
-public class Installer1Activity extends AbstractInstallerActivity {
+public class Install1Activity extends AbstractInstallerActivity {
 
     private Disposable mSubscribe;
+    private String installApkPath;
 
     @Override
-    public void startInstall(String apkPath) {
-        Log.d("Start install", apkPath + "");
-        if (apkPath != null) {
-            installApkFile = new File(apkPath);
+    public void startInstall(String getinstallApkPath) {
+        Log.d("Start install", getinstallApkPath + "");
+        if (getinstallApkPath != null) {
+            installApkPath = getinstallApkPath;
+            installApkFile = new File(installApkPath);
             String authority = getPackageName() + ".FILE_PROVIDER";
             Uri installuri = FileProvider.getUriForFile(getApplicationContext(), authority, installApkFile);
             showMyToast0(String.format(getString(R.string.tip_start_install), apkinfo[0]));
@@ -41,17 +43,7 @@ public class Installer1Activity extends AbstractInstallerActivity {
                     .subscribe((Boolean success) -> {
                         Toast.makeText(this, success ? String.format(getString(R.string.tip_success_install), apkinfo[0]) : String.format(getString(R.string.tip_failed_install), apkinfo[0]), Toast.LENGTH_SHORT).show();
 
-                        if (show_notification) {
-                            Log.e("packagename", apkinfo[1]);
-                            if (success) {
-                                deleteCache();
-                                new NotifyUtil(this).sendNotification("1", String.format(getString(R.string.tip_success_install), apkinfo[0]), apkinfo[1]);
-                            } else {
-                                new NotifyUtil(this).sendNotification("21", String.format(getString(R.string.tip_failed_install), apkinfo[0]), apkinfo[1], apkPath, istemp);
-                            }
-                        } else {
-                            deleteCache();
-                        }
+                        showNotificationWithdeleteCache(success);
 
                     }, Throwable::printStackTrace);
 
@@ -84,4 +76,23 @@ public class Installer1Activity extends AbstractInstallerActivity {
         mSubscribe = null;
     }
 
+    private void showNotificationWithdeleteCache(boolean success) {
+        if (success) {
+            isInstalledSuccess = true;
+            deleteCache();
+            if (show_notification) {
+                Log.e("packagename", apkinfo[1]);
+                new NotifyUtil(this).sendNotification("1", String.format(getString(R.string.tip_success_install), apkinfo[0]), apkinfo[1]);
+            }
+
+        } else {
+            isInstalledSuccess = false;
+            if (show_notification) {
+                Log.e("packagename", apkinfo[1]);
+                new NotifyUtil(this).sendNotification("21", String.format(getString(R.string.tip_failed_install), apkinfo[0]), apkinfo[1], installApkPath, istemp);
+            } else {
+                deleteCache();
+            }
+        }
+    }
 }

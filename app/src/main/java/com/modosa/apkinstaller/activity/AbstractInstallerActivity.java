@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
@@ -20,6 +19,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 
 import com.modosa.apkinstaller.R;
 import com.modosa.apkinstaller.util.AppInfoUtil;
@@ -37,19 +37,20 @@ public abstract class AbstractInstallerActivity extends Activity {
 
     private static final int PICK_APK_FILE = 2;
     private static final String ILLEGALPKGNAME = "IL^&IllegalPN*@!128`+=：:,.[";
-    private final String[] permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
+    private final String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
     private final String nl = System.getProperty("line.separator");
     String[] apkinfo;
     String uninstallPackageLable;
     StringBuilder alertDialogMessage;
     File installApkFile;
     boolean show_notification;
+    boolean isInstalledSuccess = false;
+    private boolean deleteSucceededApk;
     boolean istemp = false;
     private String[] source;
     private Uri uri;
-    private SharedPreferences sourceSp;
-    private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor editor;
+    private SharedPreferences spAllowSource;
+    private SharedPreferences spGetPreferenceManager;
     private AlertDialog alertDialog;
     private String cachePath;
     private String uninstallPkgName;
@@ -83,8 +84,8 @@ public abstract class AbstractInstallerActivity extends Activity {
     }
 
     private void initFromUri() {
-        sourceSp = getSharedPreferences("allowsource", Context.MODE_PRIVATE);
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        spAllowSource = getSharedPreferences("allowsource", Context.MODE_PRIVATE);
+        spGetPreferenceManager = PreferenceManager.getDefaultSharedPreferences(this);
         if (checkPermission()) {
             initInstall();
         } else {
@@ -145,9 +146,11 @@ public abstract class AbstractInstallerActivity extends Activity {
 
     private void initInstall() {
         source = checkInstallSource();
-        boolean needconfirm = sharedPreferences.getBoolean("needconfirm", true);
-        show_notification = sharedPreferences.getBoolean("show_notification", false);
-        boolean allowsource = sourceSp.getBoolean(source[0], false);
+        boolean needconfirm = spGetPreferenceManager.getBoolean("needconfirm", true);
+        deleteSucceededApk = spGetPreferenceManager.getBoolean("deleteSucceededApk", false);
+        show_notification = spGetPreferenceManager.getBoolean("show_notification", false);
+        boolean allowsource = spAllowSource.getBoolean(source[0], false);
+
         String validApkPath = preInstallGetValidApkPath();
         if (validApkPath == null) {
             showMyToast0(R.string.tip_failed_prase);
@@ -236,9 +239,8 @@ public abstract class AbstractInstallerActivity extends Activity {
                     .setPositiveButton(android.R.string.yes, (dialog, which) -> {
                         cachePath = null;
                         if (!source[1].equals(ILLEGALPKGNAME)) {
-                            editor = sourceSp.edit();
-                            editor.putBoolean(source[0], checkBox.isChecked());
-                            editor.apply();
+                            spAllowSource.edit().putBoolean(source[0], checkBox.isChecked()).apply();
+
                         }
                         startInstall(validApkPath);
                         finish();
@@ -369,7 +371,7 @@ public abstract class AbstractInstallerActivity extends Activity {
     }
 
     private boolean checkPermission() {
-        int permissionRead = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        int permissionRead = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         return (permissionRead == 0);
     }
 
@@ -397,7 +399,10 @@ public abstract class AbstractInstallerActivity extends Activity {
 
 
     void deleteCache() {
-        if (istemp) {
+        Log.e("deleteSucceededApk", " " + deleteSucceededApk);
+        Log.e("isInstalledSuccess", " " + isInstalledSuccess);
+        Log.e("installApkFile", installApkFile + "");
+        if (istemp || (deleteSucceededApk && isInstalledSuccess)) {
             OpUtil.deleteSingleFile(installApkFile);
         }
     }

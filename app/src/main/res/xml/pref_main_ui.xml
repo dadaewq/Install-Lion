@@ -1,20 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
-    <SwitchPreferenceCompat
-        app:defaultValue="false"
-        app:key="show_notification"
-        app:summary="@string/show_tip"
-        app:title="@string/show_title" />
-    <SwitchPreferenceCompat
-        app:defaultValue="true"
-        app:key="needconfirm"
-        app:summaryOff="@string/summary_off_needconfirm"
-        app:summaryOn="@string/summary_on_needconfirm"
-        app:title="@string/confirm_title" />
-    <Preference
-        app:key="manualAuthorize"
-        app:summary="@string/summary_manualAuthorize"
-        app:title="@string/title_manualAuthorize" />
     <PreferenceCategory app:title="@string/name_install1">
         <SwitchPreferenceCompat
             app:defaultValue="true"
@@ -92,7 +77,7 @@
             app:title="@string/enable_title" />
         <Preference
             app:key="dpm_settings"
-            app:title="@string/dpmSettings" />
+            app:title="@string/title_dpmSettings" />
         <Preference
             app:key="avInstall5"
             app:title="@string/title_not_deviceowner" />

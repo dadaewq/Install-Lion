@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="50dp"
+    android:paddingTop="20dp"
+    android:paddingEnd="20dp"
+    android:paddingBottom="20dp">
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/MODE_NIGHT_NO"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/AppTheme_MODE_NIGHT_NO" />
+
+        <RadioButton
+            android:id="@+id/MODE_NIGHT_YES"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:text="@string/AppTheme_MODE_NIGHT_YES" />
+
+        <RadioButton
+            android:id="@+id/MODE_NIGHT_FOLLOW_SYSTEM"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:text="@string/AppTheme_MODE_NIGHT_FOLLOW_SYSTEM" />
+    </RadioGroup>
+
+</LinearLayout>

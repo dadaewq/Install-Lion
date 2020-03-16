@@ -15,18 +15,19 @@ import java.io.File;
 /**
  * @author dadaewq
  */
-public class Installer5Activity extends AbstractInstallerActivity {
+public class Install5Activity extends AbstractInstallerActivity {
 
     private final Context context = this;
-    private String realPath;
     private String uninstallPkgName;
+    private String installApkPath;
+
 
     @Override
     public void startInstall(String getinstallApkPath) {
         Log.d("Start install", getinstallApkPath + "");
         if (getinstallApkPath != null) {
-            realPath = getinstallApkPath;
-            installApkFile = new File(getinstallApkPath);
+            installApkPath = getinstallApkPath;
+            installApkFile = new File(installApkPath);
             new InstallApkTask().start();
         }
     }
@@ -35,6 +36,26 @@ public class Installer5Activity extends AbstractInstallerActivity {
     protected void startUninstall(String getUninstallPkgName) {
         uninstallPkgName = getUninstallPkgName;
         new UninstallApkTask().start();
+    }
+
+    private void showNotificationWithdeleteCache(boolean success) {
+        if (success) {
+            isInstalledSuccess = true;
+            deleteCache();
+            if (show_notification) {
+                Log.e("packagename", apkinfo[1]);
+                new NotifyUtil(this).sendNotification("5", String.format(getString(R.string.tip_success_install), apkinfo[0]), apkinfo[1]);
+            }
+
+        } else {
+            isInstalledSuccess = false;
+            if (show_notification) {
+                Log.e("packagename", apkinfo[1]);
+                new NotifyUtil(this).sendNotification("21", String.format(getString(R.string.tip_failed_install), apkinfo[0]), apkinfo[1], installApkPath, istemp);
+            } else {
+                deleteCache();
+            }
+        }
     }
 
     private class InstallApkTask extends Thread {
@@ -52,16 +73,10 @@ public class Installer5Activity extends AbstractInstallerActivity {
                     copyErr(err);
                     showMyToast1(String.format(getString(R.string.tip_failed_install_witherror), apkinfo[0], result));
                 }
-                if (show_notification) {
-                    Log.e("packagename", apkinfo[1]);
-                    if (result == null) {
-                        deleteCache();
-                        new NotifyUtil(context).sendNotification("5", String.format(getString(R.string.tip_success_install), apkinfo[0]), apkinfo[1]);
-                    } else {
-                        new NotifyUtil(context).sendNotification("21", String.format(getString(R.string.tip_failed_install), apkinfo[0]), apkinfo[1], realPath, istemp);
-                    }
+                if (result == null) {
+                    showNotificationWithdeleteCache(true);
                 } else {
-                    deleteCache();
+                    showNotificationWithdeleteCache(false);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

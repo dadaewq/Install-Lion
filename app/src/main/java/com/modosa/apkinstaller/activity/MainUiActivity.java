@@ -1,16 +1,13 @@
 package com.modosa.apkinstaller.activity;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
-import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,31 +20,29 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.preference.PreferenceManager;
 
 import com.modosa.apkinstaller.R;
 import com.modosa.apkinstaller.fragment.DPMSettingsFragment;
 import com.modosa.apkinstaller.fragment.MainFragment;
-import com.modosa.apkinstaller.receiver.AdminReceiver;
-import com.modosa.apkinstaller.util.FileSizeUtil;
 import com.modosa.apkinstaller.util.OpUtil;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * @author dadaewq
  */
 public class MainUiActivity extends AppCompatActivity implements MainFragment.MyListener {
 
+    private final static String CONFIRM_PROMPT = "ConfirmPrompt";
     private static final String TAG_MAINUI = "mainUi";
     private static final String TAG_DPM = "dpm";
-    private static final String EMPTY_SIZE = "0B";
-    private final String[] permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
     private long exitTime = 0;
     private DevicePolicyManager devicePolicyManager;
-    private ComponentName adminComponentName;
     private boolean isMain = true;
     private FragmentManager fragmentManager;
+    private SharedPreferences spGetPreferenceManager;
+    private AlertDialog alertDialogConfirmPrompt;
 
 
     @Override
@@ -70,19 +65,24 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
             ActionBar actionBar = getSupportActionBar();
             if (actionBar != null) {
                 actionBar.setDisplayHomeAsUpEnabled(!isMain);
-                actionBar.setTitle(null);
+                actionBar.setTitle(R.string.title_dpmSettings);
             }
         }
 
 
-        adminComponentName = AdminReceiver.getComponentName(this);
-        devicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
         init();
+        confirmPrompt();
     }
 
     private void init() {
-        adminComponentName = AdminReceiver.getComponentName(this);
+        spGetPreferenceManager = PreferenceManager.getDefaultSharedPreferences(this);
         devicePolicyManager = (DevicePolicyManager) getSystemService(DEVICE_POLICY_SERVICE);
+    }
+
+    private void confirmPrompt() {
+        if (!spGetPreferenceManager.getBoolean(CONFIRM_PROMPT, false)) {
+            showDialogConfirmPrompt();
+        }
     }
 
     private void showMyToast0(final String text) {
@@ -104,50 +104,92 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
         return devicePolicyManager.isDeviceOwnerApp(getPackageName());
     }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-
-        if (isDeviceOwner()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                menu.findItem(R.id.RebootDevice).setVisible(true);
-            }
-        }
-        return true;
-    }
+//    @Override
+//    public boolean onPrepareOptionsMenu(Menu menu) {
+//        super.onPrepareOptionsMenu(menu);
+//
+//        if (isDeviceOwner()) {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                menu.findItem(R.id.RebootDevice).setVisible(true);
+//            }
+//        }
+//        return true;
+//    }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                swtichIsMainFragment(true);
+                break;
+            case R.id.InstallFromGetContent:
+                select();
+                break;
             case R.id.Settings:
                 Intent settingsIntent = new Intent(Intent.ACTION_VIEW)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         .setClass(this, SettingsActivity.class);
                 startActivity(settingsIntent);
                 break;
-            case R.id.HideIcon:
-                showDialogHideIcon();
-                break;
-            case R.id.ClearAllowedList:
-                showDialogClearAllowedList();
-                break;
-            case R.id.ClearCache:
-                showDialogClearCache();
-                break;
-            case R.id.InstallFromSAF:
-                select();
-                break;
-            case android.R.id.home:
-                swtichIsMainFragment(true);
-                break;
-            case R.id.RebootDevice:
-                devicePolicyManager.reboot(adminComponentName);
-                break;
+//            case R.id.hideIcon:
+//                showDialoghideIcon();
+//                break;
+//            case R.id.clearAllowedList:
+//                showDialogclearAllowedList();
+//                break;
+//            case R.id.clearCache:
+//                showDialogclearCache();
+//                break;
+//            case R.id.RebootDevice:
+//                devicePolicyManager.reboot(adminComponentName);
+//                break;
             default:
                 return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    @Override
+    public void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if (alertDialogConfirmPrompt != null) {
+            alertDialogConfirmPrompt.dismiss();
+        }
+    }
+
+    private void showDialogConfirmPrompt() {
+
+        View view = View.inflate(this, R.layout.confirm_doublecheckbox, null);
+
+        CheckBox checkBox1 = view.findViewById(R.id.confirm_checkbox1);
+        CheckBox checkBox2 = view.findViewById(R.id.confirm_checkbox2);
+        checkBox1.setText(R.string.checkbox1_instructions_before_use);
+        checkBox2.setText(R.string.checkbox2_instructions_before_use);
+        checkBox2.setEnabled(false);
+        checkBox1.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            checkBox2.setChecked(false);
+            checkBox2.setEnabled(isChecked);
+        });
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle(R.string.title_instructions_before_use)
+                .setView(view)
+                .setNeutralButton(android.R.string.no, null)
+                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                    boolean hasBothConfirm = false;
+                    if (checkBox1.isChecked() && checkBox2.isChecked()) {
+                        hasBothConfirm = true;
+                    }
+                    spGetPreferenceManager.edit().putBoolean(CONFIRM_PROMPT, hasBothConfirm).apply();
+                });
+
+        alertDialogConfirmPrompt = builder.create();
+        OpUtil.showAlertDialog(this, alertDialogConfirmPrompt);
+        alertDialogConfirmPrompt.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.rBackground));
+        alertDialogConfirmPrompt.getButton(DialogInterface.BUTTON_NEUTRAL).setTextColor(getResources().getColor(R.color.rBackground));
+
     }
 
     @Override
@@ -156,79 +198,70 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
         this.isMain = isMain;
 
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(!isMain);
-        }
-
-        invalidateOptionsMenu();
+        assert actionBar != null;
+        actionBar.setDisplayHomeAsUpEnabled(!isMain);
+//        invalidateOptionsMenu();
         if (isMain) {
-            if (actionBar != null) {
-                actionBar.setTitle(R.string.app_name);
-            }
+            actionBar.setTitle(R.string.app_name);
             fragmentManager.beginTransaction().replace(R.id.framelayout, new MainFragment(), TAG_MAINUI).commit();
-
         } else {
-            if (actionBar != null) {
-                actionBar.setTitle(null);
-            }
+            actionBar.setTitle(R.string.title_dpmSettings);
             fragmentManager.beginTransaction().replace(R.id.framelayout, new DPMSettingsFragment(), TAG_DPM).commit();
         }
 
     }
 
-    private void showDialogHideIcon() {
-
-        View checkBoxView = View.inflate(this, R.layout.confirm_checkbox, null);
-        CheckBox checkBox = checkBoxView.findViewById(R.id.confirm_checkbox);
-        checkBox.setText(R.string.HideIcon);
-
-        ComponentName mainComponentName = new ComponentName(this, "com.modosa.apkinstaller.activity.MainActivity");
-        PackageManager pm = getPackageManager();
-        boolean isEnabled = (pm.getComponentEnabledSetting(mainComponentName) == (PackageManager.COMPONENT_ENABLED_STATE_DEFAULT) || pm.getComponentEnabledSetting(mainComponentName) == (PackageManager.COMPONENT_ENABLED_STATE_ENABLED));
-
-        checkBox.setChecked(!isEnabled);
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setTitle(R.string.HideIcon)
-                .setMessage(R.string.message_HideIcon)
-                .setView(checkBoxView)
-                .setNeutralButton(android.R.string.no, null)
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> OpUtil.setComponentState(this, mainComponentName,
-                        !checkBox.isChecked()));
-
-        AlertDialog alertDialog = builder.create();
-
-
-        OpUtil.showAlertDialog(this, alertDialog);
-
-    }
-
-    private void showDialogClearAllowedList() {
-
-        View checkBoxView = View.inflate(this, R.layout.confirm_checkbox, null);
-        CheckBox checkBox = checkBoxView.findViewById(R.id.confirm_checkbox);
-        checkBox.setText(R.string.checkbox_ClearAllowedList);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setTitle(R.string.ClearAllowedList)
-                .setMessage(R.string.message_ClearAllowedList)
-                .setView(checkBoxView)
-                .setNeutralButton(android.R.string.no, null)
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
-                    SharedPreferences.Editor editor = getSharedPreferences("allowsource", Context.MODE_PRIVATE).edit();
-                    editor.clear();
-                    editor.apply();
-                });
-
-        AlertDialog alertDialog = builder.create();
-
-
-        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(isChecked));
-
-        OpUtil.showAlertDialog(this, alertDialog);
-
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-
-    }
+//    private void showDialoghideIcon() {
+//
+//        View checkBoxView = View.inflate(this, R.layout.confirm_checkbox, null);
+//        CheckBox checkBox = checkBoxView.findViewById(R.id.confirm_checkbox);
+//        checkBox.setText(R.string.hideIcon);
+//
+//        ComponentName mainComponentName = new ComponentName(this, "com.modosa.apkinstaller.activity.MainActivity");
+//        PackageManager pm = getPackageManager();
+//        boolean isEnabled = (pm.getComponentEnabledSetting(mainComponentName) == (PackageManager.COMPONENT_ENABLED_STATE_DEFAULT) || pm.getComponentEnabledSetting(mainComponentName) == (PackageManager.COMPONENT_ENABLED_STATE_ENABLED));
+//
+//        checkBox.setChecked(!isEnabled);
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+//                .setTitle(R.string.hideIcon)
+//                .setMessage(R.string.message_hideIcon)
+//                .setView(checkBoxView)
+//                .setNeutralButton(android.R.string.no, null)
+//                .setPositiveButton(android.R.string.yes, (dialog, which) -> OpUtil.setComponentState(this, mainComponentName,
+//                        !checkBox.isChecked()));
+//
+//        AlertDialog alertDialog = builder.create();
+//
+//
+//        OpUtil.showAlertDialog(this, alertDialog);
+//
+//    }
+//
+//    private void showDialogclearAllowedList() {
+//
+//        View checkBoxView = View.inflate(this, R.layout.confirm_checkbox, null);
+//        CheckBox checkBox = checkBoxView.findViewById(R.id.confirm_checkbox);
+//        checkBox.setText(R.string.checkbox_clearAllowedList);
+//
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+//                .setTitle(R.string.clearAllowedList)
+//                .setMessage(R.string.message_clearAllowedList)
+//                .setView(checkBoxView)
+//                .setNeutralButton(android.R.string.no, null)
+//                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+//                    getSharedPreferences("allowsource", Context.MODE_PRIVATE).edit().clear().apply();
+//                });
+//
+//        AlertDialog alertDialog = builder.create();
+//
+//
+//        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(isChecked));
+//
+//        OpUtil.showAlertDialog(this, alertDialog);
+//
+//        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+//
+//    }
 
     @Override
     public void onBackPressed() {
@@ -245,28 +278,28 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//    }
 
-    private void showDialogClearCache() {
-        String cachePath = Objects.requireNonNull(getExternalCacheDir()).getAbsolutePath();
-        String cacheSize = FileSizeUtil.getAutoFolderOrFileSize(cachePath);
-        if (EMPTY_SIZE.equals(cacheSize)) {
-            showMyToast0(R.string.tip_empty_cache);
-        } else {
-            Log.e("cacheSize", cacheSize);
-            AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                    .setTitle(R.string.ClearCache)
-                    .setMessage(String.format(getString(R.string.message_ClearCache), cacheSize))
-                    .setNeutralButton(android.R.string.no, null)
-                    .setPositiveButton(android.R.string.yes, (dialog, which) -> OpUtil.deleteDirectory(cachePath));
-
-            AlertDialog alertDialog = builder.create();
-            OpUtil.showAlertDialog(this, alertDialog);
-        }
-    }
+//    private void showDialogclearCache() {
+//        String cachePath = Objects.requireNonNull(getExternalCacheDir()).getAbsolutePath();
+//        String cacheSize = FileSizeUtil.getAutoFolderOrFileSize(cachePath);
+//        if (EMPTY_SIZE.equals(cacheSize)) {
+//            showMyToast0(R.string.tip_empty_cache);
+//        } else {
+//            Log.e("cacheSize", cacheSize);
+//            AlertDialog.Builder builder = new AlertDialog.Builder(this)
+//                    .setTitle(R.string.clearCache)
+//                    .setMessage(String.format(getString(R.string.message_clearCache), cacheSize))
+//                    .setNeutralButton(android.R.string.no, null)
+//                    .setPositiveButton(android.R.string.yes, (dialog, which) -> OpUtil.deleteDirectory(cachePath));
+//
+//            AlertDialog alertDialog = builder.create();
+//            OpUtil.showAlertDialog(this, alertDialog);
+//        }
+//    }
 
     private void startPickFile(int which, ArrayList<ComponentName> componentNameArrayList) {
 
@@ -290,7 +323,7 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
         ComponentName[] installerComponentNames = new ComponentName[MainFragment.installerSize];
         ArrayList<ComponentName> componentNameArrayList = new ArrayList<>();
         for (int i = 1; i < MainFragment.installerSize; i++) {
-            installerComponentNames[i] = new ComponentName(getPackageName(), getPackageName() + ".activity" + ".Installer" + i + "Activity");
+            installerComponentNames[i] = new ComponentName(getPackageName(), getPackageName() + ".activity" + ".Install" + i + "Activity");
 
             getAvinstaller(componentNameArrayList, installerComponentNames[i]);
         }
@@ -329,8 +362,10 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
                     showMyToast0(items[which]);
                     startPickFile(which, componentNameArrayList);
                 });
-                AlertDialog alertDialog = builder.create();
-                OpUtil.showAlertDialog(this, alertDialog);
+//                AlertDialog
+                alertDialogConfirmPrompt = builder.create();
+
+                OpUtil.showAlertDialog(this, alertDialogConfirmPrompt);
             }
 
         }

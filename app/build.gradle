@@ -8,8 +8,8 @@ android {
         applicationId "com.modosa.apkinstaller"
         minSdkVersion 22
         targetSdkVersion 29
-        versionCode 26
-        versionName "3.4-alpha"
+        versionCode 27
+        versionName "3.5"
     }
 
     buildTypes {
@@ -41,5 +41,6 @@ dependencies {
     implementation 'com.github.heruoxin.Delegated-Scopes-Manager:client:master-SNAPSHOT'
     implementation 'moe.shizuku.privilege:api:3.1.0-alpha4'
     implementation 'androidx.preference:preference:1.1.0'
+//    implementation 'com.afollestad.material-dialogs:core:3.3.0'
 //    implementation 'com.google.android.material:material:1.2.0-alpha05'
 }

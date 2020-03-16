@@ -38,13 +38,12 @@ import static com.modosa.apkinstaller.util.OpUtil.showToast0;
  * @author dadaewq
  */
 public class DPMSettingsFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener {
-    private final String sp_orgName = "orgName";
-    private final String sp_confirmWarning = "confirmWarning";
+    private final String sp_key_orgName = "orgName";
+    private final String sp_key_confirmWarning = "confirmWarning";
     private final String[] userRestrictionsKeys = {UserManager.DISALLOW_INSTALL_APPS, UserManager.DISALLOW_UNINSTALL_APPS, UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES};
     private SwitchPreferenceCompat[] switchPreferences;
     private SwitchPreferenceCompat EnableBackupService;
-
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences spGetPreferenceManager;
     private boolean isOpUserRestrictionSuccess = false;
     private DevicePolicyManager devicePolicyManager;
     private UserManager userManager;
@@ -53,6 +52,7 @@ public class DPMSettingsFragment extends PreferenceFragmentCompat implements Pre
     private CharSequence[] allMatchAppInfo;
     private ComponentName defaultApp;
     private Context context;
+    private AlertDialog alertDialog;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -74,8 +74,16 @@ public class DPMSettingsFragment extends PreferenceFragmentCompat implements Pre
         refreshSwitch();
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (alertDialog != null) {
+            alertDialog.dismiss();
+        }
+    }
+
     private void findPreferencesAndSetListner() {
-        sharedPreferences = getPreferenceManager().getSharedPreferences();
+        spGetPreferenceManager = getPreferenceManager().getSharedPreferences();
 
         switchPreferences = new SwitchPreferenceCompat[userRestrictionsKeys.length];
         switchPreferences[0] = findPreference("DISALLOW_INSTALL_APPS");
@@ -107,6 +115,12 @@ public class DPMSettingsFragment extends PreferenceFragmentCompat implements Pre
         lockDefaultPackageInstaller.setOnPreferenceClickListener(this);
         setUserRestrictions.setOnPreferenceClickListener(this);
         deactivateDeviceOwner.setOnPreferenceClickListener(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Preference RebootDevice = findPreference("RebootDevice");
+            assert RebootDevice != null;
+            RebootDevice.setVisible(true);
+            RebootDevice.setOnPreferenceClickListener(this);
+        }
 
     }
 
@@ -211,31 +225,28 @@ public class DPMSettingsFragment extends PreferenceFragmentCompat implements Pre
     @SuppressLint("SetTextI18n")
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void showDialogSetOrganizationName() {
-        String getOrgName = sharedPreferences.getString(sp_orgName, "");
+        String getOrgName = spGetPreferenceManager.getString(sp_key_orgName, "");
         devicePolicyManager.setOrganizationName(adminComponentName, getOrgName);
         final EditText editOraName = new EditText(context);
         editOraName.setText(getOrgName);
-
+        SharedPreferences.Editor editorGetPreferenceManager = spGetPreferenceManager.edit();
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                .setTitle(R.string.title_SetOrganizationName)
+                .setTitle(R.string.title_dialog_SetOrganizationName)
                 .setView(editOraName)
                 .setNeutralButton(R.string.close, null)
                 .setNegativeButton(R.string.clear, (dialog, which) -> {
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString(sp_orgName, null);
-                    editor.apply();
+                    editorGetPreferenceManager.putString(sp_key_orgName, null).apply();
                     devicePolicyManager.setOrganizationName(adminComponentName, null);
                 })
-                .setPositiveButton(R.string.set, (dialog, which) -> {
+                .setPositiveButton(R.string.bt_set, (dialog, which) -> {
                     String getEditName = editOraName.getText().toString() + "";
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString(sp_orgName, getEditName);
-                    editor.apply();
+                    editorGetPreferenceManager.putString(sp_key_orgName, getEditName).apply();
                     devicePolicyManager.setOrganizationName(adminComponentName, getEditName);
                     OpUtil.showToast0(context, getEditName);
                 });
 
-        AlertDialog alertDialog = builder.create();
+//        AlertDialog
+        alertDialog = builder.create();
 
         OpUtil.showAlertDialog(context, alertDialog);
 
@@ -252,13 +263,14 @@ public class DPMSettingsFragment extends PreferenceFragmentCompat implements Pre
             editInfo.setText(getLockScreenInfo);
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                .setTitle(R.string.title_SetLockScreenInfo)
+                .setTitle(R.string.title_dialog_SetLockScreenInfo)
                 .setView(editInfo)
                 .setNeutralButton(R.string.close, null)
                 .setNegativeButton(R.string.clear, (dialog, which) -> devicePolicyManager.setDeviceOwnerLockScreenInfo(adminComponentName, null))
-                .setPositiveButton(R.string.set, (dialog, which) -> devicePolicyManager.setDeviceOwnerLockScreenInfo(adminComponentName, editInfo.getText().toString()));
+                .setPositiveButton(R.string.bt_set, (dialog, which) -> devicePolicyManager.setDeviceOwnerLockScreenInfo(adminComponentName, editInfo.getText().toString()));
 
-        AlertDialog alertDialog = builder.create();
+//        AlertDialog
+        alertDialog = builder.create();
 
         OpUtil.showAlertDialog(context, alertDialog);
 
@@ -275,13 +287,14 @@ public class DPMSettingsFragment extends PreferenceFragmentCompat implements Pre
                 .setView(checkBoxView)
                 .setNeutralButton(android.R.string.no, null)
                 .setPositiveButton(android.R.string.yes, (dialog, which) -> {
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putBoolean(sp_confirmWarning, true);
-                    editor.apply();
+                    spGetPreferenceManager.edit()
+                            .putBoolean(sp_key_confirmWarning, true)
+                            .apply();
                     showDialogLockDefaultApplication(lockpreferenceKey);
                 });
 
-        AlertDialog alertDialog = builder.create();
+//        AlertDialog
+        alertDialog = builder.create();
 
 
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(isChecked));
@@ -306,7 +319,7 @@ public class DPMSettingsFragment extends PreferenceFragmentCompat implements Pre
                 filter.addCategory(Intent.CATEGORY_HOME);
                 filter.addCategory(Intent.CATEGORY_DEFAULT);
 
-                titleid = R.string.LockDefaultLauncher;
+                titleid = R.string.title_LockDefaultLauncher;
                 break;
             case "LockDefaultPackageInstaller":
                 intent = new Intent(Intent.ACTION_VIEW)
@@ -321,7 +334,7 @@ public class DPMSettingsFragment extends PreferenceFragmentCompat implements Pre
                     e.printStackTrace();
                 }
 
-                titleid = R.string.LockDefaultPackageInstaller;
+                titleid = R.string.title_dialog_LockDefaultPackageInstaller;
                 break;
 
             default:
@@ -345,7 +358,8 @@ public class DPMSettingsFragment extends PreferenceFragmentCompat implements Pre
                     }
                 });
 
-        AlertDialog alertDialog = builder.create();
+//        AlertDialog
+        alertDialog = builder.create();
         OpUtil.showAlertDialog(context, alertDialog);
     }
 
@@ -355,13 +369,14 @@ public class DPMSettingsFragment extends PreferenceFragmentCompat implements Pre
         final EditText keyOfRestriction = new EditText(context);
         keyOfRestriction.setHint(R.string.hint_restrictionkey);
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                .setTitle(R.string.SetUserRestrictions)
+                .setTitle(R.string.title_SetUserRestrictions)
                 .setView(keyOfRestriction)
                 .setNeutralButton(R.string.close, null)
                 .setNegativeButton(R.string.clear, null)
-                .setPositiveButton(R.string.add, null);
+                .setPositiveButton(R.string.bt_add, null);
 
-        AlertDialog alertDialog = builder.create();
+//        AlertDialog
+        alertDialog = builder.create();
 
         alertDialog.setOnDismissListener(dialog -> {
             if (isOpUserRestrictionSuccess) {
@@ -389,9 +404,7 @@ public class DPMSettingsFragment extends PreferenceFragmentCompat implements Pre
                 .setNeutralButton(android.R.string.no, null)
                 .setPositiveButton(android.R.string.yes, (dialog, which) -> {
                     if (clearDeviceOwner()) {
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putBoolean(sp_confirmWarning, false);
-                        editor.apply();
+                        spGetPreferenceManager.edit().putBoolean(sp_key_confirmWarning, false).apply();
                         showToast0(context, R.string.tip_success_deactivate);
                         ((MainFragment.MyListener) getActivity()).swtichIsMainFragment(true);
                     } else {
@@ -399,7 +412,8 @@ public class DPMSettingsFragment extends PreferenceFragmentCompat implements Pre
                     }
                 });
 
-        AlertDialog alertDialog = builder.create();
+//        AlertDialog
+        alertDialog = builder.create();
         OpUtil.showAlertDialog(context, alertDialog);
 
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
@@ -429,7 +443,7 @@ public class DPMSettingsFragment extends PreferenceFragmentCompat implements Pre
                 break;
             case "LockDefaultLauncher":
             case "LockDefaultPackageInstaller":
-                if (sharedPreferences.getBoolean(sp_confirmWarning, false)) {
+                if (spGetPreferenceManager.getBoolean(sp_key_confirmWarning, false)) {
                     showDialogLockDefaultApplication(preference.getKey());
                 } else {
                     showWarningLockDefaultApplication(preference.getKey());
@@ -440,6 +454,9 @@ public class DPMSettingsFragment extends PreferenceFragmentCompat implements Pre
                 break;
             case "DeactivateDeviceOwner":
                 showDialogDeactivateDeviceOwner();
+                break;
+            case "RebootDevice":
+                devicePolicyManager.reboot(adminComponentName);
                 break;
             default:
                 break;

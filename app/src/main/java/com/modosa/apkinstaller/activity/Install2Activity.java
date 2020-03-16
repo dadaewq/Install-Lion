@@ -17,8 +17,9 @@ import java.io.File;
 /**
  * @author dadaewq
  */
-public class Installer2Activity extends AbstractInstallerActivity {
+public class Install2Activity extends AbstractInstallerActivity {
     private final boolean ltsdk26 = Build.VERSION.SDK_INT < Build.VERSION_CODES.O;
+    private String installApkPath;
 
     @Override
     public void onCreate(Bundle bundle) {
@@ -29,14 +30,15 @@ public class Installer2Activity extends AbstractInstallerActivity {
     }
 
     @Override
-    public void startInstall(String apkPath) {
+    public void startInstall(String getinstallApkPath) {
         if (ltsdk26) {
             showMyToast1(R.string.tip_ltsdk26);
             finish();
         } else {
-            Log.d("Start install", apkPath + "");
-            if (apkPath != null) {
-                installApkFile = new File(apkPath);
+            Log.d("Start install", getinstallApkPath + "");
+            if (getinstallApkPath != null) {
+                installApkPath = getinstallApkPath;
+                installApkFile = new File(installApkPath);
                 String authority = getPackageName() + ".FILE_PROVIDER";
                 Uri installuri = FileProvider.getUriForFile(getApplicationContext(), authority, installApkFile);
                 new Thread(() -> {
@@ -48,7 +50,7 @@ public class Installer2Activity extends AbstractInstallerActivity {
                     } finally {
                         if (show_notification) {
                             Log.e("packagename", apkinfo[1]);
-                            new NotifyUtil(this).sendNotification("2", String.format(getString(R.string.tip_install_over), apkinfo[0]), apkinfo[1], apkPath, istemp);
+                            new NotifyUtil(this).sendNotification("2", String.format(getString(R.string.tip_install_over), apkinfo[0]), apkinfo[1], installApkPath, istemp);
                         } else {
                             deleteCache();
                         }

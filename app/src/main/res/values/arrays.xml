@@ -10,4 +10,9 @@
         <item>"IceBox's version is too low"</item>
         <item>"Unknown"</item>
     </string-array>
+    <string-array name="AppTheme">
+        <item>@string/AppTheme_MODE_NIGHT_NO</item>
+        <item>@string/AppTheme_MODE_NIGHT_YES</item>
+        <item>@string/AppTheme_MODE_NIGHT_FOLLOW_SYSTEM</item>
+    </string-array>
 </resources>

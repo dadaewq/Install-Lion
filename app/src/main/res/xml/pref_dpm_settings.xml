@@ -1,46 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory android:title="@string/title_systemSettings">
         <SwitchPreferenceCompat
             android:key="DISALLOW_INSTALL_APPS"
-            android:title="@string/DISALLOW_INSTALL_APPS" />
+            android:title="@string/title_DISALLOW_INSTALL_APPS" />
         <SwitchPreferenceCompat
             android:key="DISALLOW_UNINSTALL_APPS"
-            android:title="@string/DISALLOW_UNINSTALL_APPS" />
+            android:title="@string/title_DISALLOW_UNINSTALL_APPS" />
         <SwitchPreferenceCompat
             android:key="DISALLOW_INSTALL_UNKNOWN_SOURCES"
-            android:title="@string/DISALLOW_INSTALL_UNKNOWN_SOURCES" />
+            android:title="@string/title_DISALLOW_INSTALL_UNKNOWN_SOURCES" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_display">
         <Preference
             android:key="SetOrganizationName"
-            android:title="@string/SetOrganizationName" />
+            android:title="@string/title_SetOrganizationName" />
         <Preference
             android:key="SetLockScreenInfo"
-            android:title="@string/SetLockScreenInfo" />
+            android:title="@string/title_SetLockScreenInfo" />
     </PreferenceCategory>
 
 
     <PreferenceCategory android:title="@string/title_lockDefaultApp">
         <Preference
             android:key="LockDefaultLauncher"
-            android:title="@string/LockDefaultLauncher" />
+            android:title="@string/title_LockDefaultLauncher" />
         <Preference
             android:key="LockDefaultPackageInstaller"
-            android:title="@string/LockDefaultPackageInstaller" />
+            android:title="@string/title_dialog_LockDefaultPackageInstaller" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_others">
         <SwitchPreferenceCompat
             android:key="EnableBackupService"
-            android:title="@string/EnableBackupService"
+            android:title="@string/title_EnableBackupService"
             android:visibility="gone" />
         <Preference
             android:key="SetUserRestrictions"
-            android:title="@string/SetUserRestrictions" />
+            android:title="@string/title_SetUserRestrictions" />
         <Preference
             android:key="DeactivateDeviceOwner"
             android:title="@string/title_deactivate_deviceowner" />
+        <Preference
+            android:key="RebootDevice"
+            android:title="@string/title_RebootDevice"
+            app:isPreferenceVisible="false" />
     </PreferenceCategory>
 </PreferenceScreen>

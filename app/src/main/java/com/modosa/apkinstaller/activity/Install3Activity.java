@@ -26,18 +26,18 @@ import java.util.List;
 /**
  * @author dadaewq
  */
-public class Installer3Activity extends AbstractInstallerActivity implements SAIPackageInstaller.InstallationStatusListener {
+public class Install3Activity extends AbstractInstallerActivity implements SAIPackageInstaller.InstallationStatusListener {
 
     private long mOngoingSessionId;
-    private String realPath;
+    private String installApkPath;
 
 
     @Override
-    public void startInstall(String apkPath) {
-        Log.d("Start install", apkPath + "");
-        if (apkPath != null) {
-            installApkFile = new File(apkPath);
-            realPath = apkPath;
+    public void startInstall(String getinstallApkPath) {
+        Log.d("Start install", getinstallApkPath + "");
+        if (getinstallApkPath != null) {
+            installApkPath = getinstallApkPath;
+            installApkFile = new File(installApkPath);
             ArrayList<File> files = new ArrayList<>();
             files.add(installApkFile);
             new Thread(() -> {
@@ -107,13 +107,8 @@ public class Installer3Activity extends AbstractInstallerActivity implements SAI
             case INSTALLING:
                 break;
             case INSTALLATION_SUCCEED:
-                deleteCache();
                 showMyToast0(String.format(getString(R.string.tip_success_install), apkinfo[0]));
-                if (show_notification) {
-                    Log.e("packagename", apkinfo[1]);
-                    new NotifyUtil(this).sendNotification("3", String.format(getString(R.string.tip_success_install), apkinfo[0]), apkinfo[1]);
-
-                }
+                showNotificationWithdeleteCache(true);
                 break;
             case INSTALLATION_FAILED:
 
@@ -125,12 +120,7 @@ public class Installer3Activity extends AbstractInstallerActivity implements SAI
                     showMyToast1(String.format(getString(R.string.tip_failed_install_witherror), apkinfo[0], ""));
                 }
 
-                if (show_notification) {
-                    Log.e("packagename", apkinfo[1]);
-                    new NotifyUtil(this).sendNotification("21", String.format(getString(R.string.tip_failed_install), apkinfo[0]), apkinfo[1], realPath, istemp);
-                } else {
-                    deleteCache();
-                }
+                showNotificationWithdeleteCache(false);
 
                 break;
             default:
@@ -138,4 +128,23 @@ public class Installer3Activity extends AbstractInstallerActivity implements SAI
         }
     }
 
+    private void showNotificationWithdeleteCache(boolean success) {
+        if (success) {
+            isInstalledSuccess = true;
+            deleteCache();
+            if (show_notification) {
+                Log.e("packagename", apkinfo[1]);
+                new NotifyUtil(this).sendNotification("3", String.format(getString(R.string.tip_success_install), apkinfo[0]), apkinfo[1]);
+            }
+
+        } else {
+            isInstalledSuccess = false;
+            if (show_notification) {
+                Log.e("packagename", apkinfo[1]);
+                new NotifyUtil(this).sendNotification("21", String.format(getString(R.string.tip_failed_install), apkinfo[0]), apkinfo[1], installApkPath, istemp);
+            } else {
+                deleteCache();
+            }
+        }
+    }
 }

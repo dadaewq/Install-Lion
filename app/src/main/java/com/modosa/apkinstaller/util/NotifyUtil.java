@@ -20,7 +20,7 @@ import java.io.File;
  * @author dadaewq
  */
 public class NotifyUtil {
-    Context context;
+    private final Context context;
     private String channelId;
     private String channelName;
     private String versionName = "";
@@ -170,7 +170,9 @@ public class NotifyUtil {
                 //通知产生的时间，会在通知信息里显示
                 .setWhen(System.currentTimeMillis())
                 //设置小图标（通知栏没有下拉的图标）
-                .setSmallIcon(R.drawable.ic_filter_vintage_black_24dp)
+                .setSmallIcon("4".equals(channelId) ?
+                        R.drawable.ic_settings_black_24dp :
+                        R.drawable.ic_filter_vintage_black_24dp)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent);
 
