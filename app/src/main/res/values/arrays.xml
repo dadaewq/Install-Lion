@@ -2,17 +2,12 @@
 
 <resources>
     <string-array name="querySupportSilentInstall">
-        <item>"supported"</item>
-        <item>"IceBox is not installed"</item>
-        <item>"IceBox is not the devie owner"</item>
+        <item>"Supported"</item>
+        <item>"Ice Box is not installed"</item>
+        <item>"Ice Box's work mode is not Devie Owner"</item>
         <item>"No permissions"</item>
         <item>"Not supported by current system version"</item>
-        <item>"IceBox's version is too low"</item>
+        <item>"Ice Box's version is too low"</item>
         <item>"Unknown"</item>
-    </string-array>
-    <string-array name="AppTheme">
-        <item>@string/AppTheme_MODE_NIGHT_NO</item>
-        <item>@string/AppTheme_MODE_NIGHT_YES</item>
-        <item>@string/AppTheme_MODE_NIGHT_FOLLOW_SYSTEM</item>
     </string-array>
 </resources>

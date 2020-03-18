@@ -9,6 +9,7 @@ import androidx.core.content.FileProvider;
 import com.catchingnow.icebox.sdk_client.IceBox;
 import com.modosa.apkinstaller.R;
 import com.modosa.apkinstaller.util.NotifyUtil;
+import com.modosa.apkinstaller.util.OpUtil;
 
 import java.io.File;
 
@@ -37,16 +38,21 @@ public class Install1Activity extends AbstractInstallerActivity {
 
             disposeSafety();
 
-            mSubscribe = Single.fromCallable(() -> IceBox.installPackage(this, installuri))
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe((Boolean success) -> {
-                        Toast.makeText(this, success ? String.format(getString(R.string.tip_success_install), apkinfo[0]) : String.format(getString(R.string.tip_failed_install), apkinfo[0]), Toast.LENGTH_SHORT).show();
+            //查询如果为SUPPORTED才开始安装，避免因为没有安装等情况导致installPackage没有返回值
+            //（疑似部分设备即使安装了查询下也是NOT_INSTALLED）
+            if (IceBox.SilentInstallSupport.SUPPORTED.equals(IceBox.querySupportSilentInstall(this))) {
+                mSubscribe = Single.fromCallable(() -> IceBox.installPackage(this, installuri))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe((Boolean success) -> {
+                            Toast.makeText(this, success ? String.format(getString(R.string.tip_success_install), apkinfo[0]) : String.format(getString(R.string.tip_failed_install), apkinfo[0]), Toast.LENGTH_SHORT).show();
+                            showNotificationWithdeleteCache(success);
 
-                        showNotificationWithdeleteCache(success);
-
-                    }, Throwable::printStackTrace);
-
+                        }, Throwable::printStackTrace);
+            } else {
+                Toast.makeText(this, String.format(getString(R.string.tip_failed_install), apkinfo[0]), Toast.LENGTH_SHORT).show();
+                showNotificationWithdeleteCache(false);
+            }
             finish();
         } else {
             showMyToast0(R.string.tip_failed_read);
@@ -82,17 +88,24 @@ public class Install1Activity extends AbstractInstallerActivity {
             deleteCache();
             if (show_notification) {
                 Log.e("packagename", apkinfo[1]);
-                new NotifyUtil(this).sendNotification("1", String.format(getString(R.string.tip_success_install), apkinfo[0]), apkinfo[1]);
+                new NotifyUtil(this).sendSuccessNotification("1", String.format(getString(R.string.tip_success_install), apkinfo[0]), apkinfo[1]);
             }
 
         } else {
             isInstalledSuccess = false;
+
             if (show_notification) {
                 Log.e("packagename", apkinfo[1]);
-                new NotifyUtil(this).sendNotification("21", String.format(getString(R.string.tip_failed_install), apkinfo[0]), apkinfo[1], installApkPath, istemp);
+                new NotifyUtil(this).sendFailNotification("21", String.format(getString(R.string.tip_failed_install), apkinfo[0]), apkinfo[1], installApkPath, istemp && !enableAnotherinstaller);
             } else {
-                deleteCache();
+                if (!enableAnotherinstaller) {
+                    deleteCache();
+                }
             }
+            if (enableAnotherinstaller) {
+                OpUtil.startAnotherInstaller(this, installApkFile, istemp);
+            }
+
         }
     }
 }

@@ -22,7 +22,6 @@
             android:title="@string/title_SetLockScreenInfo" />
     </PreferenceCategory>
 
-
     <PreferenceCategory android:title="@string/title_lockDefaultApp">
         <Preference
             android:key="LockDefaultLauncher"

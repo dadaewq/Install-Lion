@@ -17,11 +17,13 @@ import android.widget.CheckBox;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import com.modosa.apkinstaller.R;
+import com.modosa.apkinstaller.fragment.SettingsFragment;
 import com.modosa.apkinstaller.util.AppInfoUtil;
 import com.modosa.apkinstaller.util.OpUtil;
 import com.modosa.apkinstaller.util.PraseContentUtil;
@@ -33,7 +35,7 @@ import java.util.Objects;
 /**
  * @author dadaewq
  */
-public abstract class AbstractInstallerActivity extends Activity {
+public abstract class AbstractInstallerActivity extends AppCompatActivity {
 
     private static final int PICK_APK_FILE = 2;
     private static final String ILLEGALPKGNAME = "IL^&IllegalPN*@!128`+=：:,.[";
@@ -45,8 +47,9 @@ public abstract class AbstractInstallerActivity extends Activity {
     File installApkFile;
     boolean show_notification;
     boolean isInstalledSuccess = false;
-    private boolean deleteSucceededApk;
+    boolean enableAnotherinstaller;
     boolean istemp = false;
+    private boolean deleteSucceededApk;
     private String[] source;
     private Uri uri;
     private SharedPreferences spAllowSource;
@@ -60,6 +63,7 @@ public abstract class AbstractInstallerActivity extends Activity {
         super.onCreate(savedInstanceState);
         initFromAction(getIntent().getAction() + "");
     }
+
 
     private void initFromAction(String action) {
         switch (action) {
@@ -149,6 +153,7 @@ public abstract class AbstractInstallerActivity extends Activity {
         boolean needconfirm = spGetPreferenceManager.getBoolean("needconfirm", true);
         deleteSucceededApk = spGetPreferenceManager.getBoolean("deleteSucceededApk", false);
         show_notification = spGetPreferenceManager.getBoolean("show_notification", false);
+        enableAnotherinstaller = spGetPreferenceManager.getBoolean(SettingsFragment.SP_KEY_ENABLE_ANOTHER_INSTALLER, false);
         boolean allowsource = spAllowSource.getBoolean(source[0], false);
 
         String validApkPath = preInstallGetValidApkPath();
@@ -284,7 +289,7 @@ public abstract class AbstractInstallerActivity extends Activity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
-
+        super.onActivityResult(requestCode, resultCode, resultData);
         if (requestCode == PICK_APK_FILE
                 && resultCode == Activity.RESULT_OK
                 && resultData != null) {
@@ -310,7 +315,8 @@ public abstract class AbstractInstallerActivity extends Activity {
     @Override
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if (istemp && (cachePath != null)) {
+
+        if (istemp && (cachePath != null) && !enableAnotherinstaller) {
             OpUtil.deleteSingleFile(new File(cachePath));
         }
         if (alertDialog != null) {
@@ -399,9 +405,9 @@ public abstract class AbstractInstallerActivity extends Activity {
 
 
     void deleteCache() {
-        Log.e("deleteSucceededApk", " " + deleteSucceededApk);
-        Log.e("isInstalledSuccess", " " + isInstalledSuccess);
-        Log.e("installApkFile", installApkFile + "");
+//        Log.e("deleteSucceededApk", " " + deleteSucceededApk);
+//        Log.e("isInstalledSuccess", " " + isInstalledSuccess);
+//        Log.e("installApkFile", installApkFile + "");
         if (istemp || (deleteSucceededApk && isInstalledSuccess)) {
             OpUtil.deleteSingleFile(installApkFile);
         }

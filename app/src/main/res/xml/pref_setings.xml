@@ -1,39 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
-    <SwitchPreferenceCompat
-        app:defaultValue="false"
-        app:key="show_notification"
-        app:summary="@string/show_tip"
-        app:title="@string/show_title" />
-    <SwitchPreferenceCompat
-        app:defaultValue="true"
-        app:key="needconfirm"
-        app:summaryOff="@string/summary_off_needconfirm"
-        app:summaryOn="@string/summary_on_needconfirm"
-        app:title="@string/confirm_title" />
-    <SwitchPreferenceCompat
-        app:defaultValue="false"
-        app:key="deleteSucceededApk"
-        app:summary="@string/message_deleteSucceededApk"
-        app:title="@string/title_deleteSucceededApk" />
-    <Preference
-        app:key="setAppTheme"
-        app:title="@string/title_AppTheme" />
-    <Preference
-        app:key="hideIcon"
-        app:title="@string/hideIcon" />
-    <Preference
-        app:key="clearAllowedList"
-        app:title="@string/clearAllowedList" />
-    <Preference
-        app:key="clearCache"
-        app:title="@string/title_clearCache" />
-    <Preference
-        app:key="manualAuthorize"
-        app:summary="@string/summary_manualAuthorize"
-        app:title="@string/title_manualAuthorize" />
-    <Preference
-        app:isPreferenceVisible="false"
-        app:key="ignoreBatteryOptimization"
-        app:title="@string/ignoreBatteryOptimization" />
+    <PreferenceCategory app:title="@string/title_about_install">
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:key="show_notification"
+            app:summary="@string/tip_show_notification"
+            app:title="@string/title_show_notification" />
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="needconfirm"
+            app:summaryOff="@string/summary_off_needconfirm"
+            app:summaryOn="@string/summary_on_needconfirm"
+            app:title="@string/confirm_title" />
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:key="deleteSucceededApk"
+            app:summary="@string/message_deleteSucceededApk"
+            app:title="@string/title_deleteSucceededApk" />
+        <Preference
+            app:key="installByAnotherAfterFail"
+            app:title="@string/title_installByAnotherAfterFail" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/title_display">
+        <Preference
+            app:key="setAppTheme"
+            app:title="@string/title_AppTheme" />
+        <Preference
+            app:key="hideIcon"
+            app:title="@string/hideIcon" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/title_others">
+        <Preference
+            app:key="clearAllowedList"
+            app:title="@string/clearAllowedList" />
+        <Preference
+            app:key="clearCache"
+            app:summary="@string/summary_clearCache" />
+        <Preference
+            app:key="manualAuthorize"
+            app:summary=""
+            app:title="@string/title_manualAuthorize" />
+        <Preference
+            app:isPreferenceVisible="false"
+            app:key="ignoreBatteryOptimization"
+            app:title="@string/ignoreBatteryOptimization" />
+    </PreferenceCategory>
 </PreferenceScreen>

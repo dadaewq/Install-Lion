@@ -11,42 +11,56 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.PowerManager;
-import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.modosa.apkinstaller.R;
+import com.modosa.apkinstaller.activity.MainActivity;
 import com.modosa.apkinstaller.util.FileSizeUtil;
 import com.modosa.apkinstaller.util.OpUtil;
+import com.modosa.apkinstaller.util.ResultUtil;
 
+import java.lang.ref.WeakReference;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author dadaewq
  */
 public class SettingsFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener {
     public static final String SP_KEY_NIGHT_MODE = "MODE_NIGHT";
-    private static final String EMPTY_SIZE = "0B";
+    public static final String SP_KEY_ENABLE_ANOTHER_INSTALLER = "enableAnotherInstaller";
+    public static final String SP_KEY_ANOTHER_INSTALLER_NAME = "anotherInstallerName";
     private Context context;
     private SharedPreferences spGetPreferenceManager;
-
+    private MyHandler mHandler;
     private AlertDialog alertDialog;
+    private String cachePath;
+    private String cacheSize;
+    private Preference clearCache;
+
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mHandler = new MyHandler(this);
         context = getActivity();
         init();
     }
@@ -56,37 +70,26 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         setPreferencesFromResource(R.xml.pref_setings, rootKey);
     }
 
-//    @RequiresApi(api = Build.VERSION_CODES.O)
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        refreshSwitch();
-//    }
-
     private void findPreferencesAndSetListner() {
         spGetPreferenceManager = getPreferenceManager().getSharedPreferences();
 
-        spGetPreferenceManager = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-//        SwitchPreferenceCompat needconfirm = findPreference("needconfirm");
-//        SwitchPreferenceCompat show_notification = findPreference("show_notification");
-
-
-//        Preference hideIcon = findPreference("hideIcon");
-//        Preference clearAllowedList = findPreference("clearAllowedList");
-//        Preference clearCache = findPreference("clearCache");
-//        Preference manualAuthorize = findPreference("manualAuthorize");
-
-
-//        hideIcon.setOnPreferenceClickListener(this);
-//        clearAllowedList.setOnPreferenceClickListener(this);
-//        clearCache.setOnPreferenceClickListener(this);
-//        manualAuthorize.setOnPreferenceClickListener(this);
-
+        findPreference("installByAnotherAfterFail").setOnPreferenceClickListener(this);
         findPreference("setAppTheme").setOnPreferenceClickListener(this);
         findPreference("hideIcon").setOnPreferenceClickListener(this);
         findPreference("clearAllowedList").setOnPreferenceClickListener(this);
-        findPreference("clearCache").setOnPreferenceClickListener(this);
-        findPreference("manualAuthorize").setOnPreferenceClickListener(this);
+
+        clearCache = findPreference("clearCache");
+        assert clearCache != null;
+        clearCache.setOnPreferenceClickListener(this);
+        cachePath = Objects.requireNonNull(context.getExternalCacheDir()).getAbsolutePath();
+
+        Preference manualAuthorize = findPreference("manualAuthorize");
+        assert manualAuthorize != null;
+        manualAuthorize.setOnPreferenceClickListener(this);
+        if (ResultUtil.isMiui()) {
+            manualAuthorize.setSummary(R.string.summary_manualAuthorize);
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkNeedIgnoreBatteryOptimization()) {
             Preference ignoreBatteryOptimization = findPreference("ignoreBatteryOptimization");
             assert ignoreBatteryOptimization != null;
@@ -94,20 +97,32 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
             ignoreBatteryOptimization.setOnPreferenceClickListener(this);
         }
 
-
     }
 
-    @SuppressLint("ResourceType")
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onResume() {
+        super.onResume();
+        Executors.newSingleThreadExecutor().execute(() -> {
+            Message msg = mHandler.obtainMessage();
+            msg.arg1 = 9;
+            mHandler.sendMessage(msg);
+        });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        // Remove all Runnable and Message.
+        mHandler.removeCallbacksAndMessages(null);
+    }
+
+
+    //    @SuppressLint("ResourceType")
+//    @RequiresApi(api = Build.VERSION_CODES.O)
     private void init() {
         findPreferencesAndSetListner();
     }
-
-
-//    @RequiresApi(api = Build.VERSION_CODES.O)
-//    private void refreshSwitch() {
-//
-//    }
 
     @Override
     public void onDestroyView() {
@@ -121,6 +136,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     @Override
     public boolean onPreferenceClick(Preference preference) {
         switch (preference.getKey()) {
+
+            case "installByAnotherAfterFail":
+                showDialogInstallByAnotherAfterFail();
+                break;
             case "setAppTheme":
                 showDialogSetAppTheme();
                 break;
@@ -131,7 +150,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 showDialogClearAllowedList();
                 break;
             case "clearCache":
-                showDialogClearCache();
+                Executors.newSingleThreadExecutor().execute(() -> {
+                    Message msg = mHandler.obtainMessage();
+                    msg.arg1 = 6;
+                    mHandler.sendMessage(msg);
+                });
                 break;
             case "manualAuthorize":
                 manualuthorize();
@@ -140,11 +163,36 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 ignoreBatteryOptimization();
                 break;
             default:
-                break;
         }
-        return false;
+        return true;
     }
 
+    private void showDialogInstallByAnotherAfterFail() {
+        View view = View.inflate(context, R.layout.install_by_another, null);
+        CheckBox checkBox = view.findViewById(R.id.confirm_checkbox);
+        EditText editText = view.findViewById(R.id.editText);
+
+        editText.setText(spGetPreferenceManager.getString(SP_KEY_ANOTHER_INSTALLER_NAME, ""));
+        boolean enable = spGetPreferenceManager.getBoolean(SP_KEY_ENABLE_ANOTHER_INSTALLER, false);
+        checkBox.setChecked(enable);
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                .setTitle(R.string.title_installByAnotherAfterFail)
+                .setView(view)
+                .setNeutralButton(android.R.string.no, null)
+                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                    SharedPreferences.Editor editor = spGetPreferenceManager.edit();
+                    editor.putBoolean(SP_KEY_ENABLE_ANOTHER_INSTALLER, checkBox.isChecked());
+                    editor.putString(SP_KEY_ANOTHER_INSTALLER_NAME, editText.getText().toString().trim());
+                    editor.apply();
+                });
+
+        alertDialog = builder.create();
+
+        OpUtil.showAlertDialog(context, alertDialog);
+
+    }
 
     private void showDialogSetAppTheme() {
 
@@ -161,8 +209,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
         View view = View.inflate(context, R.layout.app_theme, null);
         RadioGroup radioGroup = view.findViewById(R.id.radioGroup);
-        int radioButtonId = 520;
-        int getNightMode = spGetPreferenceManager.getInt(SP_KEY_NIGHT_MODE, 520);
+        int radioButtonId = 0;
+        int getNightMode = spGetPreferenceManager.getInt(SP_KEY_NIGHT_MODE, AppCompatDelegate.MODE_NIGHT_UNSPECIFIED);
+        AtomicBoolean isValid = new AtomicBoolean(true);
         switch (getNightMode) {
             case AppCompatDelegate.MODE_NIGHT_NO:
                 radioButtonId = R.id.MODE_NIGHT_NO;
@@ -174,12 +223,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 radioButtonId = R.id.MODE_NIGHT_FOLLOW_SYSTEM;
                 break;
             default:
+                isValid.set(false);
         }
-        if (getNightMode != 520 && radioButtonId != 520) {
+        if (isValid.get()) {
             ((RadioButton) view.findViewById(radioButtonId)).setChecked(true);
         }
+        isValid.set(true);
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            int nightMode = 520;
+            int nightMode = AppCompatDelegate.MODE_NIGHT_UNSPECIFIED;
             switch (checkedId) {
                 case R.id.MODE_NIGHT_NO:
                     nightMode = AppCompatDelegate.MODE_NIGHT_NO;
@@ -191,15 +242,16 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                     nightMode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
                     break;
                 default:
+                    isValid.set(false);
             }
-            if (nightMode != 520) {
+
+            if (isValid.get()) {
                 spGetPreferenceManager.edit().putInt(SP_KEY_NIGHT_MODE, nightMode).apply();
                 if (alertDialog != null && alertDialog.isShowing()) {
                     alertDialog.dismiss();
                 }
                 AppCompatDelegate.setDefaultNightMode(nightMode);
             }
-
         });
 
 
@@ -219,9 +271,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         CheckBox checkBox = checkBoxView.findViewById(R.id.confirm_checkbox);
         checkBox.setText(R.string.hideIcon);
 
-        ComponentName mainComponentName = new ComponentName(context, "com.modosa.apkinstaller.activity.MainActivity");
+        ComponentName launchMainUiComponentName = new ComponentName(context, MainActivity.class);
         PackageManager pm = context.getPackageManager();
-        boolean isEnabled = (pm.getComponentEnabledSetting(mainComponentName) == (PackageManager.COMPONENT_ENABLED_STATE_DEFAULT) || pm.getComponentEnabledSetting(mainComponentName) == (PackageManager.COMPONENT_ENABLED_STATE_ENABLED));
+        boolean isEnabled = (pm.getComponentEnabledSetting(launchMainUiComponentName) == (PackageManager.COMPONENT_ENABLED_STATE_DEFAULT) || pm.getComponentEnabledSetting(launchMainUiComponentName) == (PackageManager.COMPONENT_ENABLED_STATE_ENABLED));
 
         checkBox.setChecked(!isEnabled);
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
@@ -229,7 +281,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 .setMessage(R.string.message_hideIcon)
                 .setView(checkBoxView)
                 .setNeutralButton(android.R.string.no, null)
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> OpUtil.setComponentState(context, mainComponentName,
+                .setPositiveButton(android.R.string.yes, (dialog, which) -> OpUtil.setComponentState(context, launchMainUiComponentName,
                         !checkBox.isChecked()));
 
 //        AlertDialog
@@ -265,24 +317,24 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
     }
 
-    private void showDialogClearCache() {
-        String cachePath = Objects.requireNonNull(context.getExternalCacheDir()).getAbsolutePath();
-        String cacheSize = FileSizeUtil.getAutoFolderOrFileSize(cachePath);
-        if (EMPTY_SIZE.equals(cacheSize)) {
-            OpUtil.showToast0(context, R.string.tip_empty_cache);
-        } else {
-            Log.e("cacheSize", cacheSize);
-            AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                    .setTitle(R.string.title_clearCache)
-                    .setMessage(String.format(getString(R.string.message_clearCache), cacheSize))
-                    .setNeutralButton(android.R.string.no, null)
-                    .setPositiveButton(android.R.string.yes, (dialog, which) -> OpUtil.deleteDirectory(cachePath));
-
-//            AlertDialog
-            alertDialog = builder.create();
-            OpUtil.showAlertDialog(context, alertDialog);
-        }
-    }
+//    private void showDialogClearCache() {
+//        String cachePath = Objects.requireNonNull(context.getExternalCacheDir()).getAbsolutePath();
+//        String cacheSize = FileSizeUtil.getAutoFolderOrFileSize(cachePath);
+//        if (EMPTY_SIZE.equals(cacheSize)) {
+//            OpUtil.showToast0(context, R.string.tip_empty_cache);
+//        } else {
+//            Log.e("cacheSize", cacheSize);
+//            AlertDialog.Builder builder = new AlertDialog.Builder(context)
+//                    .setTitle(R.string.title_clearCache)
+//                    .setMessage(String.format(getString(R.string.message_clearCache), cacheSize))
+//                    .setNeutralButton(android.R.string.no, null)
+//                    .setPositiveButton(android.R.string.yes, (dialog, which) -> OpUtil.deleteDirectory(cachePath));
+//
+////            AlertDialog
+//            alertDialog = builder.create();
+//            OpUtil.showAlertDialog(context, alertDialog);
+//        }
+//    }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void manualuthorize() {
@@ -332,6 +384,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         return !((PowerManager) context.getSystemService(Context.POWER_SERVICE)).isIgnoringBatteryOptimizations(context.getPackageName());
     }
 
+    @SuppressLint("BatteryLife")
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void ignoreBatteryOptimization() {
         try {
@@ -344,4 +397,37 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         }
     }
 
+
+    private static class MyHandler extends Handler {
+
+        private final WeakReference<SettingsFragment> wrFragment;
+
+        MyHandler(SettingsFragment fragment) {
+            this.wrFragment = new WeakReference<>(fragment);
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            if (wrFragment.get() == null) {
+                return;
+            }
+            SettingsFragment settingsFragment = wrFragment.get();
+
+
+            settingsFragment.cacheSize = FileSizeUtil.getAutoFolderOrFileSize(settingsFragment.cachePath);
+
+            switch (msg.arg1) {
+                case 9:
+                    settingsFragment.clearCache.setTitle(String.format(settingsFragment.getString(R.string.title_clearCache), settingsFragment.cacheSize));
+                    break;
+                case 6:
+                    OpUtil.deleteDirectory(settingsFragment.cachePath);
+                    settingsFragment.clearCache.setTitle(String.format(settingsFragment.getString(R.string.title_clearCache), FileSizeUtil.getAutoFolderOrFileSize(settingsFragment.cachePath)));
+                    OpUtil.showToast0(settingsFragment.context, R.string.tip_success_clear_cache);
+                    break;
+                default:
+
+            }
+        }
+    }
 }

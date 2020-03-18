@@ -37,7 +37,7 @@ import static com.modosa.apkinstaller.util.OpUtil.showToast0;
 /**
  * @author dadaewq
  */
-public class DPMSettingsFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener {
+public class DpmSettingsFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener {
     private final String sp_key_orgName = "orgName";
     private final String sp_key_confirmWarning = "confirmWarning";
     private final String[] userRestrictionsKeys = {UserManager.DISALLOW_INSTALL_APPS, UserManager.DISALLOW_UNINSTALL_APPS, UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES};
@@ -139,28 +139,28 @@ public class DPMSettingsFragment extends PreferenceFragmentCompat implements Pre
 
         devicePolicyManager = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
 
-        int i = 0;
-        for (String key : userManager.getUserRestrictions().keySet()) {
-            i++;
-            Log.e("Bundle " + i, key + "");
-        }
+//        int i=0;
+//        for (String key : userManager.getUserRestrictions().keySet()) {
+//            i++;
+//            Log.e("Bundle " + i, key + "");
+//        }
 
         refreshSwitch();
         if (isDeviceOwner()) {
-            for (i = 0; i < userRestrictionsKeys.length; i++) {
+            for (int i = 0; i < userRestrictionsKeys.length; i++) {
                 int finalI = i;
 
                 switchPreferences[i].setOnPreferenceClickListener(v -> {
                     boolean is = switchPreferences[finalI].isChecked();
                     switchPreferences[finalI].setChecked(is);
                     opUserRestrictionFromSwitch(userRestrictionsKeys[finalI], is);
-                    return false;
+                    return true;
                 });
             }
 
             EnableBackupService.setOnPreferenceClickListener(v -> {
                 setEnableBackupServiceEnabled(EnableBackupService.isChecked());
-                return false;
+                return true;
             });
 
         }
@@ -187,8 +187,7 @@ public class DPMSettingsFragment extends PreferenceFragmentCompat implements Pre
         allMatchAppInfo = new CharSequence[size];
 
 
-        int i;
-        for (i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
             String packageName = list.get(i).activityInfo.packageName;
             String activityName = list.get(i).activityInfo.name;
             allMatchComponentName[i] = new ComponentName(packageName, activityName);
@@ -336,7 +335,6 @@ public class DPMSettingsFragment extends PreferenceFragmentCompat implements Pre
 
                 titleid = R.string.title_dialog_LockDefaultPackageInstaller;
                 break;
-
             default:
                 return;
         }
@@ -461,7 +459,7 @@ public class DPMSettingsFragment extends PreferenceFragmentCompat implements Pre
             default:
                 break;
         }
-        return false;
+        return true;
     }
 
     private void opUserRestrictionFromSwitch(String key, boolean isAdd) {

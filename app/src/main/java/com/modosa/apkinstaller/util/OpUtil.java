@@ -3,6 +3,7 @@ package com.modosa.apkinstaller.util;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -11,7 +12,11 @@ import android.util.Log;
 import android.view.Window;
 import android.widget.Toast;
 
+import androidx.core.content.FileProvider;
+import androidx.preference.PreferenceManager;
+
 import com.modosa.apkinstaller.R;
+import com.modosa.apkinstaller.fragment.SettingsFragment;
 import com.modosa.apkinstaller.receiver.AdminReceiver;
 
 import java.io.File;
@@ -93,6 +98,44 @@ public class OpUtil {
         alertDialog.show();
     }
 
+    private static Uri getMyContentUriForFile(Context context, File file) {
+
+        return FileProvider.getUriForFile(context,
+                context.getPackageName() + ".FILE_PROVIDER", file);
+    }
+
+    public static void startAnotherInstaller(Context context, File installApkFile, boolean istemp) {
+        String anotherInstallerName = PreferenceManager.getDefaultSharedPreferences(context).getString(SettingsFragment.SP_KEY_ANOTHER_INSTALLER_NAME, "").trim();
+
+        Intent systemIntent = new Intent(Intent.ACTION_VIEW)
+                .setDataAndType(getMyContentUriForFile(context, installApkFile), "application/vnd.android.package-archive")
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        Intent anotherIntent = (Intent) systemIntent.clone();
+        boolean useSystemIntent = true;
+        if (!"".equals(anotherInstallerName)) {
+            anotherIntent.setPackage(anotherInstallerName);
+            try {
+                context.startActivity(anotherIntent);
+                useSystemIntent = false;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (useSystemIntent) {
+            try {
+                context.startActivity(systemIntent);
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (istemp) {
+                    deleteSingleFile(installApkFile);
+                }
+            }
+        }
+
+    }
 
     public static boolean getComponentState(Context context, ComponentName componentName) {
         PackageManager pm = context.getPackageManager();

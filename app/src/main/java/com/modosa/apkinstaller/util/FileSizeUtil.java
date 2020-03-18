@@ -150,7 +150,6 @@ public class FileSizeUtil {
                 fileSizeLong = Double.parseDouble(df.format((double) fileSize / 1073741824));
                 break;
             default:
-                break;
         }
         return fileSizeLong;
     }

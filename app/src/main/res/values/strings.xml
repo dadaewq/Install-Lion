@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Install Lion</string>
     <string name="title_instructions_before_use">Instructions before use</string>
-    <string name="tv_instructions_before_use">\nThe main function of this App is to install APK and uninstall the application\n
+    <string name="tv_instructions_before_use">\nThe main function of this App is to install apk and uninstall the application\n
         \nMost custom systems other than native Android cannot be set as default installation and uninstallation applications due to system limitations, and the system will almost always let the system\'s default package installer handle it when initiating the installation,and there is no good solution.\n
         \nIn this case, it is recommended to use the \"Pick a file to install\" function in this App or use a file manager that supports selecting the open way to initiate the installation.\n
     </string>
@@ -16,7 +16,7 @@
     <string name="click2requestpermission">Click to request permissions</string>
     <string name="confirm_title">Confirmation before installation</string>
     <string name="enable_title">Enable installer</string>
-    <string name="hideIcon">Hide Icon</string>
+    <string name="hideIcon">Hide icon</string>
     <string name="installer_device">Device</string>
     <string name="installer_error_shell">%s installer error:\n\n%s</string>
     <string name="installer_error_shizuku_unavailable">Unable to access Shizuku service</string>
@@ -40,8 +40,8 @@
     <string name="summary_permission_no">Unauthorized！</string>
     <string name="summary_permission_yes">Authorized</string>
     <string name="Settings">Setting</string>
-    <string name="show_tip">Show notification after installation,You can run the app by clicking the notification</string>
-    <string name="show_title">Show notification</string>
+    <string name="tip_show_notification">Show notification after installation.You can run the app by clicking the notification if the installation is successful</string>
+    <string name="title_show_notification">Show notification</string>
     <string name="summary_av_no">Unavailable！</string>
     <string name="summary_av_yes">Available</string>
     <string name="summary_av_ok_installer">Available now</string>
@@ -57,8 +57,8 @@
     <string name="tip_failed_read">Reading apk failed</string>
     <string name="tip_failed_uninstall">%1$s Uninstalled failed</string>
     <string name="tip_failed_uninstall_witherror">%1$s Uninstalled failed,The error has been copied to the clipboard\n%2$s</string>
-    <string name="tip_install_end">Attempt to install has Over! The result is unknown.</string>
-    <string name="tip_install_over">%1$s attempt to install has ended</string>
+    <string name="tip_try_install_end">Attempt to install has ended.The result is unknown.</string>
+    <string name="content_title_install_end">%1$s attempt to install has ended</string>
     <string name="tip_ltsdk26">Only supports Android 8.0 and above devices</string>
     <string name="tip_manualAuthorize">Please find the app and authorize it manually</string>
     <string name="tip_start_install">Start installing  %1$s</string>
@@ -75,8 +75,8 @@
     <string name="summary_check_shizuku_service">Check Shizuku service</string>
     <string name="summary_go_shizuku">Click to go to Shizuku to check</string>
     <string name="title_delegated_OwnerPackageNameAndSDKVersion">Owner package name and SDK version</string>
-    <string name="title_icebox__authorization_state">IceBox authorization state</string>
-    <string name="title_icebox_support_state">IceBox support state</string>
+    <string name="title_icebox__authorization_state">Ice Box authorization state</string>
+    <string name="title_icebox_support_state">Ice Box support state</string>
     <string name="title_shizuku_authorization_state">Shizuku authorization state</string>
 
 
@@ -98,12 +98,12 @@
     <string name="title_DISALLOW_UNINSTALL_APPS">Disallow uninstall Apps</string>
     <string name="title_DISALLOW_INSTALL_UNKNOWN_SOURCES">Disallow install unknown sources Apps</string>
 
-    <string name="title_clearCache">Clear cache</string>
-    <string name="tip_empty_cache">No cache currently, no cleaning required</string>
-    <string name="message_clearCache">Current cache size is %s\nClear it?</string>
+    <string name="summary_clearCache">Click to clear</string>
+    <string name="tip_success_clear_cache">Clean up</string>
+    <string name="title_clearCache">Current cache size：%s</string>
     <string name="InstallFromGetContent">Pick a file to install</string>
     <string name="title_RebootDevice">Reboot device now</string>
-    <string name="title_dpmSettings">Device owner settings</string>
+    <string name="title_dpm_settings">Device Owner settings</string>
     <string name="title_lockDefaultApp">Lock Default App</string>
     <string name="title_others">Others</string>
     <string name="title_display">Display</string>
@@ -125,15 +125,20 @@
     <string name="title_lockdefault">Waring！</string>
     <string name="message_lockdefault">Locking the default app is permanent, even after deactivating the device owner.\nMake sure to cancel unnecessary locks before deactivating the device owner\n\n(Locks cannot be made on some custom rom)\n</string>
     <string name="checkbox_lockdefault">I am fully aware and at my own risk</string>
-    <string name="installer_error_root_no_root">Unable to acquire root access</string>
-    <!--    <string name="title_show_root_no_click2request">Not granted root permission,click to request</string>-->
-    <string name="title_show_root_no_click2request">Click to request root permission</string>
+    <string name="installer_error_root_no_root">Unable to acquire Root access</string>
+    <!--    <string name="title_show_root_no_click2request">Not granted Root permission,click to request</string>-->
+    <string name="tip_enable_one_installer">Please enable at least one installer</string>
+    <string name="title_show_root_no_click2check">Click to check Root permission</string>
     <string name="title_show_root_yes">Have Root permission</string>
-    <string name="title_deleteSucceededApk">Delete the Apk after successful installation</string>
-    <string name="message_deleteSucceededApk">Please open it carefully, it will delete the APK that is successfully installed and can get the real path.</string>
+    <string name="title_deleteSucceededApk">Delete the apk after successful installation</string>
+    <string name="title_installByAnotherAfterFail">Install with other app after failed installation</string>
+    <string name="checkbox_installByAnotherAfterFail">Enable this feature</string>
+    <string name="et_installByAnotherAfterFail">Enter the package name to specify the application, leave it blank to choose by the system</string>
+    <string name="message_deleteSucceededApk">Please open it carefully, it will delete the apk that is successfully installed and can get the real path.</string>
     <string name="title_AppTheme">Theme</string>
     <string name="AppTheme_MODE_NIGHT_NO">Light</string>
     <string name="AppTheme_MODE_NIGHT_YES">Dark</string>
     <string name="AppTheme_MODE_NIGHT_FOLLOW_SYSTEM">Follow system</string>
-    <string name="ignoreBatteryOptimization">Ignore Battery Optimization</string>
+    <string name="ignoreBatteryOptimization">Ignore battery optimization</string>
+    <string name="title_about_install">Installation</string>
 </resources>

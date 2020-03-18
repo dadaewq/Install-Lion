@@ -32,34 +32,31 @@ public class NotifyUtil {
         this.context = context;
     }
 
-    public void sendNotification(String channelId, String contentTitle, String packageName) {
-        sendNotification(channelId, contentTitle, packageName, null, false);
+    public void sendSuccessNotification(String channelId, String contentTitle, String packageName) {
+        sendFailNotification(channelId, contentTitle, packageName, null, false);
 
     }
 
-    public void sendNotification(String channelId, String contentTitle, String packageName, String realPath, boolean istemp) {
-
+    public void sendFailNotification(String channelId, String contentTitle, String packageName, String realPath, boolean shouldDelete) {
 
         this.channelId = channelId;
         this.channelName = getChannelName(channelId);
         this.contentTitle = contentTitle;
 
-
         int id = (int) System.currentTimeMillis();
 
         PendingIntent clickIntent;
 
-
 //        如果使用 AppInfoUtils.getApkIcon()在InstallActivity用Bundle传LargeIcon
 //        LargeIcon = getIntent().getParcelableExtra("LargeIcon");
-        String[] version;
 
+        String[] version;
 
         if (realPath != null || "2".equals(channelId)) {
             LargeIcon = AppInfoUtil.getApkIcon(context, realPath);
             clickIntent = null;
             version = AppInfoUtil.getApkVersion(context, realPath);
-            if (istemp && realPath != null) {
+            if (shouldDelete && realPath != null) {
                 OpUtil.deleteSingleFile(new File(realPath));
             }
 
@@ -69,14 +66,12 @@ public class NotifyUtil {
             version = AppInfoUtil.getApplicationVersion(context, packageName);
 
         }
-
         if (version != null) {
             versionName = version[0];
         }
 
         notifyLiveStart(clickIntent, id);
     }
-
 
     private String getChannelName(String channelId) {
         String ChannelName = "";
@@ -104,47 +99,9 @@ public class NotifyUtil {
         return ChannelName;
     }
 
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//
-//
-//        channelName = getChannelName(channelId);
-//
-//        contentTitle = getIntent().getStringExtra("contentTitle");
-//        String packageName = getIntent().getStringExtra("packageName");
-//
-//
-//        int id = (int) System.currentTimeMillis();
-//
-//        PendingIntent clickIntent;
-//
-//        Log.e("realPath ", getIntent().getStringExtra("realPath") + "");
-////        如果使用 AppInfoUtils.getApkIcon()在InstallActivity用Bundle传LargeIcon
-////        LargeIcon = getIntent().getParcelableExtra("LargeIcon");
-//        String[] version;
-//        if ("21".equals(channelId)) {
-//            LargeIcon = AppInfoUtil.getApkIcon(this, getIntent().getStringExtra("realPath"));
-//            clickIntent = null;
-//            version = AppInfoUtil.getApkVersion(this, getIntent().getStringExtra("realPath"));
-//
-//        } else {
-//            LargeIcon = AppInfoUtil.getApplicationIcon(this, packageName);
-//            clickIntent = getContentIntent(this, id, packageName);
-//            version = AppInfoUtil.getApplicationVersion(this, packageName);
-//        }
-//        if (version != null) {
-//            versionName = version[0];
-//        }
-//
-//        notifyLiveStart(clickIntent, id);
-//
-//    }
-
     private void notifyLiveStart(PendingIntent pendingIntent, int id) {
 
         NotificationChannel channel;
-
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             if (notificationManager == null) {
@@ -157,7 +114,6 @@ public class NotifyUtil {
             channel.setShowBadge(true);
 
             notificationManager.createNotificationChannel(channel);
-
         }
 
         if (notificationManager == null) {
@@ -204,7 +160,6 @@ public class NotifyUtil {
     }
 
     private PendingIntent getContentIntent(Activity context, int id, String packageName) {
-
         try {
             Intent intent = context.getPackageManager().getLaunchIntentForPackage(packageName);
             return PendingIntent.getActivity(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -212,9 +167,5 @@ public class NotifyUtil {
             e.printStackTrace();
             return null;
         }
-
-
     }
-
-
 }

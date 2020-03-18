@@ -48,14 +48,9 @@ public class Install2Activity extends AbstractInstallerActivity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     } finally {
-                        if (show_notification) {
-                            Log.e("packagename", apkinfo[1]);
-                            new NotifyUtil(this).sendNotification("2", String.format(getString(R.string.tip_install_over), apkinfo[0]), apkinfo[1], installApkPath, istemp);
-                        } else {
-                            deleteCache();
-                        }
+                        showNotificationWithdeleteCache();
                     }
-                    showMyToast1(R.string.tip_install_end);
+                    showMyToast1(R.string.tip_try_install_end);
 
                     finish();
                 }).start();
@@ -82,6 +77,15 @@ public class Install2Activity extends AbstractInstallerActivity {
                 }
                 //Todo show result
             }).start();
+        }
+    }
+
+    private void showNotificationWithdeleteCache() {
+        if (show_notification) {
+            Log.e("packagename", apkinfo[1]);
+            new NotifyUtil(this).sendFailNotification("2", String.format(getString(R.string.content_title_install_end), apkinfo[0]), apkinfo[1], installApkPath, istemp && !enableAnotherinstaller);
+        } else {
+            deleteCache();
         }
     }
 

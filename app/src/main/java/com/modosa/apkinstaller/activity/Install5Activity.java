@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.modosa.apkinstaller.R;
 import com.modosa.apkinstaller.util.NotifyUtil;
+import com.modosa.apkinstaller.util.OpUtil;
 import com.modosa.apkinstaller.util.PackageInstallerUtil;
 import com.modosa.apkinstaller.util.ResultUtil;
 
@@ -44,16 +45,21 @@ public class Install5Activity extends AbstractInstallerActivity {
             deleteCache();
             if (show_notification) {
                 Log.e("packagename", apkinfo[1]);
-                new NotifyUtil(this).sendNotification("5", String.format(getString(R.string.tip_success_install), apkinfo[0]), apkinfo[1]);
+                new NotifyUtil(this).sendSuccessNotification("5", String.format(getString(R.string.tip_success_install), apkinfo[0]), apkinfo[1]);
             }
 
         } else {
             isInstalledSuccess = false;
             if (show_notification) {
                 Log.e("packagename", apkinfo[1]);
-                new NotifyUtil(this).sendNotification("21", String.format(getString(R.string.tip_failed_install), apkinfo[0]), apkinfo[1], installApkPath, istemp);
+                new NotifyUtil(this).sendFailNotification("21", String.format(getString(R.string.tip_failed_install), apkinfo[0]), apkinfo[1], installApkPath, istemp && !enableAnotherinstaller);
             } else {
-                deleteCache();
+                if (!enableAnotherinstaller) {
+                    deleteCache();
+                }
+            }
+            if (enableAnotherinstaller) {
+                OpUtil.startAnotherInstaller(this, installApkFile, istemp);
             }
         }
     }

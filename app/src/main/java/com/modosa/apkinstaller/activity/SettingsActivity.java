@@ -60,14 +60,5 @@ public class SettingsActivity extends AppCompatActivity {
         } else {
             return super.onOptionsItemSelected(item);
         }
-
-
     }
-
-//    private void init() {
-//        show_notification.setChecked(sharedPreferences.getBoolean("show_notification", false));
-//        needconfirm.setChecked(sharedPreferences.getBoolean("needconfirm", true));
-//    }
-
-
 }

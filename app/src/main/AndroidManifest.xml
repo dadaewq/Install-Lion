@@ -35,7 +35,6 @@
         tools:targetApi="q">
         <activity
             android:name=".activity.MainUiActivity"
-
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -47,17 +46,18 @@
             </intent-filter>
         </activity>
 
-        <activity-alias
+        <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name"
-            android:targetActivity=".activity.MainUiActivity">
+            android:noHistory="true"
+            android:theme="@style/Translucent">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity-alias>
+        </activity>
 
         <activity
             android:name=".activity.SettingsActivity"
@@ -240,7 +240,9 @@
 
         <receiver android:name=".receiver.SecretCodeReceiver">
             <intent-filter>
+                <action android:name="android.telephony.action.SECRET_CODE" />
                 <action android:name="android.provider.Telephony.SECRET_CODE" />
+
                 <data
                     android:host="297297"
                     android:scheme="android_secret_code" />
@@ -252,10 +254,15 @@
             android:permission="android.permission.BIND_DEVICE_ADMIN">
             <intent-filter>
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+                <action android:name="android.app.develop.action.DEVICE_DELEGATION" />
             </intent-filter>
+
             <meta-data
                 android:name="android.app.device_admin"
                 android:resource="@xml/device_admin" />
+            <meta-data
+                android:name="android.app.develop.delegation"
+                android:resource="@xml/app_delegation" />
         </receiver>
 
         <provider

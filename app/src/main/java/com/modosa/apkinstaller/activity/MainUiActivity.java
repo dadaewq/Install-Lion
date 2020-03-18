@@ -23,7 +23,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
 
 import com.modosa.apkinstaller.R;
-import com.modosa.apkinstaller.fragment.DPMSettingsFragment;
+import com.modosa.apkinstaller.fragment.DpmSettingsFragment;
 import com.modosa.apkinstaller.fragment.MainFragment;
 import com.modosa.apkinstaller.util.OpUtil;
 
@@ -65,7 +65,7 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
             ActionBar actionBar = getSupportActionBar();
             if (actionBar != null) {
                 actionBar.setDisplayHomeAsUpEnabled(!isMain);
-                actionBar.setTitle(R.string.title_dpmSettings);
+                actionBar.setTitle(R.string.title_dpm_settings);
             }
         }
 
@@ -104,18 +104,6 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
         return devicePolicyManager.isDeviceOwnerApp(getPackageName());
     }
 
-//    @Override
-//    public boolean onPrepareOptionsMenu(Menu menu) {
-//        super.onPrepareOptionsMenu(menu);
-//
-//        if (isDeviceOwner()) {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//                menu.findItem(R.id.RebootDevice).setVisible(true);
-//            }
-//        }
-//        return true;
-//    }
-
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -124,26 +112,14 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
                 swtichIsMainFragment(true);
                 break;
             case R.id.InstallFromGetContent:
-                select();
+                installFromGetContent();
                 break;
             case R.id.Settings:
                 Intent settingsIntent = new Intent(Intent.ACTION_VIEW)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         .setClass(this, SettingsActivity.class);
                 startActivity(settingsIntent);
                 break;
-//            case R.id.hideIcon:
-//                showDialoghideIcon();
-//                break;
-//            case R.id.clearAllowedList:
-//                showDialogclearAllowedList();
-//                break;
-//            case R.id.clearCache:
-//                showDialogclearCache();
-//                break;
-//            case R.id.RebootDevice:
-//                devicePolicyManager.reboot(adminComponentName);
-//                break;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -176,8 +152,8 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(R.string.title_instructions_before_use)
                 .setView(view)
-                .setNeutralButton(android.R.string.no, null)
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                .setPositiveButton(android.R.string.no, null)
+                .setNeutralButton(android.R.string.yes, (dialog, which) -> {
                     boolean hasBothConfirm = false;
                     if (checkBox1.isChecked() && checkBox2.isChecked()) {
                         hasBothConfirm = true;
@@ -205,63 +181,11 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
             actionBar.setTitle(R.string.app_name);
             fragmentManager.beginTransaction().replace(R.id.framelayout, new MainFragment(), TAG_MAINUI).commit();
         } else {
-            actionBar.setTitle(R.string.title_dpmSettings);
-            fragmentManager.beginTransaction().replace(R.id.framelayout, new DPMSettingsFragment(), TAG_DPM).commit();
+            actionBar.setTitle(R.string.title_dpm_settings);
+            fragmentManager.beginTransaction().replace(R.id.framelayout, new DpmSettingsFragment(), TAG_DPM).commit();
         }
 
     }
-
-//    private void showDialoghideIcon() {
-//
-//        View checkBoxView = View.inflate(this, R.layout.confirm_checkbox, null);
-//        CheckBox checkBox = checkBoxView.findViewById(R.id.confirm_checkbox);
-//        checkBox.setText(R.string.hideIcon);
-//
-//        ComponentName mainComponentName = new ComponentName(this, "com.modosa.apkinstaller.activity.MainActivity");
-//        PackageManager pm = getPackageManager();
-//        boolean isEnabled = (pm.getComponentEnabledSetting(mainComponentName) == (PackageManager.COMPONENT_ENABLED_STATE_DEFAULT) || pm.getComponentEnabledSetting(mainComponentName) == (PackageManager.COMPONENT_ENABLED_STATE_ENABLED));
-//
-//        checkBox.setChecked(!isEnabled);
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this)
-//                .setTitle(R.string.hideIcon)
-//                .setMessage(R.string.message_hideIcon)
-//                .setView(checkBoxView)
-//                .setNeutralButton(android.R.string.no, null)
-//                .setPositiveButton(android.R.string.yes, (dialog, which) -> OpUtil.setComponentState(this, mainComponentName,
-//                        !checkBox.isChecked()));
-//
-//        AlertDialog alertDialog = builder.create();
-//
-//
-//        OpUtil.showAlertDialog(this, alertDialog);
-//
-//    }
-//
-//    private void showDialogclearAllowedList() {
-//
-//        View checkBoxView = View.inflate(this, R.layout.confirm_checkbox, null);
-//        CheckBox checkBox = checkBoxView.findViewById(R.id.confirm_checkbox);
-//        checkBox.setText(R.string.checkbox_clearAllowedList);
-//
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this)
-//                .setTitle(R.string.clearAllowedList)
-//                .setMessage(R.string.message_clearAllowedList)
-//                .setView(checkBoxView)
-//                .setNeutralButton(android.R.string.no, null)
-//                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
-//                    getSharedPreferences("allowsource", Context.MODE_PRIVATE).edit().clear().apply();
-//                });
-//
-//        AlertDialog alertDialog = builder.create();
-//
-//
-//        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(isChecked));
-//
-//        OpUtil.showAlertDialog(this, alertDialog);
-//
-//        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-//
-//    }
 
     @Override
     public void onBackPressed() {
@@ -278,28 +202,6 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
         }
     }
 
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//    }
-
-//    private void showDialogclearCache() {
-//        String cachePath = Objects.requireNonNull(getExternalCacheDir()).getAbsolutePath();
-//        String cacheSize = FileSizeUtil.getAutoFolderOrFileSize(cachePath);
-//        if (EMPTY_SIZE.equals(cacheSize)) {
-//            showMyToast0(R.string.tip_empty_cache);
-//        } else {
-//            Log.e("cacheSize", cacheSize);
-//            AlertDialog.Builder builder = new AlertDialog.Builder(this)
-//                    .setTitle(R.string.clearCache)
-//                    .setMessage(String.format(getString(R.string.message_clearCache), cacheSize))
-//                    .setNeutralButton(android.R.string.no, null)
-//                    .setPositiveButton(android.R.string.yes, (dialog, which) -> OpUtil.deleteDirectory(cachePath));
-//
-//            AlertDialog alertDialog = builder.create();
-//            OpUtil.showAlertDialog(this, alertDialog);
-//        }
-//    }
 
     private void startPickFile(int which, ArrayList<ComponentName> componentNameArrayList) {
 
@@ -318,11 +220,11 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
     }
 
 
-    private void select() {
+    private void installFromGetContent() {
 
-        ComponentName[] installerComponentNames = new ComponentName[MainFragment.installerSize];
+        ComponentName[] installerComponentNames = new ComponentName[MainFragment.INSTALLER_SIZE];
         ArrayList<ComponentName> componentNameArrayList = new ArrayList<>();
-        for (int i = 1; i < MainFragment.installerSize; i++) {
+        for (int i = 1; i < MainFragment.INSTALLER_SIZE; i++) {
             installerComponentNames[i] = new ComponentName(getPackageName(), getPackageName() + ".activity" + ".Install" + i + "Activity");
 
             getAvinstaller(componentNameArrayList, installerComponentNames[i]);
@@ -352,14 +254,15 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
                 items[i] = namelist.get(i);
             }
 
+
             if (items.length == 1) {
-                showMyToast0(items[0]);
+                showMyToast0(R.string.InstallFromGetContent);
                 startPickFile(0, componentNameArrayList);
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
                 builder.setItems(items, (dialog, which) -> {
-                    showMyToast0(items[which]);
+                    showMyToast0(R.string.InstallFromGetContent);
                     startPickFile(which, componentNameArrayList);
                 });
 //                AlertDialog
@@ -368,6 +271,8 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
                 OpUtil.showAlertDialog(this, alertDialogConfirmPrompt);
             }
 
+        } else {
+            showMyToast0(R.string.tip_enable_one_installer);
         }
     }
 }

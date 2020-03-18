@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 
 import com.modosa.apkinstaller.R;
 import com.modosa.apkinstaller.util.NotifyUtil;
+import com.modosa.apkinstaller.util.OpUtil;
 import com.modosa.apkinstaller.util.ResultUtil;
 import com.modosa.apkinstaller.util.ShellUtil;
 import com.modosa.apkinstaller.util.apksource.ApkSource;
@@ -159,16 +160,21 @@ public class Install4Activity extends AbstractInstallerActivity implements SAIPa
             deleteCache();
             if (show_notification) {
                 Log.e("packagename", apkinfo[1]);
-                new NotifyUtil(this).sendNotification("4", String.format(getString(R.string.tip_success_install), apkinfo[0]), apkinfo[1]);
+                new NotifyUtil(this).sendSuccessNotification("4", String.format(getString(R.string.tip_success_install), apkinfo[0]), apkinfo[1]);
             }
 
         } else {
             isInstalledSuccess = false;
             if (show_notification) {
                 Log.e("packagename", apkinfo[1]);
-                new NotifyUtil(this).sendNotification("21", String.format(getString(R.string.tip_failed_install), apkinfo[0]), apkinfo[1], installApkPath, istemp);
+                new NotifyUtil(this).sendFailNotification("21", String.format(getString(R.string.tip_failed_install), apkinfo[0]), apkinfo[1], installApkPath, istemp && !enableAnotherinstaller);
             } else {
-                deleteCache();
+                if (!enableAnotherinstaller) {
+                    deleteCache();
+                }
+            }
+            if (enableAnotherinstaller) {
+                OpUtil.startAnotherInstaller(this, installApkFile, istemp);
             }
         }
     }
