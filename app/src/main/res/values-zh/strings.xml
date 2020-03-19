@@ -18,6 +18,7 @@
     <string name="confirm_title">安装前确认</string>
     <string name="enable_title">启用安装器</string>
     <string name="hideIcon">隐藏图标</string>
+    <string name="hideIconByTranslucent">用透明图标替换隐藏</string>
     <string name="installer_device">设备</string>
     <string name="installer_error_shell">%s 安装器错误:\n\n%s</string>
     <string name="installer_error_shizuku_unavailable">无法连接到Shizuku服务</string>
@@ -82,7 +83,6 @@
     <string name="tip_start_activating">尝试激活中</string>
     <string name="tip_success_deactivate">解除成功</string>
     <string name="tip_failed_deactivate">无法取消</string>
-    <string name="title_is_deviceowner">当前是 设备管理员</string>
     <string name="title_not_deviceowner">当前不是 设备管理员</string>
     <string name="summary_clicktocopycmd">\n%1$s\n(点击可复制)</string>
     <string name="title_deactivate_deviceowner">解除设备管理员权限</string>

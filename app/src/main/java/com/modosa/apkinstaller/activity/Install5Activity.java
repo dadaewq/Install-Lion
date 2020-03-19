@@ -6,8 +6,6 @@ import android.os.Build;
 import android.util.Log;
 
 import com.modosa.apkinstaller.R;
-import com.modosa.apkinstaller.util.NotifyUtil;
-import com.modosa.apkinstaller.util.OpUtil;
 import com.modosa.apkinstaller.util.PackageInstallerUtil;
 import com.modosa.apkinstaller.util.ResultUtil;
 
@@ -17,18 +15,16 @@ import java.io.File;
  * @author dadaewq
  */
 public class Install5Activity extends AbstractInstallerActivity {
-
+    public final static String CHANNEL_ID = "5";
     private final Context context = this;
     private String uninstallPkgName;
-    private String installApkPath;
 
 
     @Override
     public void startInstall(String getinstallApkPath) {
         Log.d("Start install", getinstallApkPath + "");
         if (getinstallApkPath != null) {
-            installApkPath = getinstallApkPath;
-            installApkFile = new File(installApkPath);
+            installApkFile = new File(getinstallApkPath);
             new InstallApkTask().start();
         }
     }
@@ -39,30 +35,6 @@ public class Install5Activity extends AbstractInstallerActivity {
         new UninstallApkTask().start();
     }
 
-    private void showNotificationWithdeleteCache(boolean success) {
-        if (success) {
-            isInstalledSuccess = true;
-            deleteCache();
-            if (show_notification) {
-                Log.e("packagename", apkinfo[1]);
-                new NotifyUtil(this).sendSuccessNotification("5", String.format(getString(R.string.tip_success_install), apkinfo[0]), apkinfo[1]);
-            }
-
-        } else {
-            isInstalledSuccess = false;
-            if (show_notification) {
-                Log.e("packagename", apkinfo[1]);
-                new NotifyUtil(this).sendFailNotification("21", String.format(getString(R.string.tip_failed_install), apkinfo[0]), apkinfo[1], installApkPath, istemp && !enableAnotherinstaller);
-            } else {
-                if (!enableAnotherinstaller) {
-                    deleteCache();
-                }
-            }
-            if (enableAnotherinstaller) {
-                OpUtil.startAnotherInstaller(this, installApkFile, istemp);
-            }
-        }
-    }
 
     private class InstallApkTask extends Thread {
         @Override
@@ -80,9 +52,9 @@ public class Install5Activity extends AbstractInstallerActivity {
                     showMyToast1(String.format(getString(R.string.tip_failed_install_witherror), apkinfo[0], result));
                 }
                 if (result == null) {
-                    showNotificationWithdeleteCache(true);
+                    showNotificationWithdeleteCache(CHANNEL_ID, true);
                 } else {
-                    showNotificationWithdeleteCache(false);
+                    showNotificationWithdeleteCache(CHANNEL_ID, false);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

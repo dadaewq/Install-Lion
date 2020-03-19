@@ -27,6 +27,7 @@ import androidx.preference.SwitchPreferenceCompat;
 import com.catchingnow.delegatedscopeclient.DSMClient;
 import com.catchingnow.icebox.sdk_client.IceBox;
 import com.modosa.apkinstaller.R;
+import com.modosa.apkinstaller.activity.MainUiActivity;
 import com.modosa.apkinstaller.util.AppInfoUtil;
 import com.modosa.apkinstaller.util.OpUtil;
 import com.modosa.apkinstaller.util.shell.ShizukuShell;
@@ -41,7 +42,7 @@ import java.util.concurrent.Executors;
 import moe.shizuku.api.ShizukuApiConstants;
 import moe.shizuku.api.ShizukuService;
 
-import static com.modosa.apkinstaller.util.OpUtil.getComponentState;
+import static com.modosa.apkinstaller.util.OpUtil.getEnabledComponentState;
 import static com.modosa.apkinstaller.util.OpUtil.setComponentState;
 
 /**
@@ -49,6 +50,10 @@ import static com.modosa.apkinstaller.util.OpUtil.setComponentState;
  */
 public class MainFragment extends PreferenceFragmentCompat {
     public final static int INSTALLER_SIZE = 6;
+    public static final int RESULT_REFRESH_1 = 5201;
+    private static final int REQUEST_CODE_0 = 2330;
+    private static final int REQUEST_CODE_1 = 2331;
+    private static final int REQUEST_CODE_2 = 2332;
     private final String dsmScopes = "dsm-delegation-install-uninstall-app";
     private SwitchPreferenceCompat[] enableInstallerSwitchPreferenceCompats;
     private ComponentName[] installerComponentNames;
@@ -59,6 +64,7 @@ public class MainFragment extends PreferenceFragmentCompat {
     private Preference[] avInstallerPreferences;
     private Preference getOwnerPackageNameAndSDKVersion;
     private Preference getDelegatedScopes;
+    private Preference dpm_settings;
     private InstallerPreferenceArrayList[] preferenceArrayLists;
     private boolean issdkge26;
     private boolean issdkge23;
@@ -82,15 +88,23 @@ public class MainFragment extends PreferenceFragmentCompat {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
 
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        super.onActivityResult(requestCode, resultCode, resultData);
+        if (requestCode == MainUiActivity.REQUEST_REFRESH && resultCode == RESULT_REFRESH_1) {
+            onResume();
+        }
     }
 
     @Override
@@ -104,7 +118,6 @@ public class MainFragment extends PreferenceFragmentCompat {
     @Override
     public void onResume() {
         super.onResume();
-
         Executors.newSingleThreadExecutor().execute(() -> {
             Message msg = mHandler.obtainMessage();
             msg.arg1 = 9;
@@ -139,7 +152,7 @@ public class MainFragment extends PreferenceFragmentCompat {
             preferenceArrayLists[i].add(avInstallerPreferences[i]);
 
             enableInstallerSwitchPreferenceCompats[i].setOnPreferenceClickListener(preference -> {
-                boolean newState = !getComponentState(context, installerComponentNames[finalI]);
+                boolean newState = !getEnabledComponentState(context, installerComponentNames[finalI]);
 
                 refreshInstallerStatus(enableInstallerSwitchPreferenceCompats[finalI]);
                 setVisibleInstallerPreference(enableInstallerSwitchPreferenceCompats[finalI], newState);
@@ -161,7 +174,7 @@ public class MainFragment extends PreferenceFragmentCompat {
             try {
                 ActivityCompat.requestPermissions((Activity) context,
                         new String[]{IceBox.SDK_PERMISSION},
-                        0x2331);
+                        REQUEST_CODE_0);
             } catch (Exception e) {
                 Toast.makeText(context, e + "", Toast.LENGTH_SHORT).show();
             }
@@ -177,7 +190,7 @@ public class MainFragment extends PreferenceFragmentCompat {
 
         getDelegatedScopes.setOnPreferenceClickListener(preference -> {
             try {
-                DSMClient.requestScopes((Activity) context, 0x52, dsmScopes);
+                DSMClient.requestScopes((Activity) context, REQUEST_CODE_1, dsmScopes);
             } catch (Exception e) {
                 Toast.makeText(context, e + "", Toast.LENGTH_SHORT).show();
             }
@@ -196,7 +209,7 @@ public class MainFragment extends PreferenceFragmentCompat {
             try {
                 ActivityCompat.requestPermissions((Activity) context,
                         new String[]{ShizukuApiConstants.PERMISSION},
-                        0x2333);
+                        REQUEST_CODE_2);
             } catch (Exception e) {
                 Toast.makeText(context, e + "", Toast.LENGTH_SHORT).show();
             }
@@ -222,7 +235,7 @@ public class MainFragment extends PreferenceFragmentCompat {
 
 
         // 5-DPM
-        Preference dpm_settings = getPreferenceScreen().findPreference("dpm_settings");
+        dpm_settings = getPreferenceScreen().findPreference("dpm_settings");
         preferenceArrayLists[5].add(dpm_settings);
         assert dpm_settings != null;
         dpm_settings.setOnPreferenceClickListener(preference -> {
@@ -243,7 +256,6 @@ public class MainFragment extends PreferenceFragmentCompat {
             avInstallerPreferences[2].setSummary(tipNotSupport);
         }
         if (!issdkge23) {
-            Toast.makeText(context, R.string.tip_ltsdk23, Toast.LENGTH_SHORT).show();
             tipNotSupport = getString(R.string.summary_av_no) + getString(R.string.tip_ltsdk23);
             avInstallerPreferences[1].setSummary(tipNotSupport);
             avInstallerPreferences[3].setSummary(tipNotSupport);
@@ -264,6 +276,8 @@ public class MainFragment extends PreferenceFragmentCompat {
         int indexOfenableInstallerSwitchPreferenceCompats = getIndexOfenableInstallerSwitchPreferenceCompats(enableInstallerSwitchPreferenceCompat);
 
         if (enableInstallerSwitchPreferenceCompats[5].equals(enableInstallerSwitchPreferenceCompat) && isDeviceOwner()) {
+            dpm_settings.setVisible(true);
+            avInstallerPreferences[5].setVisible(false);
             return;
         }
         for (Object preference : preferenceArrayLists[indexOfenableInstallerSwitchPreferenceCompats]) {
@@ -460,16 +474,14 @@ public class MainFragment extends PreferenceFragmentCompat {
 
                 break;
             case 5:
-
                 // 5-DPM
-                if (isDeviceOwner()) {
-                    avInstallerPreferences[5].setTitle(R.string.title_is_deviceowner);
-                    avInstallerPreferences[5].setSummary(null);
-                    avInstallerPreferences[5].setOnPreferenceClickListener(v -> false);
-
-                } else {
+                if (!issdkge23) {
+                    enableInstallerSwitchPreferenceCompats[5].setSummaryOn(R.string.tip_ltsdk23);
+                }
+                if (!isDeviceOwner()) {
+//                    avInstallerPreferences[5].setVisible(false);
+//                } else {
                     command = OpUtil.getCommand(context);
-                    avInstallerPreferences[5].setTitle(R.string.title_not_deviceowner);
                     avInstallerPreferences[5].setSummary(String.format(getString(R.string.summary_clicktocopycmd), command));
                     avInstallerPreferences[5].setOnPreferenceClickListener(v -> {
                         copyCommand();
@@ -486,21 +498,13 @@ public class MainFragment extends PreferenceFragmentCompat {
     private void refreshStatus() {
 
         for (int i = 1; i < INSTALLER_SIZE; i++) {
-            boolean enable = getComponentState(context, installerComponentNames[i]);
+            boolean enable = getEnabledComponentState(context, installerComponentNames[i]);
+            setVisibleInstallerPreference(enableInstallerSwitchPreferenceCompats[i], enable);
 
             if (enable) {
                 refreshInstallerStatus(enableInstallerSwitchPreferenceCompats[i]);
             }
 
-
-            if (i == 5) {
-                // 5-DPM
-                if (isDeviceOwner()) {
-                    avInstallerPreferences[5].setTitle(R.string.title_is_deviceowner);
-                }
-            }
-
-            setVisibleInstallerPreference(enableInstallerSwitchPreferenceCompats[i], enable);
             enableInstallerSwitchPreferenceCompats[i].setChecked(enable);
         }
 
@@ -518,9 +522,7 @@ public class MainFragment extends PreferenceFragmentCompat {
     }
 
     public interface MyListener {
-        /**
-         * switch Fragment
-         */
+
         void swtichIsMainFragment(boolean isMain);
 
         boolean isDeviceOwner();

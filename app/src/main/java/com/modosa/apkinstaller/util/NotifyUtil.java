@@ -13,6 +13,11 @@ import android.graphics.Bitmap;
 import androidx.core.app.NotificationCompat;
 
 import com.modosa.apkinstaller.R;
+import com.modosa.apkinstaller.activity.Install1Activity;
+import com.modosa.apkinstaller.activity.Install2Activity;
+import com.modosa.apkinstaller.activity.Install3Activity;
+import com.modosa.apkinstaller.activity.Install4Activity;
+import com.modosa.apkinstaller.activity.Install5Activity;
 
 import java.io.File;
 
@@ -20,13 +25,14 @@ import java.io.File;
  * @author dadaewq
  */
 public class NotifyUtil {
+    public final static String CHANNEL_ID_FAIL = "21";
     private final Context context;
     private String channelId;
     private String channelName;
     private String versionName = "";
     private String contentTitle = "";
     private NotificationManager notificationManager;
-    private Bitmap LargeIcon;
+    private Bitmap largeIcon;
 
     public NotifyUtil(Context context) {
         this.context = context;
@@ -53,7 +59,7 @@ public class NotifyUtil {
         String[] version;
 
         if (realPath != null || "2".equals(channelId)) {
-            LargeIcon = AppInfoUtil.getApkIcon(context, realPath);
+            largeIcon = AppInfoUtil.getApkIcon(context, realPath);
             clickIntent = null;
             version = AppInfoUtil.getApkVersion(context, realPath);
             if (shouldDelete && realPath != null) {
@@ -61,7 +67,7 @@ public class NotifyUtil {
             }
 
         } else {
-            LargeIcon = AppInfoUtil.getApplicationIcon(context, packageName);
+            largeIcon = AppInfoUtil.getApplicationIcon(context, packageName);
             clickIntent = getContentIntent((Activity) context, id, packageName);
             version = AppInfoUtil.getApplicationVersion(context, packageName);
 
@@ -74,29 +80,29 @@ public class NotifyUtil {
     }
 
     private String getChannelName(String channelId) {
-        String ChannelName = "";
+        String channelName = "";
         switch (channelId) {
-            case "1":
-                ChannelName = context.getString(R.string.name_install1);
+            case Install1Activity.CHANNEL_ID:
+                channelName = context.getString(R.string.name_install1);
                 break;
-            case "2":
-                ChannelName = context.getString(R.string.name_install2);
+            case Install2Activity.CHANNEL_ID:
+                channelName = context.getString(R.string.name_install2);
                 break;
-            case "3":
-                ChannelName = context.getString(R.string.name_install3);
+            case Install3Activity.CHANNEL_ID:
+                channelName = context.getString(R.string.name_install3);
                 break;
-            case "4":
-                ChannelName = context.getString(R.string.name_install4);
+            case Install4Activity.CHANNEL_ID:
+                channelName = context.getString(R.string.name_install4);
                 break;
-            case "5":
-                ChannelName = context.getString(R.string.name_install5);
+            case Install5Activity.CHANNEL_ID:
+                channelName = context.getString(R.string.name_install5);
                 break;
-            case "21":
-                ChannelName = context.getString(R.string.channalname_fail);
+            case CHANNEL_ID_FAIL:
+                channelName = context.getString(R.string.channalname_fail);
                 break;
             default:
         }
-        return ChannelName;
+        return channelName;
     }
 
     private void notifyLiveStart(PendingIntent pendingIntent, int id) {
@@ -139,9 +145,9 @@ public class NotifyUtil {
             builder.setContentText(String.format(context.getString(R.string.click_run), versionName));
         }
 
-        if (LargeIcon != null) {
+        if (largeIcon != null) {
             //设置右侧大图标
-            builder.setLargeIcon(LargeIcon);
+            builder.setLargeIcon(largeIcon);
         }
         //设置点击通知后自动删除通知
 

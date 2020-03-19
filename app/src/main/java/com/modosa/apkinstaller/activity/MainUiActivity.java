@@ -34,6 +34,7 @@ import java.util.ArrayList;
  */
 public class MainUiActivity extends AppCompatActivity implements MainFragment.MyListener {
 
+    public static final int REQUEST_REFRESH = 233;
     private final static String CONFIRM_PROMPT = "ConfirmPrompt";
     private static final String TAG_MAINUI = "mainUi";
     private static final String TAG_DPM = "dpm";
@@ -53,26 +54,12 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
         setSupportActionBar(toolbar);
 
         fragmentManager = getSupportFragmentManager();
-
-        Fragment fragmentMainUi = fragmentManager.findFragmentByTag(TAG_MAINUI);
-        Fragment fragmentDpm = fragmentManager.findFragmentByTag(TAG_DPM);
-
-        if (fragmentMainUi == null && fragmentDpm == null) {
-            fragmentManager.beginTransaction().replace(R.id.framelayout, new MainFragment(), TAG_MAINUI).commit();
-        } else if (fragmentDpm != null) {
-            isMain = false;
-
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setDisplayHomeAsUpEnabled(!isMain);
-                actionBar.setTitle(R.string.title_dpm_settings);
-            }
-        }
-
+        swtichIsMainFragment(isMain);
 
         init();
         confirmPrompt();
     }
+
 
     private void init() {
         spGetPreferenceManager = PreferenceManager.getDefaultSharedPreferences(this);
@@ -136,7 +123,7 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
 
     private void showDialogConfirmPrompt() {
 
-        View view = View.inflate(this, R.layout.confirm_doublecheckbox, null);
+        View view = View.inflate(this, R.layout.confirmprompt_doublecheckbox, null);
 
         CheckBox checkBox1 = view.findViewById(R.id.confirm_checkbox1);
         CheckBox checkBox2 = view.findViewById(R.id.confirm_checkbox2);
@@ -147,7 +134,6 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
             checkBox2.setChecked(false);
             checkBox2.setEnabled(isChecked);
         });
-
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(R.string.title_instructions_before_use)
@@ -169,20 +155,43 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
     }
 
     @Override
-    public void swtichIsMainFragment(boolean isMain) {
+    public void swtichIsMainFragment(boolean toMain) {
 
-        this.isMain = isMain;
+        isMain = toMain;
 
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
-        actionBar.setDisplayHomeAsUpEnabled(!isMain);
-//        invalidateOptionsMenu();
-        if (isMain) {
-            actionBar.setTitle(R.string.app_name);
-            fragmentManager.beginTransaction().replace(R.id.framelayout, new MainFragment(), TAG_MAINUI).commit();
+        actionBar.setDisplayHomeAsUpEnabled(!toMain);
+        actionBar.setTitle(toMain ? R.string.app_name : R.string.title_dpm_settings);
+
+        Fragment fragmentMainUi = fragmentManager.findFragmentByTag(TAG_MAINUI);
+        Fragment fragmentDpm = fragmentManager.findFragmentByTag(TAG_DPM);
+
+
+        if (toMain) {
+            if (fragmentMainUi == null) {
+                fragmentManager.beginTransaction().add(R.id.framelayout, new MainFragment(), TAG_MAINUI).commit();
+            } else {
+                if (fragmentMainUi.isHidden()) {
+                    fragmentMainUi.onActivityResult(REQUEST_REFRESH, MainFragment.RESULT_REFRESH_1, null);
+                    fragmentManager.beginTransaction().show(fragmentMainUi).commit();
+                }
+            }
+            if (fragmentDpm != null) {
+                fragmentManager.beginTransaction().hide(fragmentDpm).commit();
+            }
         } else {
-            actionBar.setTitle(R.string.title_dpm_settings);
-            fragmentManager.beginTransaction().replace(R.id.framelayout, new DpmSettingsFragment(), TAG_DPM).commit();
+            if (fragmentDpm == null) {
+                fragmentManager.beginTransaction().add(R.id.framelayout, new DpmSettingsFragment(), TAG_DPM).commit();
+            } else {
+                if (fragmentDpm.isHidden()) {
+                    fragmentDpm.onActivityResult(REQUEST_REFRESH, DpmSettingsFragment.RESULT_REFRESH_2, null);
+                    fragmentManager.beginTransaction().show(fragmentDpm).commit();
+                }
+            }
+            if (fragmentMainUi != null) {
+                fragmentManager.beginTransaction().hide(fragmentMainUi).commit();
+            }
         }
 
     }
@@ -207,14 +216,13 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
 
         Intent intent = new Intent(OpUtil.MODOSA_ACTION_PICK_FILE);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setPackage("cn.bavelee.pokeinstalleri");
         intent.setComponent(componentNameArrayList.get(which));
         startActivity(intent);
 
     }
 
     private void getAvinstaller(ArrayList<ComponentName> list, ComponentName componentName) {
-        if (OpUtil.getComponentState(this, componentName)) {
+        if (OpUtil.getEnabledComponentState(this, componentName)) {
             list.add(componentName);
         }
     }

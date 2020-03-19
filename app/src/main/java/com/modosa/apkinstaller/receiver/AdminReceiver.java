@@ -5,6 +5,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 
+import androidx.annotation.NonNull;
+
 import com.modosa.apkinstaller.R;
 import com.modosa.apkinstaller.util.OpUtil;
 
@@ -18,7 +20,7 @@ public class AdminReceiver extends DeviceAdminReceiver {
     }
 
     @Override
-    public void onEnabled(Context context, Intent intent) {
+    public void onEnabled(@NonNull Context context, @NonNull Intent intent) {
         super.onEnabled(context, intent);
         OpUtil.showToast1(context, R.string.tip_start_activating);
     }

@@ -17,6 +17,7 @@
     <string name="confirm_title">Confirmation before installation</string>
     <string name="enable_title">Enable installer</string>
     <string name="hideIcon">Hide icon</string>
+    <string name="hideIconByTranslucent">Replace hidden with transparent icons</string>
     <string name="installer_device">Device</string>
     <string name="installer_error_shell">%s installer error:\n\n%s</string>
     <string name="installer_error_shizuku_unavailable">Unable to access Shizuku service</string>
@@ -87,7 +88,6 @@
     <string name="tip_start_activating">Trying to activate</string>
     <string name="tip_success_deactivate">Cancel succeed</string>
     <string name="tip_failed_deactivate">Unable to deactivate</string>
-    <string name="title_is_deviceowner">Is the Device Owner currently</string>
     <string name="title_not_deviceowner">Not the Device Owner currently</string>
     <string name="summary_clicktocopycmd">\n%1$sn(Click to copy)</string>
     <string name="title_deactivate_deviceowner">Deactivate Device Owner</string>

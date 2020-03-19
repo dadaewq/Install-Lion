@@ -16,6 +16,7 @@ import androidx.core.content.FileProvider;
 import androidx.preference.PreferenceManager;
 
 import com.modosa.apkinstaller.R;
+import com.modosa.apkinstaller.activity.MainUiActivity;
 import com.modosa.apkinstaller.fragment.SettingsFragment;
 import com.modosa.apkinstaller.receiver.AdminReceiver;
 
@@ -31,6 +32,14 @@ import java.io.OutputStream;
 public class OpUtil {
 
     public static final String MODOSA_ACTION_PICK_FILE = "modosa.action.PICK_FILE";
+
+
+    public static void startMainUiActivity(Context context) {
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setClass(context, MainUiActivity.class);
+        context.startActivity(intent);
+    }
 
     public static File createApkFromUri(Context context, Uri uri) {
 
@@ -137,8 +146,9 @@ public class OpUtil {
 
     }
 
-    public static boolean getComponentState(Context context, ComponentName componentName) {
+    public static boolean getEnabledComponentState(Context context, ComponentName componentName) {
         PackageManager pm = context.getPackageManager();
+        //PackageManager.COMPONENT_ENABLED_STATE_DEFAULT 需要AndroidManifest.xml里的<activity>不为android:enabled="false"
         return (pm.getComponentEnabledSetting(componentName) == (PackageManager.COMPONENT_ENABLED_STATE_DEFAULT) || pm.getComponentEnabledSetting(componentName) == (PackageManager.COMPONENT_ENABLED_STATE_ENABLED));
     }
 

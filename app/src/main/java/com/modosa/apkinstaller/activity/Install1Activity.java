@@ -8,8 +8,6 @@ import androidx.core.content.FileProvider;
 
 import com.catchingnow.icebox.sdk_client.IceBox;
 import com.modosa.apkinstaller.R;
-import com.modosa.apkinstaller.util.NotifyUtil;
-import com.modosa.apkinstaller.util.OpUtil;
 
 import java.io.File;
 
@@ -22,16 +20,14 @@ import io.reactivex.schedulers.Schedulers;
  * @author dadaewq
  */
 public class Install1Activity extends AbstractInstallerActivity {
-
+    public final static String CHANNEL_ID = "1";
     private Disposable mSubscribe;
-    private String installApkPath;
 
     @Override
     public void startInstall(String getinstallApkPath) {
         Log.d("Start install", getinstallApkPath + "");
         if (getinstallApkPath != null) {
-            installApkPath = getinstallApkPath;
-            installApkFile = new File(installApkPath);
+            installApkFile = new File(getinstallApkPath);
             String authority = getPackageName() + ".FILE_PROVIDER";
             Uri installuri = FileProvider.getUriForFile(getApplicationContext(), authority, installApkFile);
             showMyToast0(String.format(getString(R.string.tip_start_install), apkinfo[0]));
@@ -46,12 +42,12 @@ public class Install1Activity extends AbstractInstallerActivity {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((Boolean success) -> {
                             Toast.makeText(this, success ? String.format(getString(R.string.tip_success_install), apkinfo[0]) : String.format(getString(R.string.tip_failed_install), apkinfo[0]), Toast.LENGTH_SHORT).show();
-                            showNotificationWithdeleteCache(success);
+                            showNotificationWithdeleteCache(CHANNEL_ID, success);
 
                         }, Throwable::printStackTrace);
             } else {
                 Toast.makeText(this, String.format(getString(R.string.tip_failed_install), apkinfo[0]), Toast.LENGTH_SHORT).show();
-                showNotificationWithdeleteCache(false);
+                showNotificationWithdeleteCache(CHANNEL_ID, false);
             }
             finish();
         } else {
@@ -82,30 +78,4 @@ public class Install1Activity extends AbstractInstallerActivity {
         mSubscribe = null;
     }
 
-    private void showNotificationWithdeleteCache(boolean success) {
-        if (success) {
-            isInstalledSuccess = true;
-            deleteCache();
-            if (show_notification) {
-                Log.e("packagename", apkinfo[1]);
-                new NotifyUtil(this).sendSuccessNotification("1", String.format(getString(R.string.tip_success_install), apkinfo[0]), apkinfo[1]);
-            }
-
-        } else {
-            isInstalledSuccess = false;
-
-            if (show_notification) {
-                Log.e("packagename", apkinfo[1]);
-                new NotifyUtil(this).sendFailNotification("21", String.format(getString(R.string.tip_failed_install), apkinfo[0]), apkinfo[1], installApkPath, istemp && !enableAnotherinstaller);
-            } else {
-                if (!enableAnotherinstaller) {
-                    deleteCache();
-                }
-            }
-            if (enableAnotherinstaller) {
-                OpUtil.startAnotherInstaller(this, installApkFile, istemp);
-            }
-
-        }
-    }
 }

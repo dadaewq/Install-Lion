@@ -2,6 +2,7 @@ package com.modosa.apkinstaller.fragment;
 
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -30,7 +31,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.modosa.apkinstaller.R;
-import com.modosa.apkinstaller.activity.MainActivity;
+import com.modosa.apkinstaller.activity.MainUiActivity;
 import com.modosa.apkinstaller.util.FileSizeUtil;
 import com.modosa.apkinstaller.util.OpUtil;
 import com.modosa.apkinstaller.util.ResultUtil;
@@ -54,6 +55,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     private String cachePath;
     private String cacheSize;
     private Preference clearCache;
+    private Preference ignoreBatteryOptimization;
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -91,12 +93,21 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkNeedIgnoreBatteryOptimization()) {
-            Preference ignoreBatteryOptimization = findPreference("ignoreBatteryOptimization");
+            ignoreBatteryOptimization = findPreference("ignoreBatteryOptimization");
             assert ignoreBatteryOptimization != null;
             ignoreBatteryOptimization.setVisible(true);
             ignoreBatteryOptimization.setOnPreferenceClickListener(this);
         }
 
+    }
+
+    @Override
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        super.onActivityResult(requestCode, resultCode, resultData);
+        if (requestCode == MainUiActivity.REQUEST_REFRESH && resultCode == Activity.RESULT_OK) {
+            ignoreBatteryOptimization.setVisible(false);
+        }
     }
 
     @Override
@@ -117,9 +128,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         mHandler.removeCallbacksAndMessages(null);
     }
 
-
-    //    @SuppressLint("ResourceType")
-//    @RequiresApi(api = Build.VERSION_CODES.O)
     private void init() {
         findPreferencesAndSetListner();
     }
@@ -189,7 +197,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 });
 
         alertDialog = builder.create();
-
         OpUtil.showAlertDialog(context, alertDialog);
 
     }
@@ -259,37 +266,52 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 .setView(view);
 
         alertDialog = builder.create();
-
         OpUtil.showAlertDialog(context, alertDialog);
-
-
     }
 
     private void showDialogHideIcon() {
 
-        View checkBoxView = View.inflate(context, R.layout.confirm_checkbox, null);
-        CheckBox checkBox = checkBoxView.findViewById(R.id.confirm_checkbox);
-        checkBox.setText(R.string.hideIcon);
+        View checkBoxView = View.inflate(context, R.layout.hideicon_checkbox, null);
+        CheckBox checkBox1 = checkBoxView.findViewById(R.id.confirm_checkbox1);
+        CheckBox checkBox2 = checkBoxView.findViewById(R.id.confirm_checkbox2);
+        checkBox1.setText(R.string.hideIcon);
+        checkBox2.setText(R.string.hideIconByTranslucent);
 
-        ComponentName launchMainUiComponentName = new ComponentName(context, MainActivity.class);
+        ComponentName launchMainUiComponentName1 = new ComponentName(context, context.getPackageName() + ".activity.MainActivity");
+        ComponentName launchMainUiComponentName2 = new ComponentName(context, context.getPackageName() + ".activity.TransparentActivity");
         PackageManager pm = context.getPackageManager();
-        boolean isEnabled = (pm.getComponentEnabledSetting(launchMainUiComponentName) == (PackageManager.COMPONENT_ENABLED_STATE_DEFAULT) || pm.getComponentEnabledSetting(launchMainUiComponentName) == (PackageManager.COMPONENT_ENABLED_STATE_ENABLED));
 
-        checkBox.setChecked(!isEnabled);
+        boolean isDisabledMain = !OpUtil.getEnabledComponentState(context, launchMainUiComponentName1);
+        boolean isEnabledTranslucent = pm.getComponentEnabledSetting(launchMainUiComponentName2) == (PackageManager.COMPONENT_ENABLED_STATE_ENABLED);
+
+        checkBox1.setChecked(isDisabledMain);
+        checkBox2.setChecked(isEnabledTranslucent);
+        if (!isDisabledMain) {
+            checkBox2.setEnabled(false);
+        }
+
+        checkBox1.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            checkBox2.setEnabled(isChecked);
+            if (!isChecked) {
+                checkBox2.setChecked(false);
+            }
+        });
+
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
                 .setTitle(R.string.hideIcon)
                 .setMessage(R.string.message_hideIcon)
                 .setView(checkBoxView)
                 .setNeutralButton(android.R.string.no, null)
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> OpUtil.setComponentState(context, launchMainUiComponentName,
-                        !checkBox.isChecked()));
+                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                    OpUtil.setComponentState(context, launchMainUiComponentName1,
+                            !checkBox1.isChecked());
 
-//        AlertDialog
+                    OpUtil.setComponentState(context, launchMainUiComponentName2,
+                            checkBox2.isChecked());
+                });
+
         alertDialog = builder.create();
-
-
         OpUtil.showAlertDialog(context, alertDialog);
-
     }
 
     private void showDialogClearAllowedList() {
@@ -297,6 +319,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         View checkBoxView = View.inflate(context, R.layout.confirm_checkbox, null);
         CheckBox checkBox = checkBoxView.findViewById(R.id.confirm_checkbox);
         checkBox.setText(R.string.checkbox_clearAllowedList);
+        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(isChecked));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
                 .setTitle(R.string.clearAllowedList)
@@ -305,36 +328,13 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 .setNeutralButton(android.R.string.no, null)
                 .setPositiveButton(android.R.string.yes, (dialog, which) -> context.getSharedPreferences("allowsource", Context.MODE_PRIVATE).edit().clear().apply());
 
-//        AlertDialog
+
         alertDialog = builder.create();
-
-
-        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(isChecked));
-
         OpUtil.showAlertDialog(context, alertDialog);
 
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-
     }
 
-//    private void showDialogClearCache() {
-//        String cachePath = Objects.requireNonNull(context.getExternalCacheDir()).getAbsolutePath();
-//        String cacheSize = FileSizeUtil.getAutoFolderOrFileSize(cachePath);
-//        if (EMPTY_SIZE.equals(cacheSize)) {
-//            OpUtil.showToast0(context, R.string.tip_empty_cache);
-//        } else {
-//            Log.e("cacheSize", cacheSize);
-//            AlertDialog.Builder builder = new AlertDialog.Builder(context)
-//                    .setTitle(R.string.title_clearCache)
-//                    .setMessage(String.format(getString(R.string.message_clearCache), cacheSize))
-//                    .setNeutralButton(android.R.string.no, null)
-//                    .setPositiveButton(android.R.string.yes, (dialog, which) -> OpUtil.deleteDirectory(cachePath));
-//
-////            AlertDialog
-//            alertDialog = builder.create();
-//            OpUtil.showAlertDialog(context, alertDialog);
-//        }
-//    }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void manualuthorize() {
@@ -378,7 +378,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
     }
 
-
     @RequiresApi(api = Build.VERSION_CODES.M)
     private boolean checkNeedIgnoreBatteryOptimization() {
         return !((PowerManager) context.getSystemService(Context.POWER_SERVICE)).isIgnoringBatteryOptimizations(context.getPackageName());
@@ -388,10 +387,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void ignoreBatteryOptimization() {
         try {
-            startActivity(new Intent(
+            startActivityForResult(new Intent(
                     Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
                     Uri.parse("package:" + context.getPackageName())
-            ));
+            ), MainUiActivity.REQUEST_REFRESH);
         } catch (Exception e) {
             OpUtil.showToast0(context, "" + e);
         }

@@ -18,6 +18,7 @@ import java.io.File;
  * @author dadaewq
  */
 public class Install2Activity extends AbstractInstallerActivity {
+    public final static String CHANNEL_ID = "2";
     private final boolean ltsdk26 = Build.VERSION.SDK_INT < Build.VERSION_CODES.O;
     private String installApkPath;
 
@@ -48,7 +49,7 @@ public class Install2Activity extends AbstractInstallerActivity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     } finally {
-                        showNotificationWithdeleteCache();
+                        showNotificationWithdeleteCache(CHANNEL_ID, false);
                     }
                     showMyToast1(R.string.tip_try_install_end);
 
@@ -80,13 +81,23 @@ public class Install2Activity extends AbstractInstallerActivity {
         }
     }
 
-    private void showNotificationWithdeleteCache() {
+    @Override
+    void showNotificationWithdeleteCache(String channelId, boolean success) {
         if (show_notification) {
             Log.e("packagename", apkinfo[1]);
-            new NotifyUtil(this).sendFailNotification("2", String.format(getString(R.string.content_title_install_end), apkinfo[0]), apkinfo[1], installApkPath, istemp && !enableAnotherinstaller);
+            new NotifyUtil(this).sendFailNotification(CHANNEL_ID, String.format(getString(R.string.content_title_install_end), apkinfo[0]), apkinfo[1], installApkPath, istemp && !enableAnotherinstaller);
         } else {
             deleteCache();
         }
     }
+
+//    private void showNotificationWithdeleteCache() {
+//        if (show_notification) {
+//            Log.e("packagename", apkinfo[1]);
+//            new NotifyUtil(this).sendFailNotification(CHANNEL_ID, String.format(getString(R.string.content_title_install_end), apkinfo[0]), apkinfo[1], installApkPath, istemp && !enableAnotherinstaller);
+//        } else {
+//            deleteCache();
+//        }
+//    }
 
 }

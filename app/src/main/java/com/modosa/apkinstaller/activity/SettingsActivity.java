@@ -24,7 +24,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     private static final String TAG_SETTINGS = "settings";
 
-
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +39,6 @@ public class SettingsActivity extends AppCompatActivity {
         fragmentManager.beginTransaction().replace(R.id.framelayout, new SettingsFragment(), TAG_SETTINGS).commit();
 
         //TODO dwonloads
-//        init();
-//        finish();
     }
 
     private void showMyToast0(final String text) {

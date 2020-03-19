@@ -25,6 +25,7 @@ import androidx.preference.PreferenceManager;
 import com.modosa.apkinstaller.R;
 import com.modosa.apkinstaller.fragment.SettingsFragment;
 import com.modosa.apkinstaller.util.AppInfoUtil;
+import com.modosa.apkinstaller.util.NotifyUtil;
 import com.modosa.apkinstaller.util.OpUtil;
 import com.modosa.apkinstaller.util.PraseContentUtil;
 
@@ -36,8 +37,8 @@ import java.util.Objects;
  * @author dadaewq
  */
 public abstract class AbstractInstallerActivity extends AppCompatActivity {
-
-    private static final int PICK_APK_FILE = 2;
+    private static final int REQUEST_REFRESH_WRITE_PERMISSION = 0x2330;
+    private static final int REQUEST_PICK_APK_FILE = 0x2331;
     private static final String ILLEGALPKGNAME = "IL^&IllegalPN*@!128`+=：:,.[";
     private final String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
     private final String nl = System.getProperty("line.separator");
@@ -46,9 +47,10 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
     StringBuilder alertDialogMessage;
     File installApkFile;
     boolean show_notification;
-    boolean isInstalledSuccess = false;
     boolean enableAnotherinstaller;
     boolean istemp = false;
+    private String validApkPath;
+    private boolean isInstalledSuccess = false;
     private boolean deleteSucceededApk;
     private String[] source;
     private Uri uri;
@@ -85,6 +87,15 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
                 initFromUri();
 
         }
+    }
+
+    // 用 ACTION_GET_CONTENT 而不是ACTION_OPEN_DOCUMENT 可支持更多App
+    private void openFile() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        // 因为设备上Apk文件的后缀并不一定是"apk"，所以不使用"application/vnd.android.package-archive"
+        intent.setType("application/*");
+        startActivityForResult(intent, REQUEST_PICK_APK_FILE);
     }
 
     private void initFromUri() {
@@ -156,7 +167,7 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
         enableAnotherinstaller = spGetPreferenceManager.getBoolean(SettingsFragment.SP_KEY_ENABLE_ANOTHER_INSTALLER, false);
         boolean allowsource = spAllowSource.getBoolean(source[0], false);
 
-        String validApkPath = preInstallGetValidApkPath();
+        validApkPath = preInstallGetValidApkPath();
         if (validApkPath == null) {
             showMyToast0(R.string.tip_failed_prase);
             finish();
@@ -290,7 +301,7 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         super.onActivityResult(requestCode, resultCode, resultData);
-        if (requestCode == PICK_APK_FILE
+        if (requestCode == REQUEST_PICK_APK_FILE
                 && resultCode == Activity.RESULT_OK
                 && resultData != null) {
 
@@ -301,15 +312,6 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
             finish();
         }
 
-    }
-
-    // 用 ACTION_GET_CONTENT 而不是ACTION_OPEN_DOCUMENT 可支持更多App
-    private void openFile() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        // 因为设备上Apk文件的后缀并不一定是"apk"，所以不使用"application/vnd.android.package-archive"
-        intent.setType("application/*");
-        startActivityForResult(intent, PICK_APK_FILE);
     }
 
     @Override
@@ -373,7 +375,7 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
     protected abstract void startUninstall(String uninstallPkgname);
 
     private void requestPermission() {
-        ActivityCompat.requestPermissions(this, permissions, 0x2330);
+        ActivityCompat.requestPermissions(this, permissions, REQUEST_REFRESH_WRITE_PERMISSION);
     }
 
     private boolean checkPermission() {
@@ -405,11 +407,34 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
 
 
     void deleteCache() {
-//        Log.e("deleteSucceededApk", " " + deleteSucceededApk);
-//        Log.e("isInstalledSuccess", " " + isInstalledSuccess);
-//        Log.e("installApkFile", installApkFile + "");
-        if (istemp || (deleteSucceededApk && isInstalledSuccess)) {
+        boolean shouDelete = deleteSucceededApk && isInstalledSuccess;
+        if (istemp || shouDelete) {
             OpUtil.deleteSingleFile(installApkFile);
+        }
+    }
+
+    void showNotificationWithdeleteCache(String channelId, boolean success) {
+        if (success) {
+            isInstalledSuccess = true;
+            deleteCache();
+            if (show_notification) {
+                Log.e("packagename", apkinfo[1]);
+                new NotifyUtil(this).sendSuccessNotification(channelId, String.format(getString(R.string.tip_success_install), apkinfo[0]), apkinfo[1]);
+            }
+
+        } else {
+            isInstalledSuccess = false;
+            if (show_notification) {
+                Log.e("packagename", apkinfo[1]);
+                new NotifyUtil(this).sendFailNotification(NotifyUtil.CHANNEL_ID_FAIL, String.format(getString(R.string.tip_failed_install), apkinfo[0]), apkinfo[1], validApkPath, istemp && !enableAnotherinstaller);
+            } else {
+                if (!enableAnotherinstaller) {
+                    deleteCache();
+                }
+            }
+            if (enableAnotherinstaller) {
+                OpUtil.startAnotherInstaller(this, installApkFile, istemp);
+            }
         }
     }
 }

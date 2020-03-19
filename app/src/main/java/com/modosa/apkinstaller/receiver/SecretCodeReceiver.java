@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.provider.Telephony;
 import android.telephony.TelephonyManager;
 
-import com.modosa.apkinstaller.activity.MainUiActivity;
+import com.modosa.apkinstaller.util.OpUtil;
 
 /**
  * @author dadaewq
@@ -18,10 +18,7 @@ public class SecretCodeReceiver extends BroadcastReceiver {
 
         String action = intent.getAction();
         if (Telephony.Sms.Intents.SECRET_CODE_ACTION.equals(action) || TelephonyManager.ACTION_SECRET_CODE.equals(action)) {
-            Intent settingsIntent = new Intent(Intent.ACTION_MAIN)
-                    .setClass(context.getApplicationContext(), MainUiActivity.class)
-                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(settingsIntent);
+            OpUtil.startMainUiActivity(context);
         }
 
 

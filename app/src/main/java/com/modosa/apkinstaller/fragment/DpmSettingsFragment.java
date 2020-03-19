@@ -27,6 +27,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreferenceCompat;
 
 import com.modosa.apkinstaller.R;
+import com.modosa.apkinstaller.activity.MainUiActivity;
 import com.modosa.apkinstaller.receiver.AdminReceiver;
 import com.modosa.apkinstaller.util.OpUtil;
 
@@ -38,11 +39,12 @@ import static com.modosa.apkinstaller.util.OpUtil.showToast0;
  * @author dadaewq
  */
 public class DpmSettingsFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener {
+    public static final int RESULT_REFRESH_2 = 5202;
     private final String sp_key_orgName = "orgName";
     private final String sp_key_confirmWarning = "confirmWarning";
     private final String[] userRestrictionsKeys = {UserManager.DISALLOW_INSTALL_APPS, UserManager.DISALLOW_UNINSTALL_APPS, UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES};
     private SwitchPreferenceCompat[] switchPreferences;
-    private SwitchPreferenceCompat EnableBackupService;
+    private SwitchPreferenceCompat enableBackupService;
     private SharedPreferences spGetPreferenceManager;
     private boolean isOpUserRestrictionSuccess = false;
     private DevicePolicyManager devicePolicyManager;
@@ -82,6 +84,15 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
         }
     }
 
+    @Override
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        super.onActivityResult(requestCode, resultCode, resultData);
+        if (requestCode == MainUiActivity.REQUEST_REFRESH && resultCode == RESULT_REFRESH_2) {
+            onResume();
+        }
+    }
+
     private void findPreferencesAndSetListner() {
         spGetPreferenceManager = getPreferenceManager().getSharedPreferences();
 
@@ -92,10 +103,10 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
 
         Preference setOrganizationName = findPreference("SetOrganizationName");
         Preference setLockScreenInfo = findPreference("SetLockScreenInfo");
-        EnableBackupService = findPreference("EnableBackupService");
+        enableBackupService = findPreference("EnableBackupService");
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            EnableBackupService.setEnabled(false);
+            enableBackupService.setEnabled(false);
             setOrganizationName.setEnabled(false);
         }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
@@ -116,10 +127,10 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
         setUserRestrictions.setOnPreferenceClickListener(this);
         deactivateDeviceOwner.setOnPreferenceClickListener(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Preference RebootDevice = findPreference("RebootDevice");
-            assert RebootDevice != null;
-            RebootDevice.setVisible(true);
-            RebootDevice.setOnPreferenceClickListener(this);
+            Preference rebootDevice = findPreference("RebootDevice");
+            assert rebootDevice != null;
+            rebootDevice.setVisible(true);
+            rebootDevice.setOnPreferenceClickListener(this);
         }
 
     }
@@ -128,7 +139,7 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
         return devicePolicyManager.isDeviceOwnerApp(context.getPackageName());
     }
 
-    @SuppressLint("ResourceType")
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void init() {
         findPreferencesAndSetListner();
@@ -158,8 +169,8 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
                 });
             }
 
-            EnableBackupService.setOnPreferenceClickListener(v -> {
-                setEnableBackupServiceEnabled(EnableBackupService.isChecked());
+            enableBackupService.setOnPreferenceClickListener(v -> {
+                setEnableBackupServiceEnabled(enableBackupService.isChecked());
                 return true;
             });
 
@@ -244,11 +255,8 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
                     OpUtil.showToast0(context, getEditName);
                 });
 
-//        AlertDialog
         alertDialog = builder.create();
-
         OpUtil.showAlertDialog(context, alertDialog);
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -268,17 +276,15 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
                 .setNegativeButton(R.string.clear, (dialog, which) -> devicePolicyManager.setDeviceOwnerLockScreenInfo(adminComponentName, null))
                 .setPositiveButton(R.string.bt_set, (dialog, which) -> devicePolicyManager.setDeviceOwnerLockScreenInfo(adminComponentName, editInfo.getText().toString()));
 
-//        AlertDialog
         alertDialog = builder.create();
-
         OpUtil.showAlertDialog(context, alertDialog);
-
     }
 
     private void showWarningLockDefaultApplication(String lockpreferenceKey) {
         View checkBoxView = View.inflate(context, R.layout.confirm_checkbox, null);
         CheckBox checkBox = checkBoxView.findViewById(R.id.confirm_checkbox);
         checkBox.setText(R.string.checkbox_lockdefault);
+        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(isChecked));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
                 .setTitle(R.string.title_lockdefault)
@@ -292,23 +298,17 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
                     showDialogLockDefaultApplication(lockpreferenceKey);
                 });
 
-//        AlertDialog
         alertDialog = builder.create();
-
-
-        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(isChecked));
-
         OpUtil.showAlertDialog(context, alertDialog);
 
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-
     }
 
-    private void showDialogLockDefaultApplication(String PreferenceKey) {
+    private void showDialogLockDefaultApplication(String preferenceKey) {
         Intent intent;
         IntentFilter filter;
         int titleid;
-        switch (PreferenceKey) {
+        switch (preferenceKey) {
             case "LockDefaultLauncher":
                 intent = new Intent(Intent.ACTION_MAIN)
                         .addCategory(Intent.CATEGORY_HOME)
@@ -356,7 +356,6 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
                     }
                 });
 
-//        AlertDialog
         alertDialog = builder.create();
         OpUtil.showAlertDialog(context, alertDialog);
     }
@@ -373,20 +372,17 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
                 .setNegativeButton(R.string.clear, null)
                 .setPositiveButton(R.string.bt_add, null);
 
-//        AlertDialog
         alertDialog = builder.create();
+        OpUtil.showAlertDialog(context, alertDialog);
 
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> opUserRestrictionFromDialog(keyOfRestriction.getText().toString().trim(), AlertDialog.BUTTON_POSITIVE));
+        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v -> opUserRestrictionFromDialog(keyOfRestriction.getText().toString().trim(), AlertDialog.BUTTON_NEGATIVE));
         alertDialog.setOnDismissListener(dialog -> {
             if (isOpUserRestrictionSuccess) {
                 isOpUserRestrictionSuccess = false;
                 refreshSwitch();
             }
         });
-
-        OpUtil.showAlertDialog(context, alertDialog);
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> opUserRestrictionFromDialog(keyOfRestriction.getText().toString().trim(), AlertDialog.BUTTON_POSITIVE));
-        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v -> opUserRestrictionFromDialog(keyOfRestriction.getText().toString().trim(), AlertDialog.BUTTON_NEGATIVE));
-
     }
 
     private void showDialogDeactivateDeviceOwner() {
@@ -394,6 +390,7 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
         View checkBoxView = View.inflate(context, R.layout.confirm_checkbox, null);
         CheckBox checkBox = checkBoxView.findViewById(R.id.confirm_checkbox);
         checkBox.setText(R.string.checkbox_deactivate);
+        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(isChecked));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(R.string.title_deactivate_deviceowner)
@@ -410,12 +407,10 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
                     }
                 });
 
-//        AlertDialog
         alertDialog = builder.create();
         OpUtil.showAlertDialog(context, alertDialog);
 
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(isChecked));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -424,7 +419,7 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
             switchPreferences[i].setChecked(checkUserRestriction(userRestrictionsKeys[i]));
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            EnableBackupService.setChecked(isEnableBackupServiceEnabled());
+            enableBackupService.setChecked(isEnableBackupServiceEnabled());
         }
 
     }

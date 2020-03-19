@@ -9,8 +9,6 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.modosa.apkinstaller.R;
-import com.modosa.apkinstaller.util.NotifyUtil;
-import com.modosa.apkinstaller.util.OpUtil;
 import com.modosa.apkinstaller.util.ResultUtil;
 import com.modosa.apkinstaller.util.apksource.ApkSource;
 import com.modosa.apkinstaller.util.installer.ApkSourceBuilder;
@@ -28,17 +26,14 @@ import java.util.List;
  * @author dadaewq
  */
 public class Install3Activity extends AbstractInstallerActivity implements SAIPackageInstaller.InstallationStatusListener {
-
+    public final static String CHANNEL_ID = "3";
     private long mOngoingSessionId;
-    private String installApkPath;
-
 
     @Override
     public void startInstall(String getinstallApkPath) {
         Log.d("Start install", getinstallApkPath + "");
         if (getinstallApkPath != null) {
-            installApkPath = getinstallApkPath;
-            installApkFile = new File(installApkPath);
+            installApkFile = new File(getinstallApkPath);
             ArrayList<File> files = new ArrayList<>();
             files.add(installApkFile);
             new Thread(() -> {
@@ -69,12 +64,12 @@ public class Install3Activity extends AbstractInstallerActivity implements SAIPa
                 if (0 == uninstallationResult.exitCode) {
                     showMyToast0(String.format(getString(R.string.tip_success_uninstall), uninstallPackageLable));
                 } else {
-                    String ILVersion = "???";
+                    String installerVersion = "???";
                     try {
-                        ILVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+                        installerVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
                     } catch (PackageManager.NameNotFoundException ignore) {
                     }
-                    String info = String.format("%s: %s %s | %s | Android %s | Install Lion %s\n\n", getString(R.string.installer_device), Build.BRAND, Build.MODEL, ResultUtil.isMiui() ? "MIUI" : "Not MIUI", Build.VERSION.RELEASE, ILVersion);
+                    String info = String.format("%s: %s %s | %s | Android %s | Install Lion %s\n\n", getString(R.string.installer_device), Build.BRAND, Build.MODEL, ResultUtil.isMiui() ? "MIUI" : " ", Build.VERSION.RELEASE, installerVersion);
                     copyErr(info + uninstallationResult.toString());
                     showMyToast1(String.format(getString(R.string.tip_failed_uninstall_witherror), uninstallPackageLable, uninstallationResult.err));
                 }
@@ -109,7 +104,7 @@ public class Install3Activity extends AbstractInstallerActivity implements SAIPa
                 break;
             case INSTALLATION_SUCCEED:
                 showMyToast0(String.format(getString(R.string.tip_success_install), apkinfo[0]));
-                showNotificationWithdeleteCache(true);
+                showNotificationWithdeleteCache(CHANNEL_ID, true);
                 break;
             case INSTALLATION_FAILED:
 
@@ -121,7 +116,7 @@ public class Install3Activity extends AbstractInstallerActivity implements SAIPa
                     showMyToast1(String.format(getString(R.string.tip_failed_install_witherror), apkinfo[0], ""));
                 }
 
-                showNotificationWithdeleteCache(false);
+                showNotificationWithdeleteCache(CHANNEL_ID, false);
 
                 break;
             default:
@@ -129,28 +124,4 @@ public class Install3Activity extends AbstractInstallerActivity implements SAIPa
         }
     }
 
-    private void showNotificationWithdeleteCache(boolean success) {
-        if (success) {
-            isInstalledSuccess = true;
-            deleteCache();
-            if (show_notification) {
-                Log.e("packagename", apkinfo[1]);
-                new NotifyUtil(this).sendSuccessNotification("3", String.format(getString(R.string.tip_success_install), apkinfo[0]), apkinfo[1]);
-            }
-
-        } else {
-            isInstalledSuccess = false;
-            if (show_notification) {
-                Log.e("packagename", apkinfo[1]);
-                new NotifyUtil(this).sendFailNotification("21", String.format(getString(R.string.tip_failed_install), apkinfo[0]), apkinfo[1], installApkPath, istemp && !enableAnotherinstaller);
-            } else {
-                if (!enableAnotherinstaller) {
-                    deleteCache();
-                }
-            }
-            if (enableAnotherinstaller) {
-                OpUtil.startAnotherInstaller(this, installApkFile, istemp);
-            }
-        }
-    }
 }

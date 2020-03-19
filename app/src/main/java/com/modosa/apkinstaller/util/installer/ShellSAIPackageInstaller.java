@@ -109,13 +109,13 @@ public abstract class ShellSAIPackageInstaller extends SAIPackageInstaller {
     }
 
     private String getSessionInfo(ApkSource apkSource) {
-        String ILVersion = "???";
+        String installerVersion = "???";
         try {
-            ILVersion = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0).versionName;
+            installerVersion = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
             Log.wtf(TAG, "Unable to get SAI version", e);
         }
-        return String.format("%s: %s %s | %s | Android %s | Install Lion %s", getContext().getString(R.string.installer_device), Build.BRAND, Build.MODEL, ResultUtil.isMiui() ? "MIUI" : "Not MIUI", Build.VERSION.RELEASE, ILVersion);
+        return String.format("%s: %s %s | %s | Android %s | Install Lion %s", getContext().getString(R.string.installer_device), Build.BRAND, Build.MODEL, ResultUtil.isMiui() ? "MIUI" : " ", Build.VERSION.RELEASE, installerVersion);
     }
 
     private int createSession() throws RuntimeException {
