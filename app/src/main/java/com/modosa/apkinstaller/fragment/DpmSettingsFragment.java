@@ -290,8 +290,8 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
                 .setTitle(R.string.title_lockdefault)
                 .setMessage(R.string.message_lockdefault)
                 .setView(checkBoxView)
-                .setNeutralButton(android.R.string.no, null)
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                .setNeutralButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     spGetPreferenceManager.edit()
                             .putBoolean(sp_key_confirmWarning, true)
                             .apply();
@@ -396,8 +396,8 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
         builder.setTitle(R.string.title_deactivate_deviceowner)
                 .setMessage(R.string.message_deactivate)
                 .setView(checkBoxView)
-                .setNeutralButton(android.R.string.no, null)
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                .setNeutralButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     if (clearDeviceOwner()) {
                         spGetPreferenceManager.edit().putBoolean(sp_key_confirmWarning, false).apply();
                         showToast0(context, R.string.tip_success_deactivate);

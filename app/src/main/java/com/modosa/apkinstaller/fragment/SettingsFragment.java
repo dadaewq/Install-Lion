@@ -188,8 +188,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
                 .setTitle(R.string.title_installByAnotherAfterFail)
                 .setView(view)
-                .setNeutralButton(android.R.string.no, null)
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                .setNeutralButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     SharedPreferences.Editor editor = spGetPreferenceManager.edit();
                     editor.putBoolean(SP_KEY_ENABLE_ANOTHER_INSTALLER, checkBox.isChecked());
                     editor.putString(SP_KEY_ANOTHER_INSTALLER_NAME, editText.getText().toString().trim());
@@ -301,8 +301,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 .setTitle(R.string.hideIcon)
                 .setMessage(R.string.message_hideIcon)
                 .setView(checkBoxView)
-                .setNeutralButton(android.R.string.no, null)
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                .setNeutralButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     OpUtil.setComponentState(context, launchMainUiComponentName1,
                             !checkBox1.isChecked());
 
@@ -325,8 +325,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 .setTitle(R.string.clearAllowedList)
                 .setMessage(R.string.message_clearAllowedList)
                 .setView(checkBoxView)
-                .setNeutralButton(android.R.string.no, null)
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> context.getSharedPreferences("allowsource", Context.MODE_PRIVATE).edit().clear().apply());
+                .setNeutralButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> context.getSharedPreferences("allowsource", Context.MODE_PRIVATE).edit().clear().apply());
 
 
         alertDialog = builder.create();

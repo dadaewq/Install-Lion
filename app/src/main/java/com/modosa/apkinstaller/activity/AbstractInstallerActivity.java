@@ -40,7 +40,7 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
     private static final int REQUEST_REFRESH_WRITE_PERMISSION = 0x2330;
     private static final int REQUEST_PICK_APK_FILE = 0x2331;
     private static final String ILLEGALPKGNAME = "IL^&IllegalPN*@!128`+=：:,.[";
-    private final String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    private final String[] writePermissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
     private final String nl = System.getProperty("line.separator");
     String[] apkinfo;
     String uninstallPackageLable;
@@ -144,8 +144,8 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(R.string.title_dialog_uninstall)
                 .setMessage(alertDialogMessage + nl + nl + getString(R.string.message_irrevocableConfirm))
-                .setNegativeButton(android.R.string.no, (dialogInterface, i) -> finish())
-                .setPositiveButton(android.R.string.yes, (dialogInterface, i) -> {
+                .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> finish())
+                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
                     startUninstall(uninstallPkgName);
                     finish();
                 });
@@ -251,8 +251,8 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
                     .setMessage(alertDialogMessage)
                     .setView(checkBoxView)
                     .setCancelable(false)
-                    .setNegativeButton(android.R.string.no, (dialog, which) -> finish())
-                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                    .setNegativeButton(android.R.string.cancel, (dialog, which) -> finish())
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                         cachePath = null;
                         if (!source[1].equals(ILLEGALPKGNAME)) {
                             spAllowSource.edit().putBoolean(source[0], checkBox.isChecked()).apply();
@@ -375,12 +375,12 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
     protected abstract void startUninstall(String uninstallPkgname);
 
     private void requestPermission() {
-        ActivityCompat.requestPermissions(this, permissions, REQUEST_REFRESH_WRITE_PERMISSION);
+        ActivityCompat.requestPermissions(this, writePermissions, REQUEST_REFRESH_WRITE_PERMISSION);
     }
 
     private boolean checkPermission() {
-        int permissionRead = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        return (permissionRead == 0);
+        int checkSelfPermission = ContextCompat.checkSelfPermission(this, writePermissions[0]);
+        return (checkSelfPermission == 0);
     }
 
     void copyErr(String err) {

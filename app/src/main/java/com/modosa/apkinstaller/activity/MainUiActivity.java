@@ -138,8 +138,8 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(R.string.title_instructions_before_use)
                 .setView(view)
-                .setPositiveButton(android.R.string.no, null)
-                .setNeutralButton(android.R.string.yes, (dialog, which) -> {
+                .setPositiveButton(android.R.string.cancel, null)
+                .setNeutralButton(android.R.string.ok, (dialog, which) -> {
                     boolean hasBothConfirm = false;
                     if (checkBox1.isChecked() && checkBox2.isChecked()) {
                         hasBothConfirm = true;
