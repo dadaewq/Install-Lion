@@ -14,7 +14,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/tv_instructions_before_use"
-            android:textColor="@color/rBackground" />
+            android:textColor="@color/rBackground"
+            android:textSize="16sp" />
 
         <CheckBox
             android:id="@+id/confirm_checkbox1"

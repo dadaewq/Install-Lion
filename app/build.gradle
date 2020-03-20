@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 'android-R'
+    compileSdkVersion 29
     buildToolsVersion '30.0.0 rc2'
     defaultConfig {
         resConfig 'zh'
         applicationId "com.modosa.apkinstaller"
         minSdkVersion 22
         targetSdkVersion 29
-        versionCode 30
-        versionName "3.56"
+        versionCode 31
+        versionName "3.6"
     }
 
     buildTypes {
@@ -43,4 +43,9 @@ dependencies {
     implementation 'androidx.preference:preference:1.1.0'
 //    implementation 'com.afollestad.material-dialogs:core:3.3.0'
 //    implementation 'com.google.android.material:material:1.2.0-alpha05'
+
+    def appCenterSdkVersion = '3.0.0'
+    implementation "com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}"
+    implementation "com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}"
+
 }

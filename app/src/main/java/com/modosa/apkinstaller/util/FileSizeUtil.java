@@ -69,7 +69,6 @@ public class FileSizeUtil {
      *
      * @param file 指定文件
      * @return longValue
-     * @throws Exception FileNotFound
      */
     private static long getFileSize(File file) {
         return file.length();

@@ -34,7 +34,7 @@
     <PreferenceCategory app:title="@string/title_others">
         <Preference
             app:key="clearAllowedList"
-            app:title="@string/clearAllowedList" />
+            app:title="@string/title_clearAllowedList" />
         <Preference
             app:key="clearCache"
             app:summary="@string/summary_clearCache" />
@@ -43,8 +43,11 @@
             app:summary=""
             app:title="@string/title_manualAuthorize" />
         <Preference
+            app:key="bugReport"
+            app:title="@string/title_bugReport" />
+        <Preference
             app:isPreferenceVisible="false"
             app:key="ignoreBatteryOptimization"
-            app:title="@string/ignoreBatteryOptimization" />
+            app:title="@string/title_ignoreBatteryOptimization" />
     </PreferenceCategory>
 </PreferenceScreen>

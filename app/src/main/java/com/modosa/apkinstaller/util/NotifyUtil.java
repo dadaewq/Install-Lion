@@ -59,7 +59,7 @@ public class NotifyUtil {
         String[] version;
 
         if (realPath != null || "2".equals(channelId)) {
-            largeIcon = AppInfoUtil.getApkIcon(context, realPath);
+            largeIcon = AppInfoUtil.getApkIconBitmap(context, realPath);
             clickIntent = null;
             version = AppInfoUtil.getApkVersion(context, realPath);
             if (shouldDelete && realPath != null) {
@@ -67,7 +67,7 @@ public class NotifyUtil {
             }
 
         } else {
-            largeIcon = AppInfoUtil.getApplicationIcon(context, packageName);
+            largeIcon = AppInfoUtil.getApplicationIconBitmap(context, packageName);
             clickIntent = getContentIntent((Activity) context, id, packageName);
             version = AppInfoUtil.getApplicationVersion(context, packageName);
 

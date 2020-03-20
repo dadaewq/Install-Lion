@@ -48,6 +48,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     public static final String SP_KEY_NIGHT_MODE = "MODE_NIGHT";
     public static final String SP_KEY_ENABLE_ANOTHER_INSTALLER = "enableAnotherInstaller";
     public static final String SP_KEY_ANOTHER_INSTALLER_NAME = "anotherInstallerName";
+    public static final String SP_KEY_DISABLE_BUG_REPORT = "disableBugReport";
+    public static final String SP_KEY_EASTER_EGG = "Easter Egg";
     private Context context;
     private SharedPreferences spGetPreferenceManager;
     private MyHandler mHandler;
@@ -79,6 +81,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         findPreference("setAppTheme").setOnPreferenceClickListener(this);
         findPreference("hideIcon").setOnPreferenceClickListener(this);
         findPreference("clearAllowedList").setOnPreferenceClickListener(this);
+        findPreference("bugReport").setOnPreferenceClickListener(this);
 
         clearCache = findPreference("clearCache");
         assert clearCache != null;
@@ -167,6 +170,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
             case "manualAuthorize":
                 manualuthorize();
                 break;
+            case "bugReport":
+                showDialogBugReport();
+                break;
             case "ignoreBatteryOptimization":
                 ignoreBatteryOptimization();
                 break;
@@ -236,6 +242,15 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
             ((RadioButton) view.findViewById(radioButtonId)).setChecked(true);
         }
         isValid.set(true);
+        RadioButton radioButton = view.findViewById(R.id.MODE_NIGHT_FOLLOW_SYSTEM);
+        radioButton.setOnLongClickListener(view1 -> {
+            spGetPreferenceManager.edit().putBoolean(SP_KEY_EASTER_EGG, !spGetPreferenceManager.getBoolean(SP_KEY_EASTER_EGG, false)).apply();
+            OpUtil.showToast0(context, SP_KEY_EASTER_EGG);
+            if (alertDialog != null && alertDialog.isShowing()) {
+                alertDialog.dismiss();
+            }
+            return true;
+        });
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             int nightMode = AppCompatDelegate.MODE_NIGHT_UNSPECIFIED;
             switch (checkedId) {
@@ -299,7 +314,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
                 .setTitle(R.string.hideIcon)
-                .setMessage(R.string.message_hideIcon)
                 .setView(checkBoxView)
                 .setNeutralButton(android.R.string.cancel, null)
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
@@ -322,7 +336,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(isChecked));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                .setTitle(R.string.clearAllowedList)
+                .setTitle(R.string.title_clearAllowedList)
                 .setMessage(R.string.message_clearAllowedList)
                 .setView(checkBoxView)
                 .setNeutralButton(android.R.string.cancel, null)
@@ -382,6 +396,25 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     private boolean checkNeedIgnoreBatteryOptimization() {
         return !((PowerManager) context.getSystemService(Context.POWER_SERVICE)).isIgnoringBatteryOptimizations(context.getPackageName());
     }
+
+    private void showDialogBugReport() {
+
+        View checkBoxView = View.inflate(context, R.layout.confirm_checkbox, null);
+        CheckBox checkBox = checkBoxView.findViewById(R.id.confirm_checkbox);
+        checkBox.setText(R.string.checkbox_bugReport);
+        checkBox.setChecked(spGetPreferenceManager.getBoolean(SP_KEY_DISABLE_BUG_REPORT, false));
+        AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                .setTitle(R.string.title_bugReport)
+                .setMessage(R.string.message_bugReport)
+                .setView(checkBoxView)
+                .setNeutralButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> spGetPreferenceManager.edit().putBoolean(SP_KEY_DISABLE_BUG_REPORT, checkBox.isChecked()).apply());
+
+
+        alertDialog = builder.create();
+        OpUtil.showAlertDialog(context, alertDialog);
+    }
+
 
     @SuppressLint("BatteryLife")
     @RequiresApi(api = Build.VERSION_CODES.M)

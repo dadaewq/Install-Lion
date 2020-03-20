@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -103,6 +104,14 @@ public class OpUtil {
 
                 window.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(R.color.Background)));
             }
+            SharedPreferences spGetPreferenceManager = PreferenceManager.getDefaultSharedPreferences(context);
+            if (spGetPreferenceManager.getBoolean(SettingsFragment.SP_KEY_EASTER_EGG, false)) {
+                window.setBackgroundDrawableResource(R.drawable.alertdialog_background_transparent);
+            } else {
+                window.setBackgroundDrawableResource(R.drawable.alertdialog_background);
+            }
+
+
         }
         alertDialog.show();
     }

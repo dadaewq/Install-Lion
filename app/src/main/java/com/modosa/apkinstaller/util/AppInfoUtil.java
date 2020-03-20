@@ -59,7 +59,7 @@ public final class AppInfoUtil {
     }
 
 
-    public static Bitmap getApplicationIcon(Context context, String pkgName) {
+    public static Drawable getApplicationIconDrawable(Context context, String pkgName) {
         PackageManager pm = context.getPackageManager();
         ApplicationInfo applicationInfo = null;
         try {
@@ -67,16 +67,19 @@ public final class AppInfoUtil {
         } catch (Exception ignore) {
         }
 
-
         if (applicationInfo != null) {
-            return drawable2Bitmap(applicationInfo.loadIcon(pm));
+            return applicationInfo.loadIcon(pm);
         } else {
             try {
-                return drawable2Bitmap(pm.getApplicationInfo(pkgName, Build.VERSION.SDK_INT > Build.VERSION_CODES.M ? MATCH_UNINSTALLED_PACKAGES : GET_UNINSTALLED_PACKAGES).loadIcon(pm));
+                return pm.getApplicationInfo(pkgName, Build.VERSION.SDK_INT > Build.VERSION_CODES.M ? MATCH_UNINSTALLED_PACKAGES : GET_UNINSTALLED_PACKAGES).loadIcon(pm);
             } catch (Exception ignore) {
-                return null;
+                return pm.getDefaultActivityIcon();
             }
         }
+    }
+
+    static Bitmap getApplicationIconBitmap(Context context, String pkgName) {
+        return drawable2Bitmap(getApplicationIconDrawable(context, pkgName));
     }
 
     public static String[] getApkInfo(Context context, String apkPath) {
@@ -99,7 +102,7 @@ public final class AppInfoUtil {
     }
 
 
-    public static String[] getApkVersion(Context context, String apkPath) {
+    static String[] getApkVersion(Context context, String apkPath) {
         PackageManager pm = context.getPackageManager();
         PackageInfo pkgInfo = pm.getPackageArchiveInfo(apkPath, PackageManager.GET_ACTIVITIES);
 
@@ -117,35 +120,48 @@ public final class AppInfoUtil {
         }
     }
 
-    public static Bitmap getApkIcon(Context context, String apkPath) {
+    public static Drawable getApkIconDrawable(Context context, String apkPath) {
+        Drawable icon = null;
         PackageManager pm = context.getPackageManager();
         PackageInfo pkgInfo = pm.getPackageArchiveInfo(apkPath, PackageManager.GET_ACTIVITIES);
         if (pkgInfo != null) {
             ApplicationInfo applicationInfo = pkgInfo.applicationInfo;
             pkgInfo.applicationInfo.sourceDir = apkPath;
             pkgInfo.applicationInfo.publicSourceDir = apkPath;
-            return drawable2Bitmap(applicationInfo.loadIcon(pm));
+            icon = applicationInfo.loadIcon(pm);
         }
-        return null;
+        if (icon == null) {
+            icon = pm.getDefaultActivityIcon();
+        }
+        return icon;
+    }
+
+    static Bitmap getApkIconBitmap(Context context, String apkPath) {
+        return drawable2Bitmap(getApkIconDrawable(context, apkPath));
     }
 
     private static Bitmap drawable2Bitmap(Drawable drawable) {
 
+        Bitmap bitmap = null;
+
         if (drawable instanceof BitmapDrawable) {
             BitmapDrawable bd = (BitmapDrawable) drawable;
-            return bd.getBitmap();
+            bitmap = bd.getBitmap();
         }
 
-        Bitmap bitmap = Bitmap
-                .createBitmap(
-                        drawable.getIntrinsicWidth(),
-                        drawable.getIntrinsicHeight(),
-                        drawable.getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888
-                                : Bitmap.Config.RGB_565);
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(),
-                drawable.getIntrinsicHeight());
-        drawable.draw(canvas);
+        if (bitmap == null && drawable != null) {
+            bitmap = Bitmap
+                    .createBitmap(
+                            drawable.getIntrinsicWidth(),
+                            drawable.getIntrinsicHeight(),
+                            drawable.getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888
+                                    : Bitmap.Config.RGB_565);
+            Canvas canvas = new Canvas(bitmap);
+            drawable.setBounds(0, 0, drawable.getIntrinsicWidth(),
+                    drawable.getIntrinsicHeight());
+            drawable.draw(canvas);
+        }
+
         return bitmap;
     }
 

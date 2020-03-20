@@ -12,7 +12,7 @@
     <string name="checkbox_always_allow">总是允许 %1$s</string>
     <string name="checkbox_clearAllowedList">确认清空</string>
     <string name="checkbox_installsource_unkonwn">未知安装来源</string>
-    <string name="clearAllowedList">清空允许安装列表</string>
+    <string name="title_clearAllowedList">清空允许安装列表</string>
     <string name="click_run"> %1$s, 点击打开应用</string>
     <string name="click2requestpermission">点击申请权限</string>
     <string name="confirm_title">安装前确认</string>
@@ -26,12 +26,12 @@
     <string name="launch_name">启动应用</string>
     <string name="message_clearAllowedList">\n清空安装前无需确认的应用列表\n</string>
     <string name="message_hideIcon">你可以通过以下方式打开应用\n\n1.系统应用信息-管理空间\n2.拨号 *#*#297297#*#*\n3.系统应用信息-其他设置\n</string>
-    <string name="message_name">名称：%1$s</string>
-    <string name="message_packagename">包名：%1$s</string>
-    <string name="message_size">大小：%1$s</string>
+    <string name="tv_lable">名称：</string>
+    <string name="tv_packagename">包名：</string>
+    <string name="tv_size_apk">大小：</string>
     <string name="message_irrevocableConfirm">此操作不可撤销\n确认卸载吗?</string>
-    <string name="message_version">版本：%1$s(%2$s)</string>
-    <string name="message_version_existed">现存：%1$s(%2$s)</string>
+    <string name="tv_version_apk">版本：</string>
+    <string name="tv_version_app">现存：</string>
     <string name="name_install1">安装狮-冰箱</string>
     <string name="name_install2">安装狮-DSM</string>
     <string name="name_install3">安装狮-Shizuku</string>
@@ -54,6 +54,7 @@
     <string name="summaryOn">已启用</string>
     <string name="tip_exit">再按一次退出</string>
     <string name="tip_failed_install">%1$s 安装失败</string>
+    <string name="tip_copy_to_clipboard">已复制到剪贴板</string>
     <string name="tip_failed_install_witherror">%1$s 安装失败,错误已复制到剪贴板\n%2$s</string>
     <string name="tip_failed_prase">无法解析</string>
     <string name="tip_failed_read">读取apk失败</string>
@@ -69,7 +70,6 @@
     <string name="tip_success_uninstall">%1$s 卸载成功</string>
     <string name="title_delegated_authorization_state">托管权限状态</string>
     <string name="title_delegated_OwnerPackageNameAndSDKVersion">已安装的托管主应用以及SDK版本</string>
-    <string name="title_dialog_install">安装</string>
     <string name="title_dialog_uninstall">卸载</string>
     <string name="title_icebox__authorization_state">冰箱权限状态</string>
     <string name="title_icebox_support_state">冰箱支持状态</string>
@@ -121,7 +121,6 @@
     <string name="checkbox_lockdefault">我已经充分知晓并自行承担风险</string>
     <string name="installer_error_root_no_root">无法获取Root权限</string>
     <!--    <string name="title_show_root_no_click2request">未获取Root权限,点击申请</string>-->
-
     <string name="tip_enable_one_installer">请至少启用一个安装器</string>
     <string name="title_show_root_no_click2check">点击检查Root权限</string>
     <string name="title_show_root_yes">已获取Root权限</string>
@@ -134,6 +133,9 @@
     <string name="AppTheme_MODE_NIGHT_NO">浅色</string>
     <string name="AppTheme_MODE_NIGHT_YES">深色</string>
     <string name="AppTheme_MODE_NIGHT_FOLLOW_SYSTEM">跟随系统</string>
-    <string name="ignoreBatteryOptimization">忽略电池优化</string>
+    <string name="title_bugReport">错误收集</string>
+    <string name="message_bugReport">\n安装狮使用Visual Studio App Center（来自Microsoft）来收集错误以进行优化和改进。\n不会收集您的个人隐私,只会发送匿名数据。更多信息：https://appcenter.ms</string>
+    <string name="checkbox_bugReport">关闭错误收集</string>
+    <string name="title_ignoreBatteryOptimization">忽略电池优化</string>
     <string name="title_about_install">安装</string>
 </resources>

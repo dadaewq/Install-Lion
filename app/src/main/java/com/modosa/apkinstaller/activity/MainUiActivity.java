@@ -229,11 +229,13 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
 
 
     private void installFromGetContent() {
-
+        String[] installerClassName = new String[MainFragment.INSTALLER_SIZE];
         ComponentName[] installerComponentNames = new ComponentName[MainFragment.INSTALLER_SIZE];
         ArrayList<ComponentName> componentNameArrayList = new ArrayList<>();
         for (int i = 1; i < MainFragment.INSTALLER_SIZE; i++) {
-            installerComponentNames[i] = new ComponentName(getPackageName(), getPackageName() + ".activity" + ".Install" + i + "Activity");
+            installerClassName[i] = getPackageName() + ".activity" + ".Install" + i + "Activity";
+
+            installerComponentNames[i] = new ComponentName(getPackageName(), installerClassName[i]);
 
             getAvinstaller(componentNameArrayList, installerComponentNames[i]);
         }
@@ -264,16 +266,13 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
 
 
             if (items.length == 1) {
-                showMyToast0(R.string.InstallFromGetContent);
+                showMyToast0(items[0]);
                 startPickFile(0, componentNameArrayList);
             } else {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                        .setTitle(R.string.InstallFromGetContent)
+                        .setItems(items, (dialog, which) -> startPickFile(which, componentNameArrayList));
 
-                builder.setItems(items, (dialog, which) -> {
-                    showMyToast0(R.string.InstallFromGetContent);
-                    startPickFile(which, componentNameArrayList);
-                });
-//                AlertDialog
                 alertDialogConfirmPrompt = builder.create();
 
                 OpUtil.showAlertDialog(this, alertDialogConfirmPrompt);

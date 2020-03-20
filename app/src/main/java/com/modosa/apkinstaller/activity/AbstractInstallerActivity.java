@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -115,35 +116,40 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
         if (AppInfoUtil.UNINSTALLED.equals(uninstallPackageLable)) {
             uninstallPackageLable = "Uninstalled";
         }
-        alertDialogMessage = new StringBuilder();
-        alertDialogMessage
-                .append(
-                        String.format(
-                                getString(R.string.message_name),
-                                uninstallPackageLable
-                        )
-                )
-                .append(nl)
-                .append(
-                        String.format(
-                                getString(R.string.message_packagename),
-                                uninstallPkgName
-                        )
-                )
-                .append(nl);
 
-        if (version != null) {
-            alertDialogMessage.append(String.format(
-                    getString(R.string.message_version),
-                    version[0],
-                    version[1])
-            )
-                    .append(nl);
+        View infoView = View.inflate(this, R.layout.uninstall_content_view, null);
+
+        TextView textView1 = infoView.findViewById(R.id.textView1);
+        TextView textView2 = infoView.findViewById(R.id.textView2);
+
+        String text1 = uninstallPkgName;
+        String text2;
+
+        textView1.setText(text1);
+        textView1.setOnClickListener(view -> {
+            copyErr(text1);
+            showMyToast0(R.string.tip_copy_to_clipboard);
+        });
+
+
+        if (version == null) {
+            text2 = getString(R.string.unknown);
+        } else {
+            text2 = version[0] + " (" + version[1] + ")";
         }
+        textView2.setText(text2);
+
+        textView2.setOnClickListener(view -> {
+            copyErr(text2);
+            showMyToast0(R.string.tip_copy_to_clipboard);
+        });
+
+        alertDialogMessage = new StringBuilder().append(uninstallPackageLable).append(nl).append(text1).append(nl).append(text2);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setTitle(R.string.title_dialog_uninstall)
-                .setMessage(alertDialogMessage + nl + nl + getString(R.string.message_irrevocableConfirm))
+                .setIcon(AppInfoUtil.getApplicationIconDrawable(this, uninstallPkgName))
+                .setTitle(uninstallPackageLable)
+                .setView(infoView)
                 .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> finish())
                 .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
                     startUninstall(uninstallPkgName);
@@ -151,13 +157,11 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
                 });
         alertDialog = builder.create();
         OpUtil.showAlertDialog(this, alertDialog);
-
         alertDialog.setOnCancelListener(dialog -> finish());
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(20);
         alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(20);
 
     }
-
 
     private void initInstall() {
         source = checkInstallSource();
@@ -186,58 +190,63 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
                 finish();
                 return;
             }
-            String[] version = AppInfoUtil.getApplicationVersion(this, apkinfo[1]);
+            String[] appVersion = AppInfoUtil.getApplicationVersion(this, apkinfo[1]);
 
-            alertDialogMessage = new StringBuilder();
-            alertDialogMessage
-                    .append(nl)
-                    .append(
-                            String.format(
-                                    getString(R.string.message_name),
-                                    apkinfo[0]
-                            )
-                    )
-                    .append(nl)
-                    .append(
-                            String.format(
-                                    getString(R.string.message_packagename),
-                                    apkinfo[1]
-                            )
-                    )
-                    .append(nl)
-                    .append(
-                            String.format(
-                                    getString(R.string.message_version),
-                                    apkinfo[2],
-                                    apkinfo[3]
-                            )
-                    )
-                    .append(nl);
+            View infoView = View.inflate(this, R.layout.install_content_view, null);
 
-            if (version != null) {
-                alertDialogMessage.append(
-                        String.format(
-                                getString(R.string.message_version_existed),
-                                version[0],
-                                version[1]
-                        )
-                )
-                        .append(nl);
+            TextView textView1 = infoView.findViewById(R.id.textView1);
+            TextView textView2 = infoView.findViewById(R.id.textView2);
+            TextView textView3 = infoView.findViewById(R.id.textView3);
+            TextView textView4 = infoView.findViewById(R.id.textView4);
+            CheckBox checkBox = infoView.findViewById(R.id.confirm_checkbox);
+
+            String text1 = apkinfo[1];
+            String text2 = apkinfo[2] + " (" + apkinfo[3] + ")";
+            String text3 = null;
+            String text4 = apkinfo[4];
+
+            textView1.setText(text1);
+            textView1.setOnClickListener(view -> {
+                copyErr(text1);
+                showMyToast0(R.string.tip_copy_to_clipboard);
+            });
+
+            textView2.setText(text2);
+
+            textView2.setOnClickListener(view -> {
+                copyErr(text2);
+                showMyToast0(R.string.tip_copy_to_clipboard);
+            });
+
+            if (appVersion != null) {
+                infoView.findViewById(R.id.line3).setVisibility(View.VISIBLE);
+                text3 = appVersion[0] + " (" + appVersion[1] + ")";
+                Long appVersionCode = Long.parseLong(appVersion[1]);
+                Long apkVersionCode = Long.parseLong(apkinfo[3]);
+
+                String text2Suffix = "";
+                if (apkVersionCode > appVersionCode) {
+                    // ↗
+                    text2Suffix = " \u2197";
+                } else if (apkVersionCode < appVersionCode) {
+                    // ↘
+                    text2Suffix = " \u2198";
+                }
+                textView2.append(text2Suffix);
+                textView3.setText(text3);
+                String finalText = text3;
+                textView3.setOnClickListener(view -> {
+                    copyErr(finalText);
+                    showMyToast0(R.string.tip_copy_to_clipboard);
+                });
             }
 
-            alertDialogMessage
-                    .append(
-                            String.format(
-                                    getString(R.string.message_size),
-                                    apkinfo[4]
-                            )
-                    )
-                    .append(nl);
+            textView4.setText(text4);
+            textView4.setOnClickListener(view -> {
+                copyErr(text4);
+                showMyToast0(R.string.tip_copy_to_clipboard);
+            });
 
-
-            View checkBoxView = View.inflate(this, R.layout.confirm_checkbox, null);
-
-            CheckBox checkBox = checkBoxView.findViewById(R.id.confirm_checkbox);
 
             if (source[1].equals(ILLEGALPKGNAME)) {
                 checkBox.setText(R.string.checkbox_installsource_unkonwn);
@@ -246,17 +255,23 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
                 checkBox.setText(String.format(getString(R.string.checkbox_always_allow), source[1]));
             }
 
+            if (appVersion != null) {
+                alertDialogMessage = new StringBuilder().append(apkinfo[0]).append(nl).append(text1).append(nl).append(text2).append(nl).append(text3).append(nl).append(text4);
+            } else {
+                alertDialogMessage = new StringBuilder().append(apkinfo[0]).append(nl).append(text1).append(nl).append(text2).append(nl).append(text4);
+            }
+
+
             AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                    .setTitle(R.string.title_dialog_install)
-                    .setMessage(alertDialogMessage)
-                    .setView(checkBoxView)
+                    .setIcon(AppInfoUtil.getApkIconDrawable(this, validApkPath))
+                    .setTitle(apkinfo[0])
+                    .setView(infoView)
                     .setCancelable(false)
                     .setNegativeButton(android.R.string.cancel, (dialog, which) -> finish())
                     .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                         cachePath = null;
                         if (!source[1].equals(ILLEGALPKGNAME)) {
                             spAllowSource.edit().putBoolean(source[0], checkBox.isChecked()).apply();
-
                         }
                         startInstall(validApkPath);
                         finish();
@@ -265,10 +280,208 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
             alertDialog = builder.create();
             OpUtil.showAlertDialog(this, alertDialog);
 
+
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(20);
             alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(20);
         }
     }
+
+
+//    private void initUninstall1() {
+//        String[] version = AppInfoUtil.getApplicationVersion(this, uninstallPkgName);
+//
+//        uninstallPackageLable = AppInfoUtil.getApplicationLabel(this, uninstallPkgName);
+//        if (AppInfoUtil.UNINSTALLED.equals(uninstallPackageLable)) {
+//            uninstallPackageLable = "Uninstalled";
+//        }
+//
+//        View infoView = View.inflate(this, R.layout.uninstall_content_viewuu, null);
+//
+//        TextView textView1 = infoView.findViewById(R.id.textView1);
+//        TextView textView2 = infoView.findViewById(R.id.textView2);
+//
+//        String text1 = uninstallPkgName;
+//        String text2;
+//
+//        textView1.setText(String.format(
+//                getString(R.string.tv_packagename),
+//                text1
+//        ));
+//        textView1.setOnClickListener(view -> {
+//            copyErr(text1);
+//            showMyToast0(text1);
+//        });
+//
+//
+//        if (version == null) {
+//            text2 = getString(R.string.unknown);
+//        } else {
+//            text2 = version[0] + " (" + version[1] + ")";
+//        }
+//        textView2.setText(String.format(
+//                getString(R.string.tv_version_apk),
+//                text2));
+//
+//        textView2.setOnClickListener(view -> {
+//            copyErr(text2);
+//            showMyToast0(text2);
+//        });
+//
+//        alertDialogMessage = new StringBuilder().append(String.format(getString(R.string.tv_lable), uninstallPackageLable)).append(nl).append(text1).append(nl).append(text2);
+//
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+//                .setIcon(AppInfoUtil.getApplicationIconDrawable(this, uninstallPkgName))
+//                .setTitle(uninstallPackageLable)
+//                .setView(infoView)
+//                .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> finish())
+//                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+//                    startUninstall(uninstallPkgName);
+//                    finish();
+//                });
+//        alertDialog = builder.create();
+//        OpUtil.showAlertDialog(this, alertDialog);
+//        alertDialog.setOnCancelListener(dialog -> finish());
+//        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(20);
+//        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(20);
+//
+//    }
+//
+//
+//
+//    private void initInstall1() {
+//        source = checkInstallSource();
+//        boolean needconfirm = spGetPreferenceManager.getBoolean("needconfirm", true);
+//        deleteSucceededApk = spGetPreferenceManager.getBoolean("deleteSucceededApk", false);
+//        show_notification = spGetPreferenceManager.getBoolean("show_notification", false);
+//        enableAnotherinstaller = spGetPreferenceManager.getBoolean(SettingsFragment.SP_KEY_ENABLE_ANOTHER_INSTALLER, false);
+//        boolean allowsource = spAllowSource.getBoolean(source[0], false);
+//
+//        validApkPath = preInstallGetValidApkPath();
+//        if (validApkPath == null) {
+//            showMyToast0(R.string.tip_failed_prase);
+//            finish();
+//        } else {
+//            cachePath = validApkPath;
+//            Log.e("cachePath", cachePath + "");
+//
+//            if (needconfirm) {
+//                if (!source[1].equals(ILLEGALPKGNAME) && allowsource) {
+//                    startInstall(validApkPath);
+//                    finish();
+//                    return;
+//                }
+//            } else {
+//                startInstall(validApkPath);
+//                finish();
+//                return;
+//            }
+//            String[] appVersion = AppInfoUtil.getApplicationVersion(this, apkinfo[1]);
+//
+//            View infoView = View.inflate(this, R.layout.install_content_viewuu, null);
+//
+//            TextView textView1 = infoView.findViewById(R.id.textView1);
+//            TextView textView2 = infoView.findViewById(R.id.textView2);
+//            TextView textView3 = infoView.findViewById(R.id.textView3);
+//            TextView textView4 = infoView.findViewById(R.id.textView4);
+//            CheckBox checkBox = infoView.findViewById(R.id.confirm_checkbox);
+//
+//            String text1 = apkinfo[1];
+//            String text2 = apkinfo[2] + " (" + apkinfo[3] + ")";
+//            String text3 = null;
+//            String text4 = apkinfo[4];
+//
+//            textView1.setText(String.format(
+//                    getString(R.string.tv_packagename),
+//                    text1
+//            ));
+//            textView1.setOnClickListener(view -> {
+//                copyErr(text1);
+//                showMyToast0(text1);
+//            });
+//
+//            textView2.setText(String.format(
+//                    getString(R.string.tv_version_apk),
+//                    text2));
+//
+//            textView2.setOnClickListener(view -> {
+//                copyErr(text2);
+//                showMyToast0(text2);
+//            });
+//
+//            if (appVersion != null) {
+//                textView3.setVisibility(View.VISIBLE);
+//                text3 = appVersion[0] + " (" + appVersion[1] + ")";
+//                Long appVersionCode = Long.parseLong(appVersion[1]);
+//                Long apkVersionCode = Long.parseLong(apkinfo[3]);
+//
+//                String text2Suffix = "";
+//                if (apkVersionCode > appVersionCode) {
+//                    // ↗
+//                    text2Suffix = " \u2197";
+//                } else if (apkVersionCode < appVersionCode) {
+//                    // ↘
+//                    text2Suffix = " \u2198";
+//                }
+//                textView2.append(text2Suffix);
+//                textView3.setText(String.format(
+//                        getString(R.string.tv_version_app),
+//                        text3
+//                        )
+//                );
+//                String finalText = text3;
+//                textView3.setOnClickListener(view -> {
+//                    copyErr(finalText);
+//                    showMyToast0(finalText);
+//                });
+//            }
+//
+//            textView4.setText(String.format(
+//                    getString(R.string.tv_size_apk),
+//                    text4
+//            ));
+//            textView4.setOnClickListener(view -> {
+//                copyErr(text4);
+//                showMyToast0(text4);
+//            });
+//
+//
+//            if (source[1].equals(ILLEGALPKGNAME)) {
+//                checkBox.setText(R.string.checkbox_installsource_unkonwn);
+//                checkBox.setEnabled(false);
+//            } else {
+//                checkBox.setText(String.format(getString(R.string.checkbox_always_allow), source[1]));
+//            }
+//
+//            if (appVersion != null) {
+//                alertDialogMessage = new StringBuilder().append(String.format(getString(R.string.tv_lable), apkinfo[0])).append(nl).append(text1).append(nl).append(text2).append(nl).append(text3).append(nl).append(text4);
+//            } else {
+//                alertDialogMessage = new StringBuilder().append(String.format(getString(R.string.tv_lable), apkinfo[0])).append(nl).append(text1).append(nl).append(text2).append(nl).append(text4);
+//            }
+//
+//
+//            AlertDialog.Builder builder = new AlertDialog.Builder(this)
+//                    .setIcon(AppInfoUtil.getApkIconDrawable(this, validApkPath))
+//                    .setTitle(apkinfo[0])
+//                    .setView(infoView)
+//                    .setCancelable(false)
+//                    .setNegativeButton(android.R.string.cancel, (dialog, which) -> finish())
+//                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+//                        cachePath = null;
+//                        if (!source[1].equals(ILLEGALPKGNAME)) {
+//                            spAllowSource.edit().putBoolean(source[0], checkBox.isChecked()).apply();
+//
+//                        }
+//                        startInstall(validApkPath);
+//                        finish();
+//                    });
+//
+//            alertDialog = builder.create();
+//            OpUtil.showAlertDialog(this, alertDialog);
+//
+//            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(20);
+//            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(20);
+//        }
+//    }
 
 
     private String[] checkInstallSource() {

@@ -3,11 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingStart="20dp"
-    android:paddingLeft="20dp"
-    android:paddingEnd="20dp"
-    android:paddingRight="20dp">
+    android:padding="20dp">
 
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/message_hideIcon"
+        android:textColor="@color/rBackground"
+        android:textSize="16sp" />
 
     <CheckBox
         android:id="@+id/confirm_checkbox1"
