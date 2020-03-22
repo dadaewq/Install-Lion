@@ -11,9 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -87,10 +84,6 @@ public class MainFragment extends PreferenceFragmentCompat {
         setPreferencesFromResource(R.xml.pref_main_ui, rootKey);
     }
 
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -118,6 +111,7 @@ public class MainFragment extends PreferenceFragmentCompat {
     @Override
     public void onResume() {
         super.onResume();
+        context = getActivity();
         Executors.newSingleThreadExecutor().execute(() -> {
             Message msg = mHandler.obtainMessage();
             msg.arg1 = 9;

@@ -11,6 +11,10 @@
         <SwitchPreferenceCompat
             android:key="DISALLOW_INSTALL_UNKNOWN_SOURCES"
             android:title="@string/title_DISALLOW_INSTALL_UNKNOWN_SOURCES" />
+        <SwitchPreferenceCompat
+            android:key="DISALLOW_ADD_MANAGED_PROFILE"
+            android:title="@string/title_DISALLOW_ADD_MANAGED_PROFILE"
+            app:isPreferenceVisible="false" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_display">

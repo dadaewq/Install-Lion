@@ -5,6 +5,8 @@
     <string name="tv_instructions_before_use">\n本应用的主要功能是安装APK和卸载应用\n
         \n除了原生Android外的绝大部分定制系统由于系统的限制，无法将本应用设置为默认安装与卸载应用,而且发起安装时这些系统会直接让系统默认的软件包安装程序来处理，也没有很好的解决办法\n
         \n这种情况推荐用本应用内的\"选择文件安装\"功能或用一些支持选择打开方式的文件管理器等来发起安装\n
+        \n重要提示：安装失败的请尝试这些步骤——关闭Google Play的安全扫描;在开发者选项打开USB安装、关闭监控ADB安装应用等等以防止安装失败。(尤其是非原生Android)\n
+        \n友情提示：Android系统自带的\"软件包安装程序\"不仅是用来安装和卸载的，同时也是管理权限的重要系统组件，请不要随意进行冻结或其他危险操作！\n
     </string>
     <string name="checkbox1_instructions_before_use">我已经充分知晓</string>
     <string name="checkbox2_instructions_before_use">不再提示</string>
@@ -13,7 +15,10 @@
     <string name="checkbox_clearAllowedList">确认清空</string>
     <string name="checkbox_installsource_unkonwn">未知安装来源</string>
     <string name="title_clearAllowedList">清空允许安装列表</string>
-    <string name="click_run"> %1$s, 点击打开应用</string>
+    <string name="click_delete_apk">删除安装包</string>
+    <string name="tip_delete_apk_success">安装包已删除</string>
+    <string name="tip_delete_apk_fail">安装包删除失败</string>
+    <string name="click_launch"> 打开</string>
     <string name="click2requestpermission">点击申请权限</string>
     <string name="confirm_title">安装前确认</string>
     <string name="enable_title">启用安装器</string>
@@ -26,7 +31,6 @@
     <string name="launch_name">启动应用</string>
     <string name="message_clearAllowedList">\n清空安装前无需确认的应用列表\n</string>
     <string name="message_hideIcon">你可以通过以下方式打开应用\n\n1.系统应用信息-管理空间\n2.拨号 *#*#297297#*#*\n3.系统应用信息-其他设置\n</string>
-    <string name="tv_lable">名称：</string>
     <string name="tv_packagename">包名：</string>
     <string name="tv_size_apk">大小：</string>
     <string name="message_irrevocableConfirm">此操作不可撤销\n确认卸载吗?</string>
@@ -40,8 +44,6 @@
     <string name="summary_notexist">不存在！</string>
     <string name="summary_permission_no">未授权！</string>
     <string name="summary_permission_yes">已授权</string>
-    <string name="tip_show_notification">安装结束后显示通知，安装成功的可点击通知可打开应用</string>
-    <string name="title_show_notification">显示通知</string>
     <string name="summary_av_no">不可用！</string>
     <string name="summary_av_yes">可用</string>
     <string name="summary_av_ok_installer">现在可以使用</string>
@@ -92,6 +94,7 @@
     <string name="title_DISALLOW_INSTALL_APPS">禁止安装应用</string>
     <string name="title_DISALLOW_UNINSTALL_APPS">禁止卸载应用</string>
     <string name="title_DISALLOW_INSTALL_UNKNOWN_SOURCES">禁止安装未知来源应用</string>
+    <string name="title_DISALLOW_ADD_MANAGED_PROFILE">禁止添加配置管理文件</string>
     <string name="summary_clearCache">点击清理</string>
     <string name="tip_success_clear_cache">清理完成</string>
     <string name="title_clearCache">当前缓存大小： %s</string>
@@ -128,7 +131,8 @@
     <string name="title_installByAnotherAfterFail">安装失败后用其他安装</string>
     <string name="checkbox_installByAnotherAfterFail">启用此功能</string>
     <string name="et_installByAnotherAfterFail">输入包名来指定应用，留空则由系统选择</string>
-    <string name="message_deleteSucceededApk">请谨慎开启,会删除安装成功且能获取到真实路径的安装包</string>
+    <string name="summary_on_deleteSucceededApk">如果能获取到安装包的真实路径，则会在安装成功后自动删除</string>
+    <string name="summary_off_deleteSucceededApk">如果能获取到安装包的真实路径，则可在安装成功后的通知中手动删除</string>
     <string name="title_AppTheme">主题</string>
     <string name="AppTheme_MODE_NIGHT_NO">浅色</string>
     <string name="AppTheme_MODE_NIGHT_YES">深色</string>

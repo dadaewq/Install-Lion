@@ -65,8 +65,13 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mHandler = new MyHandler(this);
-        context = getActivity();
         init();
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.context = context;
     }
 
     @Override
@@ -116,6 +121,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     @Override
     public void onResume() {
         super.onResume();
+        context = getActivity();
         Executors.newSingleThreadExecutor().execute(() -> {
             Message msg = mHandler.obtainMessage();
             msg.arg1 = 9;

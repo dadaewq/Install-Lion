@@ -18,6 +18,7 @@ import com.modosa.apkinstaller.activity.Install2Activity;
 import com.modosa.apkinstaller.activity.Install3Activity;
 import com.modosa.apkinstaller.activity.Install4Activity;
 import com.modosa.apkinstaller.activity.Install5Activity;
+import com.modosa.apkinstaller.activity.LaunchAppActivity;
 
 import java.io.File;
 
@@ -33,17 +34,13 @@ public class NotifyUtil {
     private String contentTitle = "";
     private NotificationManager notificationManager;
     private Bitmap largeIcon;
+    private boolean canLaunchApp = true;
 
     public NotifyUtil(Context context) {
         this.context = context;
     }
 
-    public void sendSuccessNotification(String channelId, String contentTitle, String packageName) {
-        sendFailNotification(channelId, contentTitle, packageName, null, false);
-
-    }
-
-    public void sendFailNotification(String channelId, String contentTitle, String packageName, String realPath, boolean shouldDelete) {
+    public void sendNotification(String channelId, String contentTitle, String packageName, String realPath, boolean isTemp, boolean enableAnotherinstaller) {
 
         this.channelId = channelId;
         this.channelName = getChannelName(channelId);
@@ -51,24 +48,28 @@ public class NotifyUtil {
 
         int id = (int) System.currentTimeMillis();
 
-        PendingIntent clickIntent;
+        PendingIntent deleteFilePendingIntent = null;
+        PendingIntent runAppPendingIntent = null;
+
 
 //        如果使用 AppInfoUtils.getApkIcon()在InstallActivity用Bundle传LargeIcon
 //        LargeIcon = getIntent().getParcelableExtra("LargeIcon");
 
         String[] version;
 
-        if (realPath != null || "2".equals(channelId)) {
+        if (CHANNEL_ID_FAIL.equals(channelId) || Install2Activity.CHANNEL_ID.equals(channelId)) {
             largeIcon = AppInfoUtil.getApkIconBitmap(context, realPath);
-            clickIntent = null;
             version = AppInfoUtil.getApkVersion(context, realPath);
-            if (shouldDelete && realPath != null) {
+            if (isTemp && !enableAnotherinstaller) {
                 OpUtil.deleteSingleFile(new File(realPath));
             }
 
         } else {
             largeIcon = AppInfoUtil.getApplicationIconBitmap(context, packageName);
-            clickIntent = getContentIntent((Activity) context, id, packageName);
+            runAppPendingIntent = getRunAppPendingIntent((Activity) context, id, packageName);
+            if (!isTemp) {
+                deleteFilePendingIntent = getDeleteFilePendingIntent((Activity) context, id, realPath);
+            }
             version = AppInfoUtil.getApplicationVersion(context, packageName);
 
         }
@@ -76,7 +77,7 @@ public class NotifyUtil {
             versionName = version[0];
         }
 
-        notifyLiveStart(clickIntent, id);
+        notifyLiveStart(deleteFilePendingIntent, runAppPendingIntent, id);
     }
 
     private String getChannelName(String channelId) {
@@ -105,7 +106,7 @@ public class NotifyUtil {
         return channelName;
     }
 
-    private void notifyLiveStart(PendingIntent pendingIntent, int id) {
+    private void notifyLiveStart(PendingIntent deleteFilePendingIntent, PendingIntent runAppPendingIntent, int id) {
 
         NotificationChannel channel;
 
@@ -132,29 +133,33 @@ public class NotifyUtil {
                 //通知产生的时间，会在通知信息里显示
                 .setWhen(System.currentTimeMillis())
                 //设置小图标（通知栏没有下拉的图标）
-                .setSmallIcon("4".equals(channelId) ?
+                .setSmallIcon(Install4Activity.CHANNEL_ID.equals(channelId) ?
                         R.drawable.ic_settings_black_24dp :
                         R.drawable.ic_filter_vintage_black_24dp)
-                .setAutoCancel(true)
-                .setContentIntent(pendingIntent);
+                //设置点击通知后自动删除通知
+                .setAutoCancel(true);
+
+//                .setContentIntent(null);
+
+        if (deleteFilePendingIntent != null) {
+            builder.addAction(0, context.getString(R.string.click_delete_apk), deleteFilePendingIntent);
+        }
+
+        if (runAppPendingIntent != null) {
+            builder.addAction(0, context.getString(R.string.click_launch), runAppPendingIntent);
+        }
 
         //设置通知栏显示内容
-        if (pendingIntent == null) {
-            builder.setContentText(versionName);
-        } else {
-            builder.setContentText(String.format(context.getString(R.string.click_run), versionName));
-        }
+        builder.setContentText(versionName);
 
         if (largeIcon != null) {
             //设置右侧大图标
             builder.setLargeIcon(largeIcon);
         }
-        //设置点击通知后自动删除通知
+
 
         Notification notification = builder.build();
 //        .setPriority(Notification.PRIORITY_DEFAULT) //设置该通知优先级
-//
-//        .setAutoCancel(true)//设置这个标志当用户单击面板就可以让通知将自动取消
 //
 //        .setOngoing(false)//ture，设置他为一个正在进行的通知,通常是用来表示一个后台任务,以某种方式正在等待,如一个文件下载,同步操作
 //
@@ -165,13 +170,30 @@ public class NotifyUtil {
 
     }
 
-    private PendingIntent getContentIntent(Activity context, int id, String packageName) {
+    private PendingIntent getRunAppPendingIntent(Activity context, int id, String packageName) {
         try {
             Intent intent = context.getPackageManager().getLaunchIntentForPackage(packageName);
+            return PendingIntent.getActivity(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        } catch (Exception e) {
+            canLaunchApp = false;
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private PendingIntent getDeleteFilePendingIntent(Activity context, int id, String realPath) {
+
+        Intent intent = new Intent(context, LaunchAppActivity.class)
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .putExtra("realPath", realPath)
+                .putExtra("id", id)
+                .putExtra("isClearNotification", !canLaunchApp);
+        try {
             return PendingIntent.getActivity(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
+
 }

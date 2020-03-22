@@ -8,8 +8,8 @@ android {
         applicationId "com.modosa.apkinstaller"
         minSdkVersion 22
         targetSdkVersion 29
-        versionCode 31
-        versionName "3.6"
+        versionCode 32
+        versionName "3.61"
     }
 
     buildTypes {

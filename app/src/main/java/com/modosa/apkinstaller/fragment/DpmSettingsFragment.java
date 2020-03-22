@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
@@ -38,11 +39,12 @@ import static com.modosa.apkinstaller.util.OpUtil.showToast0;
 /**
  * @author dadaewq
  */
+@RequiresApi(api = Build.VERSION_CODES.O)
 public class DpmSettingsFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener {
     public static final int RESULT_REFRESH_2 = 5202;
     private final String sp_key_orgName = "orgName";
     private final String sp_key_confirmWarning = "confirmWarning";
-    private final String[] userRestrictionsKeys = {UserManager.DISALLOW_INSTALL_APPS, UserManager.DISALLOW_UNINSTALL_APPS, UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES};
+    private final String[] userRestrictionsKeys = {UserManager.DISALLOW_INSTALL_APPS, UserManager.DISALLOW_UNINSTALL_APPS, UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES, UserManager.DISALLOW_ADD_MANAGED_PROFILE};
     private SwitchPreferenceCompat[] switchPreferences;
     private SwitchPreferenceCompat enableBackupService;
     private SharedPreferences spGetPreferenceManager;
@@ -60,8 +62,13 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        context = getActivity();
         init();
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.context = context;
     }
 
     @Override
@@ -73,6 +80,7 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
     @Override
     public void onResume() {
         super.onResume();
+        context = getActivity();
         refreshSwitch();
     }
 
@@ -100,6 +108,8 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
         switchPreferences[0] = findPreference("DISALLOW_INSTALL_APPS");
         switchPreferences[1] = findPreference("DISALLOW_UNINSTALL_APPS");
         switchPreferences[2] = findPreference("DISALLOW_INSTALL_UNKNOWN_SOURCES");
+        switchPreferences[3] = findPreference("DISALLOW_ADD_MANAGED_PROFILE");
+
 
         Preference setOrganizationName = findPreference("SetOrganizationName");
         Preference setLockScreenInfo = findPreference("SetLockScreenInfo");
@@ -108,6 +118,8 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             enableBackupService.setEnabled(false);
             setOrganizationName.setEnabled(false);
+        } else {
+            switchPreferences[3].setVisible(true);
         }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             setLockScreenInfo.setEnabled(false);
@@ -401,7 +413,8 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
                     if (clearDeviceOwner()) {
                         spGetPreferenceManager.edit().putBoolean(sp_key_confirmWarning, false).apply();
                         showToast0(context, R.string.tip_success_deactivate);
-                        ((MainFragment.MyListener) getActivity()).swtichIsMainFragment(true);
+                        getActivity().finish();
+//                        ((MainFragment.MyListener) getActivity()).swtichIsMainFragment(true);
                     } else {
                         showToast0(context, R.string.tip_failed_deactivate);
                     }
@@ -415,11 +428,14 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void refreshSwitch() {
-        for (int i = 0; i < userRestrictionsKeys.length; i++) {
+        int length = userRestrictionsKeys.length - 1;
+        for (int i = 0; i < length; i++) {
             switchPreferences[i].setChecked(checkUserRestriction(userRestrictionsKeys[i]));
         }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             enableBackupService.setChecked(isEnableBackupServiceEnabled());
+            switchPreferences[length].setChecked(checkUserRestriction(userRestrictionsKeys[length]));
         }
 
     }

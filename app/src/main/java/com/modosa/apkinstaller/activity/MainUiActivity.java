@@ -103,9 +103,13 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
                 break;
             case R.id.Settings:
                 Intent settingsIntent = new Intent(Intent.ACTION_VIEW)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         .setClass(this, SettingsActivity.class);
-                startActivity(settingsIntent);
+                try {
+                    startActivity(settingsIntent);
+                } catch (Exception e) {
+                    showMyToast0("" + e);
+                }
                 break;
             default:
                 return super.onOptionsItemSelected(item);
@@ -212,11 +216,11 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
     }
 
 
-    private void startPickFile(int which, ArrayList<ComponentName> componentNameArrayList) {
+    private void startPickFile(ComponentName componentName) {
 
-        Intent intent = new Intent(OpUtil.MODOSA_ACTION_PICK_FILE);
+        Intent intent = new Intent(OpUtil.MODOSA_ACTION_GO_GET_CONTENT);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setComponent(componentNameArrayList.get(which));
+        intent.setComponent(componentName);
         startActivity(intent);
 
     }
@@ -267,11 +271,11 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
 
             if (items.length == 1) {
                 showMyToast0(items[0]);
-                startPickFile(0, componentNameArrayList);
+                startPickFile(componentNameArrayList.get(0));
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this)
                         .setTitle(R.string.InstallFromGetContent)
-                        .setItems(items, (dialog, which) -> startPickFile(which, componentNameArrayList));
+                        .setItems(items, (dialog, which) -> startPickFile(componentNameArrayList.get(which)));
 
                 alertDialogConfirmPrompt = builder.create();
 

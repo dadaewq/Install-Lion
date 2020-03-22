@@ -32,8 +32,8 @@ import java.io.OutputStream;
  */
 public class OpUtil {
 
-    public static final String MODOSA_ACTION_PICK_FILE = "modosa.action.PICK_FILE";
-
+    public static final String MODOSA_ACTION_GO_GET_CONTENT = "modosa.action.GO_GET_CONTENT";
+    public static final String MODOSA_ACTION_GO_OPEN_DOCUMENT = "modosa.action.GO_OPEN_DOCUMENT";
 
     public static void startMainUiActivity(Context context) {
         Intent intent = new Intent(Intent.ACTION_MAIN);

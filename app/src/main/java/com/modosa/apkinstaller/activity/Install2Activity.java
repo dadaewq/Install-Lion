@@ -83,21 +83,7 @@ public class Install2Activity extends AbstractInstallerActivity {
 
     @Override
     void showNotificationWithdeleteCache(String channelId, boolean success) {
-        if (show_notification) {
-            Log.e("packagename", apkinfo[1]);
-            new NotifyUtil(this).sendFailNotification(CHANNEL_ID, String.format(getString(R.string.content_title_install_end), apkinfo[0]), apkinfo[1], installApkPath, istemp && !enableAnotherinstaller);
-        } else {
-            deleteCache();
-        }
+        Log.e("packagename", apkinfo[1]);
+        new NotifyUtil(this).sendNotification(CHANNEL_ID, String.format(getString(R.string.content_title_install_end), apkinfo[0]), apkinfo[1], installApkPath, istemp, false);
     }
-
-//    private void showNotificationWithdeleteCache() {
-//        if (show_notification) {
-//            Log.e("packagename", apkinfo[1]);
-//            new NotifyUtil(this).sendFailNotification(CHANNEL_ID, String.format(getString(R.string.content_title_install_end), apkinfo[0]), apkinfo[1], installApkPath, istemp && !enableAnotherinstaller);
-//        } else {
-//            deleteCache();
-//        }
-//    }
-
 }
