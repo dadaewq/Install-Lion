@@ -37,6 +37,12 @@ public class LaunchAppActivity extends Activity {
         Intent getIntent = getIntent();
 
         if (getIntent != null) {
+            if (getIntent.hasExtra("notificationId")) {
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                if (notificationManager != null) {
+                    notificationManager.cancel(getIntent.getExtras().getInt("notificationId"));
+                }
+            }
             if (getIntent.hasExtra(Intent.EXTRA_PACKAGE_NAME)) {
                 String packagename = getIntent.getStringExtra(Intent.EXTRA_PACKAGE_NAME) + "";
                 Log.d("PACKAGE_NAME ==>", packagename);
@@ -52,14 +58,6 @@ public class LaunchAppActivity extends Activity {
 
                     File apkFile = new File(getIntent.getStringExtra(extraRealPath));
                     OpUtil.deleteSingleFile(apkFile);
-
-
-                    if (getIntent.getBooleanExtra("isClearNotification", false)) {
-                        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                        if (notificationManager != null) {
-                            notificationManager.cancel(getIntent.getExtras().getInt("id"));
-                        }
-                    }
 
                     if (apkFile.exists()) {
                         Toast.makeText(this, R.string.tip_delete_apk_fail, Toast.LENGTH_SHORT).show();

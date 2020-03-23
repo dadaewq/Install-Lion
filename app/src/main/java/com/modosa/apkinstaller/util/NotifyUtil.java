@@ -9,7 +9,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Build;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.modosa.apkinstaller.R;
@@ -34,19 +36,20 @@ public class NotifyUtil {
     private String contentTitle = "";
     private NotificationManager notificationManager;
     private Bitmap largeIcon;
-    private boolean canLaunchApp = true;
 
     public NotifyUtil(Context context) {
         this.context = context;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void sendNotification(String channelId, String contentTitle, String packageName, String realPath, boolean isTemp, boolean enableAnotherinstaller) {
 
         this.channelId = channelId;
         this.channelName = getChannelName(channelId);
         this.contentTitle = contentTitle;
 
-        int id = (int) System.currentTimeMillis();
+
+        int notificationId = (int) System.currentTimeMillis();
 
         PendingIntent deleteFilePendingIntent = null;
         PendingIntent runAppPendingIntent = null;
@@ -66,9 +69,11 @@ public class NotifyUtil {
 
         } else {
             largeIcon = AppInfoUtil.getApplicationIconBitmap(context, packageName);
-            runAppPendingIntent = getRunAppPendingIntent((Activity) context, id, packageName);
+            runAppPendingIntent = getRunAppPendingIntent((Activity) context, notificationId, packageName);
             if (!isTemp) {
-                deleteFilePendingIntent = getDeleteFilePendingIntent((Activity) context, id, realPath);
+                deleteFilePendingIntent = getDeleteFilePendingIntent((Activity) context, notificationId, realPath);
+
+//                deleteFilePendingIntent=runAppPendingIntent;
             }
             version = AppInfoUtil.getApplicationVersion(context, packageName);
 
@@ -77,7 +82,7 @@ public class NotifyUtil {
             versionName = version[0];
         }
 
-        notifyLiveStart(deleteFilePendingIntent, runAppPendingIntent, id);
+        notifyLiveStart(deleteFilePendingIntent, runAppPendingIntent, notificationId);
     }
 
     private String getChannelName(String channelId) {
@@ -106,7 +111,7 @@ public class NotifyUtil {
         return channelName;
     }
 
-    private void notifyLiveStart(PendingIntent deleteFilePendingIntent, PendingIntent runAppPendingIntent, int id) {
+    private void notifyLiveStart(PendingIntent deleteFilePendingIntent, PendingIntent runAppPendingIntent, int notificationId) {
 
         NotificationChannel channel;
 
@@ -149,6 +154,7 @@ public class NotifyUtil {
             builder.addAction(0, context.getString(R.string.click_launch), runAppPendingIntent);
         }
 
+
         //设置通知栏显示内容
         builder.setContentText(versionName);
 
@@ -166,30 +172,37 @@ public class NotifyUtil {
 //        .setDefaults(Notification.DEFAULT_VIBRATE)//向通知添加声音、闪灯和振动效果
 
 
-        notificationManager.notify(id, notification);
+        notificationManager.notify(notificationId, notification);
 
     }
 
-    private PendingIntent getRunAppPendingIntent(Activity context, int id, String packageName) {
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private PendingIntent getRunAppPendingIntent(Activity context, int notificationId, String packageName) {
         try {
             Intent intent = context.getPackageManager().getLaunchIntentForPackage(packageName);
-            return PendingIntent.getActivity(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            if (intent != null) {
+                intent = new Intent(context, LaunchAppActivity.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        .putExtra("notificationId", notificationId)
+                        .putExtra(Intent.EXTRA_PACKAGE_NAME, packageName);
+
+                return PendingIntent.getActivity(context, notificationId + 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            }
         } catch (Exception e) {
-            canLaunchApp = false;
             e.printStackTrace();
-            return null;
         }
+        return null;
     }
 
-    private PendingIntent getDeleteFilePendingIntent(Activity context, int id, String realPath) {
+    private PendingIntent getDeleteFilePendingIntent(Activity context, int notificationId, String realPath) {
 
         Intent intent = new Intent(context, LaunchAppActivity.class)
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .putExtra("realPath", realPath)
-                .putExtra("id", id)
-                .putExtra("isClearNotification", !canLaunchApp);
+                .putExtra("notificationId", notificationId)
+                .putExtra("realPath", realPath);
+
         try {
-            return PendingIntent.getActivity(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            return PendingIntent.getActivity(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

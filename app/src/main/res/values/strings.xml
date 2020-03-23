@@ -29,7 +29,7 @@
     <string name="installer_error_unknown_apk_size">Installer error unknown apk size</string>
     <string name="launch_name">Run app</string>
     <string name="message_clearAllowedList">\nClear the list of apps you don\'t need to confirm before installation\n</string>
-    <string name="message_hideIcon">You can open the App in the following way\n\n1.System App Info-Manage space\n2.Dialer *#*#297297#*#*\n3.System App Info-Additional settings\n</string>
+    <string name="message_hideIcon">You can launch the App in the following way\n\n1.System App Info-Manage space\n2.Dialer *#*#297297#*#*\n3.System App Info-Additional settings\n</string>
     <string name="tv_packagename">Package Name：</string>
     <string name="tv_size_apk">Size：</string>
     <string name="message_irrevocableConfirm">This operation is irrevocable\nConfirm uninstallation?</string>
@@ -132,12 +132,13 @@
     <string name="tip_enable_one_installer">Please enable at least one installer</string>
     <string name="title_show_root_no_click2check">Click to check Root permission</string>
     <string name="title_show_root_yes">Have Root permission</string>
+    <string name="title_show_notification">Show notification</string>
+    <string name="summary_show_notification">Show notification after installation.\nYou can launch the app and delete the APK in the notification (if you can get the real path)after successful installation</string>
     <string name="title_deleteSucceededApk">Delete the apk after successful installation</string>
     <string name="title_installByAnotherAfterFail">Install with other app after failed installation</string>
     <string name="checkbox_installByAnotherAfterFail">Enable this feature</string>
     <string name="et_installByAnotherAfterFail">Enter the package name to specify the application, leave it blank to choose by the system</string>
-    <string name="summary_on_deleteSucceededApk">If the App can get the real path of the apk, it will be deleted automatically after successful installation.</string>
-    <string name="summary_off_deleteSucceededApk">If the App can get the real path of the apk, you can manually delete it in the notification after successful installation.</string>
+    <string name="summary_deleteSucceededApk">Delete the APK automatically after successful installation (if the real path can be obtained)</string>
     <string name="title_AppTheme">Theme</string>
     <string name="AppTheme_MODE_NIGHT_NO">Light</string>
     <string name="AppTheme_MODE_NIGHT_YES">Dark</string>

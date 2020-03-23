@@ -2,17 +2,21 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory app:title="@string/title_about_install">
         <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:key="show_notification"
+            app:summary="@string/summary_show_notification"
+            app:title="@string/title_show_notification" />
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:key="deleteSucceededApk"
+            app:summary="@string/summary_deleteSucceededApk"
+            app:title="@string/title_deleteSucceededApk" />
+        <SwitchPreferenceCompat
             app:defaultValue="true"
             app:key="needconfirm"
             app:summaryOff="@string/summary_off_needconfirm"
             app:summaryOn="@string/summary_on_needconfirm"
             app:title="@string/confirm_title" />
-        <SwitchPreferenceCompat
-            app:defaultValue="false"
-            app:key="deleteSucceededApk"
-            app:summaryOff="@string/summary_off_deleteSucceededApk"
-            app:summaryOn="@string/summary_on_deleteSucceededApk"
-            app:title="@string/title_deleteSucceededApk" />
         <Preference
             app:key="installByAnotherAfterFail"
             app:title="@string/title_installByAnotherAfterFail" />

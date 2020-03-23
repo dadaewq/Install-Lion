@@ -127,12 +127,13 @@
     <string name="tip_enable_one_installer">请至少启用一个安装器</string>
     <string name="title_show_root_no_click2check">点击检查Root权限</string>
     <string name="title_show_root_yes">已获取Root权限</string>
+    <string name="title_show_notification">显示通知</string>
+    <string name="summary_show_notification">安装结束后显示通知。\n安装成功后可在通知中打开应用和删除安装包(如果能获取到真实路径)</string>
     <string name="title_deleteSucceededApk">安装成功后删除安装包</string>
     <string name="title_installByAnotherAfterFail">安装失败后用其他安装</string>
     <string name="checkbox_installByAnotherAfterFail">启用此功能</string>
     <string name="et_installByAnotherAfterFail">输入包名来指定应用，留空则由系统选择</string>
-    <string name="summary_on_deleteSucceededApk">如果能获取到安装包的真实路径，则会在安装成功后自动删除</string>
-    <string name="summary_off_deleteSucceededApk">如果能获取到安装包的真实路径，则可在安装成功后的通知中手动删除</string>
+    <string name="summary_deleteSucceededApk">安装成功后自动删除安装包（如果能获取到真实路径）</string>
     <string name="title_AppTheme">主题</string>
     <string name="AppTheme_MODE_NIGHT_NO">浅色</string>
     <string name="AppTheme_MODE_NIGHT_YES">深色</string>

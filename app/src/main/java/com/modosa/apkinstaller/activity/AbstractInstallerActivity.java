@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -47,6 +49,7 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
     String uninstallPackageLable;
     StringBuilder alertDialogMessage;
     File installApkFile;
+    boolean show_notification;
     boolean istemp = false;
     private boolean enableAnotherinstaller;
     private String validApkPath;
@@ -67,6 +70,7 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
     }
 
     private void initFromAction(String action) {
+
         switch (action) {
             case OpUtil.MODOSA_ACTION_GO_GET_CONTENT:
                 getContent();
@@ -193,6 +197,7 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
     private void initInstall() {
         source = checkInstallSource();
         boolean needconfirm = spGetPreferenceManager.getBoolean("needconfirm", true);
+        show_notification = spGetPreferenceManager.getBoolean("show_notification", false);
         deleteSucceededApk = spGetPreferenceManager.getBoolean("deleteSucceededApk", false);
         enableAnotherinstaller = spGetPreferenceManager.getBoolean(SettingsFragment.SP_KEY_ENABLE_ANOTHER_INSTALLER, false);
         boolean allowsource = spAllowSource.getBoolean(source[0], false);
@@ -372,7 +377,6 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-
         if (checkPermission()) {
             initInstall();
         } else {
@@ -462,20 +466,28 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     void showNotificationWithdeleteCache(String channelId, boolean success) {
-        Log.e("packagename", apkinfo[1]);
+        Log.e("install " + success, apkinfo[1]);
         if (success) {
             isInstalledSuccess = true;
             deleteCache();
-            new NotifyUtil(this).sendNotification(channelId, String.format(getString(R.string.tip_success_install), apkinfo[0]), apkinfo[1], validApkPath, istemp, enableAnotherinstaller);
+            if (show_notification) {
+                new NotifyUtil(this).sendNotification(channelId, String.format(getString(R.string.tip_success_install), apkinfo[0]), apkinfo[1], validApkPath, istemp, enableAnotherinstaller);
+            }
         } else {
             isInstalledSuccess = false;
-            new NotifyUtil(this).sendNotification(NotifyUtil.CHANNEL_ID_FAIL, String.format(getString(R.string.tip_failed_install), apkinfo[0]), apkinfo[1], validApkPath, istemp, enableAnotherinstaller);
+            if (show_notification) {
+                new NotifyUtil(this).sendNotification(NotifyUtil.CHANNEL_ID_FAIL, String.format(getString(R.string.tip_failed_install), apkinfo[0]), apkinfo[1], validApkPath, istemp, enableAnotherinstaller);
+            } else {
+                if (!enableAnotherinstaller) {
+                    deleteCache();
+                }
+            }
             if (enableAnotherinstaller) {
                 OpUtil.startAnotherInstaller(this, installApkFile, istemp);
             }
         }
     }
-
 
 }

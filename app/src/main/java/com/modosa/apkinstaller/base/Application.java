@@ -18,7 +18,7 @@ public class Application extends android.app.Application {
         super.onCreate();
         SharedPreferences spGetPreferenceManager = PreferenceManager.getDefaultSharedPreferences(this);
         if (!spGetPreferenceManager.getBoolean(SettingsFragment.SP_KEY_DISABLE_BUG_REPORT, false)) {
-            String scretCode = "";
+            String scretCode = null;
 
 
             AppCenter.start(this, scretCode, Analytics.class, Crashes.class);
