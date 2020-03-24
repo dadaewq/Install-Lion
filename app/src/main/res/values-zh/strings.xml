@@ -3,10 +3,11 @@
     <string name="Settings">设置</string>
     <string name="title_instructions_before_use">用前须知</string>
     <string name="tv_instructions_before_use">\n本应用的主要功能是安装APK和卸载应用\n
-        \n除了原生Android外的绝大部分定制系统由于系统的限制，无法将本应用设置为默认安装与卸载应用,而且发起安装时这些系统会直接让系统默认的软件包安装程序来处理，也没有很好的解决办法\n
-        \n这种情况推荐用本应用内的\"选择文件安装\"功能或用一些支持选择打开方式的文件管理器等来发起安装\n
+        \n除了原生Android外的绝大部分定制系统由于系统的限制，无法将本应用设置为默认安装与卸载应用,而且发起安装时这些系统会直接让系统默认的软件包安装程序来处理，也没有很好的解决办法。\n
+        \n这种情况推荐用本应用内的\"选择文件安装\"功能或用一些支持选择打开方式的文件管理器等来发起安。装\n
         \n重要提示：安装失败的请尝试这些步骤——关闭Google Play的安全扫描;在开发者选项打开USB安装、关闭监控ADB安装应用等等以防止安装失败。(尤其是非原生Android)\n
         \n友情提示：Android系统自带的\"软件包安装程序\"不仅是用来安装和卸载的，同时也是管理权限的重要系统组件，请不要随意进行冻结或其他危险操作！\n
+        \n为了优化和改进应用，安装狮会通过网络来收集错误。您可以在设置中关闭它。\n
     </string>
     <string name="checkbox1_instructions_before_use">我已经充分知晓</string>
     <string name="checkbox2_instructions_before_use">不再提示</string>
@@ -14,6 +15,7 @@
     <string name="checkbox_always_allow">总是允许 %1$s</string>
     <string name="checkbox_clearAllowedList">确认清空</string>
     <string name="checkbox_installsource_unkonwn">未知安装来源</string>
+    <string name="title_manageAllowSource">管理允许安装列表</string>
     <string name="title_clearAllowedList">清空允许安装列表</string>
     <string name="click_delete_apk">删除安装包</string>
     <string name="tip_delete_apk_success">安装包已删除</string>
@@ -33,7 +35,7 @@
     <string name="message_hideIcon">你可以通过以下方式打开应用\n\n1.系统应用信息-管理空间\n2.拨号 *#*#297297#*#*\n3.系统应用信息-其他设置\n</string>
     <string name="tv_packagename">包名：</string>
     <string name="tv_size_apk">大小：</string>
-    <string name="message_irrevocableConfirm">此操作不可撤销\n确认卸载吗?</string>
+    <string name="message_confirm_uninstall">\n确认卸载吗?</string>
     <string name="tv_version_apk">版本：</string>
     <string name="tv_version_app">现存：</string>
     <string name="name_install1">安装狮-冰箱</string>
@@ -143,4 +145,8 @@
     <string name="checkbox_bugReport">关闭错误收集</string>
     <string name="title_ignoreBatteryOptimization">忽略电池优化</string>
     <string name="title_about_install">安装</string>
+    <string name="bt_install">安装</string>
+    <string name="empty">空</string>
+    <string name="uninstalled">已卸载</string>
+    <string name="message_confirm_remove_list">从列表中移除</string>
 </resources>

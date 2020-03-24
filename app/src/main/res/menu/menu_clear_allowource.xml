@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.modosa.apkinstaller.activity.MainUiActivity">
+
+    <item
+        android:id="@+id/clearAllowedList"
+        android:title="@string/title_clearAllowedList"
+        app:showAsAction="never" />
+</menu>

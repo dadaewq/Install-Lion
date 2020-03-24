@@ -10,8 +10,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.RequiresApi;
-
 import com.modosa.apkinstaller.R;
 import com.modosa.apkinstaller.util.OpUtil;
 
@@ -23,7 +21,6 @@ import java.io.File;
  */
 public class LaunchAppActivity extends Activity {
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,7 +29,6 @@ public class LaunchAppActivity extends Activity {
         finish();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     private void init() {
         Intent getIntent = getIntent();
 
@@ -43,8 +39,10 @@ public class LaunchAppActivity extends Activity {
                     notificationManager.cancel(getIntent.getExtras().getInt("notificationId"));
                 }
             }
-            if (getIntent.hasExtra(Intent.EXTRA_PACKAGE_NAME)) {
-                String packagename = getIntent.getStringExtra(Intent.EXTRA_PACKAGE_NAME) + "";
+            String EXTRA_PACKAGE_NAME = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ? Intent.EXTRA_PACKAGE_NAME : "android.intent.extra.PACKAGE_NAME";
+
+            if (getIntent.hasExtra(EXTRA_PACKAGE_NAME)) {
+                String packagename = getIntent.getStringExtra(EXTRA_PACKAGE_NAME) + "";
                 Log.d("PACKAGE_NAME ==>", packagename);
                 try {
                     Intent intent = getPackageManager().getLaunchIntentForPackage(packagename);

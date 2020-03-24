@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
@@ -39,7 +40,9 @@ public class PraseContentUtil {
     private static String getPathFromIndex1PathSegment;
     private static String getLastPathSegment;
 
-    // 反射获取准确的Intent Referrer
+    /**
+     * 反射获取准确的Intent Referrer
+     */
     public static String reflectGetReferrer(Context context) {
         try {
 
@@ -55,7 +58,9 @@ public class PraseContentUtil {
         }
     }
 
-    //获取SharedUserId,兼容"存储空间隔离"新特性
+    /**
+     * 获取pkgName的SharedUserId,兼容"存储空间隔离"新特性
+     */
     private static String getSharedUserId(Context context, String pkgName) {
         PackageManager pm = context.getPackageManager();
         ApplicationInfo applicationInfo = null;
@@ -107,7 +112,7 @@ public class PraseContentUtil {
         // DocumentProvider
         if (DocumentsContract.isDocumentUri(context, uri)) {
 
-            final String docId = DocumentsContract.getDocumentId(uri);
+            String docId = DocumentsContract.getDocumentId(uri);
             final String[] split = docId.split(":");
             final String type = split[0];
 
@@ -116,20 +121,24 @@ public class PraseContentUtil {
             switch (getAuthority) {
                 // DownloadsProvider
                 case "com.android.providers.downloads.documents":
+
                     if (split.length > 1) {
                         if ("raw".equalsIgnoreCase(type)) {
                             path = split[1];
                         }
                     } else {
-                        //测试多个设备都无法使用,Android9以上必不能用
-                        Uri contentUri = ContentUris.withAppendedId(
-                                Uri.parse("content://downloads/public_downloads"), Long.parseLong(docId));
-                        //TODO
-//                        "content://downloads/public_downloads",
-//                                "content://downloads/my_downloads",
-//                                "content://downloads/all_downloads"
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                            //不支持Android10 及以上
+                            // 需要android.permission.ACCESS_ALL_DOWNLOADS
+                            String[] uriString = new String[]{"content://downloads/public_downloads", "content://downloads/my_downloads", "content://downloads/all_downloads"};
 
-                        path = getDataColumn(context, contentUri, null, null);
+                            for (String s : uriString) {
+                                path = getDataColumn(context, ContentUris.withAppendedId(Uri.parse(s), Long.parseLong(docId)), null, null);
+                                if (path != null) {
+                                    break;
+                                }
+                            }
+                        }
                     }
                     break;
                 // ExternalStorageProvider
@@ -173,11 +182,8 @@ public class PraseContentUtil {
             }
         }
 
-        if (path != null) {
-            File file = new File(path);
-            if (file.exists()) {
-                return file;
-            }
+        if (checkFileorPath(path)) {
+            return new File(path);
         }
 
         return null;

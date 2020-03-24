@@ -11,6 +11,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 
+import com.modosa.apkinstaller.R;
+
 import static android.content.pm.PackageManager.GET_UNINSTALLED_PACKAGES;
 import static android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES;
 
@@ -18,7 +20,6 @@ import static android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES;
  * @author dadaewq
  */
 public final class AppInfoUtil {
-    public static final String UNINSTALLED = "IL^&UninstalledPN*@!128`+=：:,.[";
 
     public static String getApplicationLabel(Context context, String pkgName) {
         PackageManager pm = context.getPackageManager();
@@ -34,7 +35,7 @@ public final class AppInfoUtil {
             try {
                 return (pm.getApplicationInfo(pkgName, Build.VERSION.SDK_INT > Build.VERSION_CODES.M ? MATCH_UNINSTALLED_PACKAGES : GET_UNINSTALLED_PACKAGES).loadLabel(pm).toString());
             } catch (PackageManager.NameNotFoundException ignore) {
-                return UNINSTALLED;
+                return context.getString(R.string.uninstalled);
             } catch (Exception e) {
                 e.printStackTrace();
                 return pkgName;

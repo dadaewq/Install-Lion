@@ -34,7 +34,7 @@
     <PreferenceCategory app:title="@string/title_others">
         <Preference
             app:key="clearAllowedList"
-            app:title="@string/title_clearAllowedList" />
+            app:title="@string/title_manageAllowSource" />
         <Preference
             app:key="clearCache"
             app:summary="@string/summary_clearCache" />

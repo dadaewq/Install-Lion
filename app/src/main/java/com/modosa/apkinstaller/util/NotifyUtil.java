@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 
-import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.modosa.apkinstaller.R;
@@ -41,7 +40,7 @@ public class NotifyUtil {
         this.context = context;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+
     public void sendNotification(String channelId, String contentTitle, String packageName, String realPath, boolean isTemp, boolean enableAnotherinstaller) {
 
         this.channelId = channelId;
@@ -176,7 +175,7 @@ public class NotifyUtil {
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+
     private PendingIntent getRunAppPendingIntent(Activity context, int notificationId, String packageName) {
         try {
             Intent intent = context.getPackageManager().getLaunchIntentForPackage(packageName);
@@ -184,7 +183,7 @@ public class NotifyUtil {
                 intent = new Intent(context, LaunchAppActivity.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         .putExtra("notificationId", notificationId)
-                        .putExtra(Intent.EXTRA_PACKAGE_NAME, packageName);
+                        .putExtra(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ? Intent.EXTRA_PACKAGE_NAME : "android.intent.extra.PACKAGE_NAME", packageName);
 
                 return PendingIntent.getActivity(context, notificationId + 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             }

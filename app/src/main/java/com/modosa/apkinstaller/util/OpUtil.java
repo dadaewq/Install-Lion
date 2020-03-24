@@ -26,6 +26,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author dadaewq
@@ -42,7 +47,7 @@ public class OpUtil {
         context.startActivity(intent);
     }
 
-    public static File createApkFromUri(Context context, Uri uri) {
+    public static File createApkFromUri(Context context, InputStream is) {
 
         // getExternalCacheDir 此方法会确保此路径存在
         File cacheDir = context.getExternalCacheDir();
@@ -57,19 +62,22 @@ public class OpUtil {
                 cacheDir.mkdir();
             }
 
-            tempFile = new File(cacheDir, System.currentTimeMillis() + ".apk");
-
-            InputStream is = context.getContentResolver().openInputStream(uri);
             if (is != null) {
-                OutputStream fos = new FileOutputStream(tempFile);
-                byte[] buf = new byte[4096 * 1024];
-                int ret;
-                while ((ret = is.read(buf)) != -1) {
-                    fos.write(buf, 0, ret);
-                    fos.flush();
+                tempFile = new File(cacheDir, System.currentTimeMillis() + ".apk");
+                if (Build.VERSION.SDK_INT >= 26) {
+                    Files.copy(is, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                } else {
+                    OutputStream fos = new FileOutputStream(tempFile);
+                    byte[] buf = new byte[4096 * 1024];
+                    int ret;
+                    while ((ret = is.read(buf)) != -1) {
+                        fos.write(buf, 0, ret);
+                        fos.flush();
+                    }
+                    fos.close();
+                    is.close();
                 }
-                fos.close();
-                is.close();
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -172,7 +180,9 @@ public class OpUtil {
     }
 
 
-    //只有是文件且存在时删除
+    /**
+     * 只有是文件且存在时删除
+     */
     public static void deleteSingleFile(File file) {
         if (file != null && file.exists() && file.isFile() && file.delete()) {
             Log.e("-DELETE-", "==>" + file.getAbsolutePath() + " OK！");
@@ -216,6 +226,33 @@ public class OpUtil {
 
         }
     }
+
+    public static ArrayList<String> convertToList(String origin, String s) {
+        return origin == null ? new ArrayList<>() : new ArrayList<>(Arrays.asList(origin.split(s)));
+    }
+
+    public static ArrayList<String> convertToList(String[] origin) {
+        return origin == null ? new ArrayList<>() : new ArrayList<>(Arrays.asList(origin));
+    }
+
+    public static String listToString(List<String> stringList, String s) {
+
+        if (stringList == null) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (String s1 : stringList) {
+            if (!"".equals(s1)) {
+                sb.append(s1);
+                sb.append(s);
+            }
+
+        }
+
+        return sb.toString();
+    }
+
 
     public static void showToast0(Context context, final String text) {
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show();

@@ -10,7 +10,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -33,6 +31,9 @@ import com.modosa.apkinstaller.util.OpUtil;
 import com.modosa.apkinstaller.util.PraseContentUtil;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -49,8 +50,8 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
     String uninstallPackageLable;
     StringBuilder alertDialogMessage;
     File installApkFile;
-    boolean show_notification;
     boolean istemp = false;
+    private boolean show_notification;
     private boolean enableAnotherinstaller;
     private String validApkPath;
     private boolean isInstalledSuccess = false;
@@ -95,7 +96,10 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
         }
     }
 
-    // 优先用 ACTION_GET_CONTENT可支持更多App
+
+    /**
+     * 优先用 ACTION_GET_CONTENT可支持更多App
+     */
     private void getContent() {
         Intent intentContent = new Intent(Intent.ACTION_GET_CONTENT)
                 .addCategory(Intent.CATEGORY_OPENABLE)
@@ -118,7 +122,9 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
 
     }
 
-    // 部分设备没有可以处理GET_CONTENT的Activity 所以再次尝试ACTION_OPEN_DOCUMENT
+    /**
+     * 部分设备没有可以处理GET_CONTENT的Activity 所以再次尝试ACTION_OPEN_DOCUMENT
+     */
     private void openDocument() {
         Intent intentDocument = new Intent(Intent.ACTION_OPEN_DOCUMENT)
                 .addCategory(Intent.CATEGORY_OPENABLE)
@@ -131,7 +137,7 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
     }
 
     private void initFromUri() {
-        spAllowSource = getSharedPreferences("allowsource", Context.MODE_PRIVATE);
+        spAllowSource = getSharedPreferences(ManageAllowSourceActivity.SP_KEY_ALLOWSOURCE, Context.MODE_PRIVATE);
         spGetPreferenceManager = PreferenceManager.getDefaultSharedPreferences(this);
         if (checkPermission()) {
             initInstall();
@@ -144,9 +150,9 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
         String[] version = AppInfoUtil.getApplicationVersion(this, uninstallPkgName);
 
         uninstallPackageLable = AppInfoUtil.getApplicationLabel(this, uninstallPkgName);
-        if (AppInfoUtil.UNINSTALLED.equals(uninstallPackageLable)) {
-            uninstallPackageLable = "Uninstalled";
-        }
+//        if (AppInfoUtil.UNINSTALLED.equals(uninstallPackageLable)) {
+//            uninstallPackageLable = "Uninstalled";
+//        }
 
         View infoView = View.inflate(this, R.layout.uninstall_content_view, null);
 
@@ -200,7 +206,16 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
         show_notification = spGetPreferenceManager.getBoolean("show_notification", false);
         deleteSucceededApk = spGetPreferenceManager.getBoolean("deleteSucceededApk", false);
         enableAnotherinstaller = spGetPreferenceManager.getBoolean(SettingsFragment.SP_KEY_ENABLE_ANOTHER_INSTALLER, false);
-        boolean allowsource = spAllowSource.getBoolean(source[0], false);
+//        boolean allowsource = spAllowSource.getBoolean(source[0], false);
+
+        boolean allowsource = false;
+
+        String allowsourceString = spAllowSource.getString(ManageAllowSourceActivity.SP_KEY_ALLOWSOURCE, "");
+        List<String> allowsourceList = OpUtil.convertToList(allowsourceString, ",");
+
+        if (!source[1].equals(ILLEGALPKGNAME)) {
+            allowsource = allowsourceList.contains(source[0]);
+        }
 
         validApkPath = preInstallGetValidApkPath();
         if (validApkPath == null) {
@@ -299,10 +314,17 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
                     .setView(infoView)
                     .setCancelable(false)
                     .setNegativeButton(android.R.string.cancel, (dialog, which) -> finish())
-                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    .setPositiveButton(R.string.bt_install, (dialog, which) -> {
                         cachePath = null;
-                        if (!source[1].equals(ILLEGALPKGNAME)) {
-                            spAllowSource.edit().putBoolean(source[0], checkBox.isChecked()).apply();
+                        if (!source[1].equals(ILLEGALPKGNAME) && checkBox.isChecked()) {
+//                            String newAllowSourceString;
+//                            if("".equals(allowsourceString)){
+//                                newAllowSourceString=source[0];
+//                            }else {
+//                                newAllowSourceString=allowsourceString+","+source[0];
+//                            }
+//                            Log.e("newAllowSourceString", newAllowSourceString);
+                            spAllowSource.edit().putString(ManageAllowSourceActivity.SP_KEY_ALLOWSOURCE, allowsourceString + source[0] + ",").apply();
                         }
                         startInstall(validApkPath);
                         finish();
@@ -336,7 +358,7 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
         }
         String refererPackageLabel =
                 AppInfoUtil.getApplicationLabel(this, fromPkgName);
-        if (AppInfoUtil.UNINSTALLED.equals(refererPackageLabel)) {
+        if (getString(R.string.uninstalled).equals(refererPackageLabel)) {
             fromPkgLabel = ILLEGALPKGNAME;
         } else {
             fromPkgLabel = refererPackageLabel;
@@ -398,7 +420,15 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
                     getPath = file.getPath();
                 } else {
                     istemp = true;
-                    getPath = OpUtil.createApkFromUri(this, uri).getPath();
+                    InputStream is = null;
+                    try {
+                        is = getContentResolver().openInputStream(uri);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    if (is != null) {
+                        getPath = OpUtil.createApkFromUri(this, is).getPath();
+                    }
                     Log.e("createApkFromUri", getPath + "");
 
                 }
@@ -419,8 +449,14 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
         return null;
     }
 
+    /**
+     * 开始安装 installApkFile
+     */
     protected abstract void startInstall(String installApkFile);
 
+    /**
+     * 开始卸载 uninstallPkgname
+     */
     protected abstract void startUninstall(String uninstallPkgname);
 
     private void requestPermission() {
@@ -466,9 +502,9 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+
     void showNotificationWithdeleteCache(String channelId, boolean success) {
-        Log.e("install " + success, apkinfo[1]);
+        Log.e("installed " + (success ? "success" : "fail"), apkinfo[1]);
         if (success) {
             isInstalledSuccess = true;
             deleteCache();

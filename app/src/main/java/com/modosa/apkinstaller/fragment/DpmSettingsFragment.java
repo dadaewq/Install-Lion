@@ -39,6 +39,7 @@ import static com.modosa.apkinstaller.util.OpUtil.showToast0;
 /**
  * @author dadaewq
  */
+
 @RequiresApi(api = Build.VERSION_CODES.O)
 public class DpmSettingsFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener {
     public static final int RESULT_REFRESH_2 = 5202;
@@ -58,7 +59,7 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
     private Context context;
     private AlertDialog alertDialog;
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +77,7 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
         setPreferencesFromResource(R.xml.pref_dpm_settings, rootKey);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+
     @Override
     public void onResume() {
         super.onResume();
@@ -93,7 +94,7 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
     }
 
     @Override
-    @RequiresApi(api = Build.VERSION_CODES.O)
+
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         super.onActivityResult(requestCode, resultCode, resultData);
         if (requestCode == MainUiActivity.REQUEST_REFRESH && resultCode == RESULT_REFRESH_2) {
@@ -152,7 +153,6 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
     }
 
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     private void init() {
         findPreferencesAndSetListner();
 
@@ -234,18 +234,22 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
         return userManager.hasUserRestriction(key);
     }
 
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     private boolean isEnableBackupServiceEnabled() {
         return devicePolicyManager.isBackupServiceEnabled(adminComponentName);
     }
+
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void setEnableBackupServiceEnabled(boolean isEnable) {
         devicePolicyManager.setBackupServiceEnabled(adminComponentName, isEnable);
     }
 
-    @SuppressLint("SetTextI18n")
+
     @RequiresApi(api = Build.VERSION_CODES.O)
+    @SuppressLint("SetTextI18n")
+
     private void showDialogSetOrganizationName() {
         String getOrgName = spGetPreferenceManager.getString(sp_key_orgName, "");
         devicePolicyManager.setOrganizationName(adminComponentName, getOrgName);
@@ -271,7 +275,7 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
         OpUtil.showAlertDialog(context, alertDialog);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+
     private void showDialogSetLockScreenInfo() {
 
         final EditText editInfo = new EditText(context);
@@ -372,7 +376,7 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
         OpUtil.showAlertDialog(context, alertDialog);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+
     private void showDialogSetUserRestrictions() {
 
         final EditText keyOfRestriction = new EditText(context);
@@ -426,7 +430,7 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+
     private void refreshSwitch() {
         int length = userRestrictionsKeys.length - 1;
         for (int i = 0; i < length; i++) {
@@ -440,7 +444,7 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+
     @Override
     public boolean onPreferenceClick(Preference preference) {
         switch (preference.getKey()) {

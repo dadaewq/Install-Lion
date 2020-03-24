@@ -46,6 +46,7 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
     private AlertDialog alertDialogConfirmPrompt;
 
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,7 +92,8 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
         return devicePolicyManager.isDeviceOwnerApp(getPackageName());
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -158,6 +160,7 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void swtichIsMainFragment(boolean toMain) {
 
@@ -200,6 +203,7 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onBackPressed() {
         if (isMain) {

@@ -6,6 +6,7 @@
         \nIn this case, it is recommended to use the \"Pick a file to install\" function in this App or use a file manager that supports selecting the open way to initiate the installation.\n
         \nImportant：Please try these steps if the installation failed——turn off Google Play\'s security scan; turn on the USB installation in the developer options, turn off the monitoring ADB installation application, etc to prevent the installation from failing. (Especially non-native Android)\n
         \nFriendly reminder：The \"Package installer\" of the Android system is not only used for installation and uninstallation, but also an important system component for managing permissions. Please do not arbitrarily freeze or other dangerous operations！\n
+        \nInstall Lion will track bugs through the network for optimization and improvement.You can disable it in the settings.\n
     </string>
     <string name="checkbox1_instructions_before_use">I have fully understood</string>
     <string name="checkbox2_instructions_before_use">No longer prompt</string>
@@ -13,6 +14,7 @@
     <string name="checkbox_always_allow">Always Allow %1$s</string>
     <string name="checkbox_clearAllowedList">Confirm Clear</string>
     <string name="checkbox_installsource_unkonwn">Unknown installation source</string>
+    <string name="title_manageAllowSource">Manage allowed installation list</string>
     <string name="title_clearAllowedList">Clear allowed installation list</string>
     <string name="click_delete_apk">Delete apk</string>
     <string name="tip_delete_apk_success">The APK has been deleted</string>
@@ -32,7 +34,7 @@
     <string name="message_hideIcon">You can launch the App in the following way\n\n1.System App Info-Manage space\n2.Dialer *#*#297297#*#*\n3.System App Info-Additional settings\n</string>
     <string name="tv_packagename">Package Name：</string>
     <string name="tv_size_apk">Size：</string>
-    <string name="message_irrevocableConfirm">This operation is irrevocable\nConfirm uninstallation?</string>
+    <string name="message_confirm_uninstall">\nConfirm uninstallation?</string>
     <string name="tv_version_apk">Version：</string>
     <string name="tv_version_app">Existed：</string>
     <string name="name_install1">Install Lion-IceBox</string>
@@ -148,4 +150,8 @@
     <string name="checkbox_bugReport">Disable bug report</string>
     <string name="title_ignoreBatteryOptimization">Ignore battery optimization</string>
     <string name="title_about_install">Installation</string>
+    <string name="bt_install">Install</string>
+    <string name="empty">Empty</string>
+    <string name="uninstalled">Uninstalled</string>
+    <string name="message_confirm_remove_list">Remove from list</string>
 </resources>

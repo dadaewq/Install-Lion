@@ -1,20 +1,17 @@
 package com.modosa.apkinstaller.activity;
 
 
-import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 
 import com.modosa.apkinstaller.R;
 import com.modosa.apkinstaller.fragment.SettingsFragment;
-
-import java.util.Objects;
 
 
 /**
@@ -24,21 +21,22 @@ public class SettingsActivity extends AppCompatActivity {
 
     private static final String TAG_SETTINGS = "settings";
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_ui);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         FragmentManager fragmentManager = getSupportFragmentManager();
 
         fragmentManager.beginTransaction().replace(R.id.framelayout, new SettingsFragment(), TAG_SETTINGS).commit();
 
-        //TODO dwonloads
     }
 
     private void showMyToast0(final String text) {

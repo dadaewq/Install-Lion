@@ -23,7 +23,8 @@
             android:layout_height="wrap_content"
             android:checked="false"
             android:text="@string/checkbox1_instructions_before_use"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <CheckBox
             android:id="@+id/confirm_checkbox2"

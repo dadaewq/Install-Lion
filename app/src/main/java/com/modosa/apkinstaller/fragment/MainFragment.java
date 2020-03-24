@@ -14,7 +14,6 @@ import android.os.Message;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.preference.Preference;
@@ -69,7 +68,7 @@ public class MainFragment extends PreferenceFragmentCompat {
     private MyHandler mHandler;
     private String command;
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,7 +118,7 @@ public class MainFragment extends PreferenceFragmentCompat {
         });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+
     private void init() {
 
         installerComponentNames = new ComponentName[INSTALLER_SIZE];
@@ -345,9 +344,9 @@ public class MainFragment extends PreferenceFragmentCompat {
                         String ownerPackageName = DSMClient.getOwnerPackageName(context);
                         String ownerPackageLable = AppInfoUtil.getApplicationLabel(context, ownerPackageName);
 
-                        if (AppInfoUtil.UNINSTALLED.equals(ownerPackageLable)) {
-                            ownerPackageLable = ownerPackageName;
-                        }
+//                        if (AppInfoUtil.UNINSTALLED.equals(ownerPackageLable)) {
+//                            ownerPackageLable = ownerPackageName;
+//                        }
                         getOwnerPackageNameAndSDKVersion.setSummary(ownerPackageLable + " - " + DSMClient.getOwnerSDKVersion(context));
                     } else {
                         getOwnerPackageNameAndSDKVersion.setSummary(R.string.summary_notexist);

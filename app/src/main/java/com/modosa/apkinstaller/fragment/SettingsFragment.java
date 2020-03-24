@@ -32,6 +32,7 @@ import androidx.preference.PreferenceFragmentCompat;
 
 import com.modosa.apkinstaller.R;
 import com.modosa.apkinstaller.activity.MainUiActivity;
+import com.modosa.apkinstaller.activity.ManageAllowSourceActivity;
 import com.modosa.apkinstaller.util.FileSizeUtil;
 import com.modosa.apkinstaller.util.OpUtil;
 import com.modosa.apkinstaller.util.ResultUtil;
@@ -60,7 +61,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     private Preference ignoreBatteryOptimization;
 
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -149,7 +149,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+
     @Override
     public boolean onPreferenceClick(Preference preference) {
         switch (preference.getKey()) {
@@ -164,7 +164,16 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 showDialogHideIcon();
                 break;
             case "clearAllowedList":
-                showDialogClearAllowedList();
+
+                Intent settingsIntent = new Intent(Intent.ACTION_VIEW)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        .setClass(context, ManageAllowSourceActivity.class);
+                try {
+                    startActivity(settingsIntent);
+                } catch (Exception e) {
+                    OpUtil.showToast0(context, "" + e);
+                }
+
                 break;
             case "clearCache":
                 Executors.newSingleThreadExecutor().execute(() -> {
@@ -180,7 +189,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 showDialogBugReport();
                 break;
             case "ignoreBatteryOptimization":
-                ignoreBatteryOptimization();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    ignoreBatteryOptimization();
+                }
                 break;
             default:
         }
@@ -334,35 +345,13 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         OpUtil.showAlertDialog(context, alertDialog);
     }
 
-    private void showDialogClearAllowedList() {
 
-        View checkBoxView = View.inflate(context, R.layout.confirm_checkbox, null);
-        CheckBox checkBox = checkBoxView.findViewById(R.id.confirm_checkbox);
-        checkBox.setText(R.string.checkbox_clearAllowedList);
-        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(isChecked));
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                .setTitle(R.string.title_clearAllowedList)
-                .setMessage(R.string.message_clearAllowedList)
-                .setView(checkBoxView)
-                .setNeutralButton(android.R.string.cancel, null)
-                .setPositiveButton(android.R.string.ok, (dialog, which) -> context.getSharedPreferences("allowsource", Context.MODE_PRIVATE).edit().clear().apply());
-
-
-        alertDialog = builder.create();
-        OpUtil.showAlertDialog(context, alertDialog);
-
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-    }
-
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
     private void manualuthorize() {
         String targetPackage = "com.android.settings";
         Intent intentManageAppPermissions, intentManageAll;
         intentManageAppPermissions = new Intent("android.intent.action.MANAGE_APP_PERMISSIONS")
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .putExtra(Intent.EXTRA_PACKAGE_NAME, context.getPackageName());
+                .putExtra(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ? Intent.EXTRA_PACKAGE_NAME : "android.intent.extra.PACKAGE_NAME", context.getPackageName());
 //      intentManageAppPermissions.setComponent(new ComponentName("com.android.packageinstaller","com.android.packageinstaller.permission.ui.ManagePermissionsActivity"))
 
         //MIUI等不能用

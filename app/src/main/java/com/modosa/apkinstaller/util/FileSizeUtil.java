@@ -8,9 +8,8 @@ import java.text.DecimalFormat;
 
 /**
  * @author dadaewq
- * @Used android  Get the size of a folder or file  In units of B, KB, MB, GB
- * @
- * @modifiedFrom https://github.com/haiyuKing/FileSizeUtilDemo/blob/master/app/src/main/java/com/why/project/filesizeutildemo/utils/FileSizeUtil.java
+ * android  Get the size of a folder or file  In units of B, KB, MB, GB
+ * https://github.com/haiyuKing/FileSizeUtilDemo/blob/master/app/src/main/java/com/why/project/filesizeutildemo/utils/FileSizeUtil.java
  */
 public class FileSizeUtil {
 

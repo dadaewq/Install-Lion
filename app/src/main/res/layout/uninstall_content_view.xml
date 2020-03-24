@@ -59,7 +59,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="10dp"
-        android:text="@string/message_irrevocableConfirm"
+        android:text="@string/message_confirm_uninstall"
         android:textColor="@color/rBackground"
 
         android:textSize="16sp" />
