@@ -8,8 +8,8 @@ android {
         applicationId "com.modosa.apkinstaller"
         minSdkVersion 22
         targetSdkVersion 29
-        versionCode 34
-        versionName "3.63"
+        versionCode 36
+        versionName "3.7-beta"
     }
 
     buildTypes {
@@ -34,18 +34,24 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'com.catchingnow.icebox:SDK:1.0.5'
-    implementation 'io.reactivex.rxjava2:rxjava:2.2.13'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    implementation 'com.github.heruoxin.Delegated-Scopes-Manager:client:master-SNAPSHOT'
-    implementation 'moe.shizuku.privilege:api:3.1.0-alpha4'
-    implementation 'androidx.preference:preference:1.1.0'
-//    implementation 'com.afollestad.material-dialogs:core:3.3.0'
-//    implementation 'com.google.android.material:material:1.2.0-alpha05'
-
-    def appCenterSdkVersion = '3.0.0'
+    def appCenterSdkVersion = '3.1.0'
     implementation "com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}"
     implementation "com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}"
+
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.preference:preference:1.1.0'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.13'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation 'com.catchingnow.icebox:SDK:1.0.5'
+    implementation 'com.github.heruoxin.Delegated-Scopes-Manager:client:master-SNAPSHOT'
+    implementation 'moe.shizuku.privilege:api:3.1.0-alpha4'
+    implementation 'me.rosuh:AndroidFilePicker:0.6.1'
+
+//    implementation "androidx.recyclerview:recyclerview-selection:1.1.0-rc01"
+//    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta4'
+//
+//    implementation 'com.google.android.material:material:1.2.0-alpha05'
+//    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.71"
+//    implementation 'com.afollestad.material-dialogs:core:3.3.0'
 
 }

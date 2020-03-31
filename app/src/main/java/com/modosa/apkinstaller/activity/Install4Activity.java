@@ -3,6 +3,7 @@ package com.modosa.apkinstaller.activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -154,6 +155,7 @@ public class Install4Activity extends AbstractInstallerActivity implements SAIPa
     private class InstallApkTask extends Thread {
         @Override
         public void run() {
+            Looper.prepare();
             super.run();
             if (SuShell.getInstance().isAvailable()) {
                 showMyToast0(String.format(getString(R.string.tip_start_install), apkinfo[0]));
@@ -166,12 +168,14 @@ public class Install4Activity extends AbstractInstallerActivity implements SAIPa
                 deleteCache();
                 showMyToast1(String.format(getString(R.string.tip_failed_install), getString(R.string.installer_error_root_no_root)));
             }
+            Looper.loop();
         }
     }
 
     private class UninstallApkTask extends Thread {
         @Override
         public void run() {
+            Looper.prepare();
             super.run();
             Log.d("Start uninstall", uninstallPkgName);
 
@@ -192,6 +196,7 @@ public class Install4Activity extends AbstractInstallerActivity implements SAIPa
             } else {
                 showMyToast1(String.format(getString(R.string.tip_failed_uninstall), getString(R.string.installer_error_root_no_root)));
             }
+            Looper.loop();
         }
     }
 }

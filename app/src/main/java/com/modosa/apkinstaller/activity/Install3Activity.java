@@ -37,6 +37,7 @@ public class Install3Activity extends AbstractInstallerActivity implements SAIPa
             ArrayList<File> files = new ArrayList<>();
             files.add(installApkFile);
             new Thread(() -> {
+                Looper.prepare();
                 showMyToast0(String.format(getString(R.string.tip_start_install), apkinfo[0]));
                 try {
                     installPackages(files);
@@ -44,6 +45,7 @@ public class Install3Activity extends AbstractInstallerActivity implements SAIPa
                     e.printStackTrace();
                 }
                 finish();
+                Looper.loop();
             }
 
             ).start();

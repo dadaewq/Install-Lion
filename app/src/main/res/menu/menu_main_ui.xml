@@ -4,10 +4,10 @@
     tools:context="com.modosa.apkinstaller.activity.MainUiActivity">
 
     <item
-        android:id="@+id/InstallFromGetContent"
+        android:id="@+id/PickFileToInstall"
         android:icon="@drawable/ic_pick"
         android:orderInCategory="10"
-        android:title="@string/InstallFromGetContent"
+        android:title="@string/PickFileToInstall"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/Settings"

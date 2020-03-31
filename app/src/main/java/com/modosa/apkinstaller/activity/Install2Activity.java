@@ -3,6 +3,7 @@ package com.modosa.apkinstaller.activity;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.core.content.FileProvider;
@@ -43,6 +44,7 @@ public class Install2Activity extends AbstractInstallerActivity {
                 String authority = getPackageName() + ".FILE_PROVIDER";
                 Uri installuri = FileProvider.getUriForFile(getApplicationContext(), authority, installApkFile);
                 new Thread(() -> {
+                    Looper.prepare();
                     showMyToast0(String.format(getString(R.string.tip_start_install), apkinfo[0]));
                     try {
                         DSMClient.installApp(this, installuri, null);
@@ -52,7 +54,7 @@ public class Install2Activity extends AbstractInstallerActivity {
                         showNotificationWithdeleteCache(CHANNEL_ID, false);
                     }
                     showMyToast1(R.string.tip_try_install_end);
-
+                    Looper.loop();
                     finish();
                 }).start();
             } else {
@@ -70,12 +72,14 @@ public class Install2Activity extends AbstractInstallerActivity {
         } else {
             Log.d("Start uninstall", pkgName);
             new Thread(() -> {
+                Looper.prepare();
                 showMyToast0(String.format(getString(R.string.tip_start_uninstall), uninstallPackageLable));
                 try {
                     DSMClient.uninstallApp(this, pkgName);
                 } catch (Exception e) {
                     showMyToast1(e.toString());
                 }
+                Looper.loop();
                 //Todo show result
             }).start();
         }

@@ -13,4 +13,21 @@
 
     <style name="Translucent" parent="@android:style/Theme.Translucent.NoTitleBar" />
 
+
+    <style name="myFilePickerThemeRailButtonStyle" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:background">@drawable/my_btn_selector_file_picker_rail</item>
+    </style>
+
+    <style name="myFilePickerThemeRail" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/rail_color_primary</item>
+        <item name="colorPrimaryDark">@color/rail_color_primary_dark</item>
+        <item name="colorAccent">@color/rail_color_accent</item>
+        <item name="android:buttonStyle">@style/myFilePickerThemeRailButtonStyle</item>
+        <item name="android:textColor">@color/rail_text_color</item>
+        <item name="android:textColorPrimary">@color/rail_textColor_Primary</item>
+        <item name="android:colorBackground">@color/Background</item>
+        <!--<item name="android:windowTranslucentStatus">true</item>-->
+        <item name="android:fitsSystemWindows">true</item>
+    </style>
+
 </resources>

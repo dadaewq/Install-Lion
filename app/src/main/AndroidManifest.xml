@@ -23,7 +23,6 @@
         android:name="android.permission.GRANT_RUNTIME_PERMISSIONS"
         tools:ignore="ProtectedPermissions" />
 
-
     <application
         android:name=".base.Application"
         android:allowBackup="true"
@@ -37,9 +36,8 @@
         android:theme="@style/AppTheme.NoActionBar"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="q">
-        <activity
-            android:name=".activity.MainUiActivity"
-            android:launchMode="singleInstance">
+
+        <activity android:name=".activity.MainUiActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -129,7 +127,7 @@
 
                 <data android:scheme="file" />
                 <data android:scheme="content" />
-                <data android:mimeType="application/vnd.android.package-archive" />
+
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.DELETE" />

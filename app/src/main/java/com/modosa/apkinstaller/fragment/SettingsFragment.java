@@ -445,11 +445,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
             switch (msg.arg1) {
                 case 9:
-                    settingsFragment.clearCache.setTitle(String.format(settingsFragment.getString(R.string.title_clearCache), settingsFragment.cacheSize));
+                    settingsFragment.clearCache.setSummary(String.format(settingsFragment.getString(R.string.summary_clearCache), settingsFragment.cacheSize));
                     break;
                 case 6:
                     OpUtil.deleteDirectory(settingsFragment.cachePath);
-                    settingsFragment.clearCache.setTitle(String.format(settingsFragment.getString(R.string.title_clearCache), FileSizeUtil.getAutoFolderOrFileSize(settingsFragment.cachePath)));
+                    settingsFragment.clearCache.setSummary(String.format(settingsFragment.getString(R.string.summary_clearCache), FileSizeUtil.getAutoFolderOrFileSize(settingsFragment.cachePath)));
                     OpUtil.showToast0(settingsFragment.context, R.string.tip_success_clear_cache);
                     break;
                 default:

@@ -1,7 +1,5 @@
 package com.modosa.apkinstaller.activity;
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -19,8 +17,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import com.modosa.apkinstaller.R;
@@ -31,20 +27,21 @@ import com.modosa.apkinstaller.util.OpUtil;
 import com.modosa.apkinstaller.util.PraseContentUtil;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import me.rosuh.filepicker.config.FilePickerManager;
 
 
 /**
  * @author dadaewq
  */
 public abstract class AbstractInstallerActivity extends AppCompatActivity {
-    private static final int REQUEST_REFRESH_WRITE_PERMISSION = 0x2330;
+
     private static final int REQUEST_PICK_APK_FILE = 0x2331;
     private static final String ILLEGALPKGNAME = "IL^&IllegalPN*@!128`+=：:,.[";
-    private final String[] writePermissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
     private final String nl = System.getProperty("line.separator");
     String[] apkinfo;
     String uninstallPackageLable;
@@ -67,17 +64,25 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        spGetPreferenceManager = PreferenceManager.getDefaultSharedPreferences(this);
         initFromAction(getIntent().getAction() + "");
     }
 
     private void initFromAction(String action) {
 
         switch (action) {
-            case OpUtil.MODOSA_ACTION_GO_GET_CONTENT:
-                getContent();
+            case OpUtil.MODOSA_ACTION_PICK_FILE:
+                if (spGetPreferenceManager.getBoolean("useInternalFilePicker", true)) {
+                    getFile();
+                } else {
+                    getContent();
+                }
                 break;
             case OpUtil.MODOSA_ACTION_GO_OPEN_DOCUMENT:
                 openDocument();
+                break;
+            case OpUtil.MODOSA_ACTION_GO_GET_FILE:
+                getFile();
                 break;
             case Intent.ACTION_DELETE:
             case Intent.ACTION_UNINSTALL_PACKAGE:
@@ -96,6 +101,80 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
         }
     }
 
+
+    private void startGetFile() {
+
+        Intent intent = new Intent(OpUtil.MODOSA_ACTION_GO_GET_FILE)
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .setClass(this, getClass());
+        startActivity(intent);
+
+    }
+
+    private void getFile() {
+
+        FilePickerManager.INSTANCE.saveData(new ArrayList<>());
+        FilePickerManager.INSTANCE
+                .from(this)
+                .enableSingleChoice()
+                .showHiddenFiles(true)
+                .setTheme(R.style.myFilePickerThemeRail)
+                .forResult(FilePickerManager.REQUEST_CODE);
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        super.onActivityResult(requestCode, resultCode, resultData);
+        Log.e("onActivityResult", requestCode + "|" + resultCode + "|\n" + resultData);
+        switch (requestCode) {
+            case FilePickerManager.REQUEST_CODE:
+                List<String> list = FilePickerManager.INSTANCE.obtainData();
+
+                if (list.size() != 0) {
+                    String path = list.get(0);
+                    uri = Uri.fromFile(new File(path));
+                    initFromUri();
+                } else {
+                    finish();
+                }
+                break;
+            case REQUEST_PICK_APK_FILE:
+                if (resultData != null) {
+                    uri = resultData.getData();
+                    initFromUri();
+                } else {
+                    showMyToast0(R.string.tip_failed_get_content);
+                    finish();
+                    break;
+                }
+            default:
+        }
+
+    }
+
+    @Override
+    public void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+
+        if (istemp && (cachePath != null) && !enableAnotherinstaller) {
+            OpUtil.deleteSingleFile(new File(cachePath));
+        }
+        if (alertDialog != null) {
+            alertDialog.dismiss();
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (OpUtil.checkWritePermission(this)) {
+            initInstall();
+        } else {
+            OpUtil.requestWritePermission(this);
+        }
+    }
 
     /**
      * 优先用 ACTION_GET_CONTENT可支持更多App
@@ -133,16 +212,17 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
             startActivityForResult(intentDocument, REQUEST_PICK_APK_FILE);
         } catch (Exception e0) {
             e0.printStackTrace();
+            startGetFile();
         }
     }
 
+
     private void initFromUri() {
         spAllowSource = getSharedPreferences(ManageAllowSourceActivity.SP_KEY_ALLOWSOURCE, Context.MODE_PRIVATE);
-        spGetPreferenceManager = PreferenceManager.getDefaultSharedPreferences(this);
-        if (checkPermission()) {
+        if (OpUtil.checkWritePermission(this)) {
             initInstall();
         } else {
-            requestPermission();
+            OpUtil.requestWritePermission(this);
         }
     }
 
@@ -317,13 +397,6 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
                     .setPositiveButton(R.string.bt_install, (dialog, which) -> {
                         cachePath = null;
                         if (!source[1].equals(ILLEGALPKGNAME) && checkBox.isChecked()) {
-//                            String newAllowSourceString;
-//                            if("".equals(allowsourceString)){
-//                                newAllowSourceString=source[0];
-//                            }else {
-//                                newAllowSourceString=allowsourceString+","+source[0];
-//                            }
-//                            Log.e("newAllowSourceString", newAllowSourceString);
                             spAllowSource.edit().putString(ManageAllowSourceActivity.SP_KEY_ALLOWSOURCE, allowsourceString + source[0] + ",").apply();
                         }
                         startInstall(validApkPath);
@@ -366,45 +439,6 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
         return new String[]{fromPkgName, fromPkgLabel};
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
-        super.onActivityResult(requestCode, resultCode, resultData);
-
-        if (requestCode == REQUEST_PICK_APK_FILE) {
-            if (resultCode == Activity.RESULT_OK && resultData != null) {
-                uri = resultData.getData();
-                initFromUri();
-            } else {
-                showMyToast0(R.string.tip_failed_get_content);
-                finish();
-            }
-        } else {
-            finish();
-        }
-
-    }
-
-    @Override
-    public void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-
-        if (istemp && (cachePath != null) && !enableAnotherinstaller) {
-            OpUtil.deleteSingleFile(new File(cachePath));
-        }
-        if (alertDialog != null) {
-            alertDialog.dismiss();
-        }
-
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (checkPermission()) {
-            initInstall();
-        } else {
-            requestPermission();
-        }
-    }
 
     private String preInstallGetValidApkPath() {
         String getPath = null;
@@ -423,9 +457,18 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
                     InputStream is = null;
                     try {
                         is = getContentResolver().openInputStream(uri);
-                    } catch (FileNotFoundException e) {
+                    } catch (Exception e) {
+                        copyErr(uri + "\n" + e);
+                        showMyToast1("致命错误，请向开发者报告\n" + uri + "\n" + e + "\n已复制到剪贴板");
                         e.printStackTrace();
+                        finish();
                     }
+                    if (is == null) {
+                        copyErr(uri + "\n");
+                        showMyToast1("致命错误，请向开发者报告\n" + uri + "\n已复制到剪贴板");
+                        finish();
+                    }
+
                     if (is != null) {
                         getPath = OpUtil.createApkFromUri(this, is).getPath();
                     }
@@ -459,19 +502,19 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
      */
     protected abstract void startUninstall(String uninstallPkgname);
 
-    private void requestPermission() {
-        try {
-            ActivityCompat.requestPermissions(this, writePermissions, REQUEST_REFRESH_WRITE_PERMISSION);
-        } catch (Exception e) {
-            showMyToast1("" + e);
-            finish();
-        }
-    }
+//    private void requestPermission() {
+//        try {
+//            ActivityCompat.requestPermissions(this, writePermissions, REQUEST_REFRESH_WRITE_PERMISSION);
+//        } catch (Exception e) {
+//            showMyToast1("" + e);
+//            finish();
+//        }
+//    }
 
-    private boolean checkPermission() {
-        int checkSelfPermission = ContextCompat.checkSelfPermission(this, writePermissions[0]);
-        return (checkSelfPermission == 0);
-    }
+//    private boolean checkPermission() {
+//        int checkSelfPermission = ContextCompat.checkSelfPermission(this, writePermissions[0]);
+//        return (checkSelfPermission == 0);
+//    }
 
     void copyErr(String err) {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);

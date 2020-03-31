@@ -1,2 +1,2 @@
 include ':app'
-rootProject.name='Install-Lion'
+rootProject.name = 'Install-Lion'

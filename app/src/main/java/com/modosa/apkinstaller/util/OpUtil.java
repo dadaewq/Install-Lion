@@ -1,8 +1,11 @@
 package com.modosa.apkinstaller.util;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -13,6 +16,8 @@ import android.util.Log;
 import android.view.Window;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.preference.PreferenceManager;
 
@@ -37,14 +42,30 @@ import java.util.List;
  */
 public class OpUtil {
 
-    public static final String MODOSA_ACTION_GO_GET_CONTENT = "modosa.action.GO_GET_CONTENT";
+    public static final String MODOSA_ACTION_PICK_FILE = "modosa.action.GO_PICK_FILE";
     public static final String MODOSA_ACTION_GO_OPEN_DOCUMENT = "modosa.action.GO_OPEN_DOCUMENT";
+    public static final String MODOSA_ACTION_GO_GET_FILE = "modosa.action.GO_GET_FILE";
+    public static final String WRITE_PERMISSION = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+    public static final int REQUEST_REFRESH_WRITE_PERMISSION = 0x2330;
 
     public static void startMainUiActivity(Context context) {
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setClass(context, MainUiActivity.class);
         context.startActivity(intent);
+    }
+
+    public static void requestWritePermission(Activity activity) {
+        try {
+            ActivityCompat.requestPermissions(activity, new String[]{WRITE_PERMISSION}, REQUEST_REFRESH_WRITE_PERMISSION);
+        } catch (Exception e) {
+            showToast1(activity, "" + e);
+        }
+    }
+
+    public static boolean checkWritePermission(Context context) {
+        int checkSelfPermission = ContextCompat.checkSelfPermission(context, WRITE_PERMISSION);
+        return (checkSelfPermission == 0);
     }
 
     public static File createApkFromUri(Context context, InputStream is) {
@@ -118,10 +139,20 @@ public class OpUtil {
             } else {
                 window.setBackgroundDrawableResource(R.drawable.alertdialog_background);
             }
-
-
         }
-        alertDialog.show();
+        if (!((Activity) context).isFinishing()) {
+            alertDialog.show();
+        }
+    }
+
+    public static void setButtonTextColor(Context context, AlertDialog alertDialog) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(context.getResources().getColor(R.color.rBackground, null));
+            alertDialog.getButton(DialogInterface.BUTTON_NEUTRAL).setTextColor(context.getResources().getColor(R.color.rBackground, null));
+        } else {
+            alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(context.getResources().getColor(R.color.rBackground));
+            alertDialog.getButton(DialogInterface.BUTTON_NEUTRAL).setTextColor(context.getResources().getColor(R.color.rBackground));
+        }
     }
 
     private static Uri getMyContentUriForFile(Context context, File file) {
@@ -262,7 +293,7 @@ public class OpUtil {
         Toast.makeText(context, stringId, Toast.LENGTH_SHORT).show();
     }
 
-    public static void showToast1(Context context, final String text) {
+    private static void showToast1(Context context, final String text) {
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
     }
 

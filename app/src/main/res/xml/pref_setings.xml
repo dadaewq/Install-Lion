@@ -7,16 +7,22 @@
             app:summary="@string/summary_show_notification"
             app:title="@string/title_show_notification" />
         <SwitchPreferenceCompat
-            app:defaultValue="false"
-            app:key="deleteSucceededApk"
-            app:summary="@string/summary_deleteSucceededApk"
-            app:title="@string/title_deleteSucceededApk" />
-        <SwitchPreferenceCompat
             app:defaultValue="true"
             app:key="needconfirm"
             app:summaryOff="@string/summary_off_needconfirm"
             app:summaryOn="@string/summary_on_needconfirm"
             app:title="@string/confirm_title" />
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="useInternalFilePicker"
+            app:summaryOff="@string/summaryOff_useInternalFilePicker"
+            app:summaryOn="@string/summaryOn_useInternalFilePicker"
+            app:title="@string/title_useInternalFilePicker" />
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:key="deleteSucceededApk"
+            app:summary="@string/summary_deleteSucceededApk"
+            app:title="@string/title_deleteSucceededApk" />
         <Preference
             app:key="installByAnotherAfterFail"
             app:title="@string/title_installByAnotherAfterFail" />
@@ -37,7 +43,7 @@
             app:title="@string/title_manageAllowSource" />
         <Preference
             app:key="clearCache"
-            app:summary="@string/summary_clearCache" />
+            app:title="@string/title_clearCache" />
         <Preference
             app:key="manualAuthorize"
             app:summary=""

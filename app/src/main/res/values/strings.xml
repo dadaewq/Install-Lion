@@ -4,9 +4,11 @@
     <string name="tv_instructions_before_use">\nThe main function of this App is to install apk and uninstall the application\n
         \nMost custom systems other than native Android cannot be set as default installation and uninstallation applications due to system limitations, and the system will almost always let the system\'s default package installer handle it when initiating the installation,and there is no good solution.\n
         \nIn this case, it is recommended to use the \"Pick a file to install\" function in this App or use a file manager that supports selecting the open way to initiate the installation.\n
-        \nImportant：Please try these steps if the installation failed——turn off Google Play\'s security scan; turn on the USB installation in the developer options, turn off the monitoring ADB installation application, etc to prevent the installation from failing. (Especially non-native Android)\n
-        \nFriendly reminder：The \"Package installer\" of the Android system is not only used for installation and uninstallation, but also an important system component for managing permissions. Please do not arbitrarily freeze or other dangerous operations！\n
-        \nInstall Lion will track bugs through the network for optimization and improvement.You can disable it in the settings.\n
+        \nImportant：Please try these steps if the installation failed——turn off Google Play\'s security scan; turn on the USB installation in the developer options, turn off the \"Monitor adb installation\", etc to prevent the installation from failing. (Especially non-native Android)\n
+        \nAndroid 11 devices please grant \"All files access\"\n
+        \nInstall Lion will track bugs through network for optimization and improvement.You can disable it in the settings.\n
+        \nFriendly reminder：
+        \nThe \"Package installer\" of the Android system is not only used for installation and uninstallation, but also an important system component for managing permissions.It is strongly recommended not to freeze arbitrarily or perform other dangerous operations！\n
     </string>
     <string name="checkbox1_instructions_before_use">I have fully understood</string>
     <string name="checkbox2_instructions_before_use">No longer prompt</string>
@@ -102,10 +104,10 @@
     <string name="title_DISALLOW_UNINSTALL_APPS">Disallow uninstall Apps</string>
     <string name="title_DISALLOW_INSTALL_UNKNOWN_SOURCES">Disallow install unknown sources Apps</string>
     <string name="title_DISALLOW_ADD_MANAGED_PROFILE">Disallow add managed profiles</string>
-    <string name="summary_clearCache">Click to clear</string>
+    <string name="title_clearCache">Click to clear cache</string>
     <string name="tip_success_clear_cache">Clean up</string>
-    <string name="title_clearCache">Current cache size：%s</string>
-    <string name="InstallFromGetContent">Pick a file to install</string>
+    <string name="summary_clearCache">Current cache size：%s</string>
+    <string name="PickFileToInstall">Pick a file to install</string>
     <string name="title_RebootDevice">Reboot device now</string>
     <string name="title_dpm_settings">Device Owner settings</string>
     <string name="title_lockDefaultApp">Lock Default App</string>
@@ -137,6 +139,9 @@
     <string name="title_show_notification">Show notification</string>
     <string name="summary_show_notification">Show notification after installation.\nYou can launch the app and delete the APK in the notification (if you can get the real path)after successful installation</string>
     <string name="title_deleteSucceededApk">Delete the apk after successful installation</string>
+    <string name="title_useInternalFilePicker">Use internal file picker</string>
+    <string name="summaryOn_useInternalFilePicker">Use system file picker when picking a file to install</string>
+    <string name="summaryOff_useInternalFilePicker">Use internal file picker when picking a file to install</string>
     <string name="title_installByAnotherAfterFail">Install with other app after failed installation</string>
     <string name="checkbox_installByAnotherAfterFail">Enable this feature</string>
     <string name="et_installByAnotherAfterFail">Enter the package name to specify the application, leave it blank to choose by the system</string>
@@ -154,4 +159,5 @@
     <string name="empty">Empty</string>
     <string name="uninstalled">Uninstalled</string>
     <string name="message_confirm_remove_list">Remove from list</string>
+    <string name="file_picker_tv_sd_card">Internal shared storage</string>
 </resources>

@@ -261,7 +261,12 @@ public class PraseContentUtil {
             return null;
         } else {
             Log.e("getSomeFile_FROM_URI", uri + "");
-            File file = getSomeFileFromAuthorityAndUri();
+            File file = null;
+            try {
+                file = getSomeFileFromAuthorityAndUri();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             if (file == null) {
                 file = getSomeFileFromReferrerAndUri();
             }

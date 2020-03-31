@@ -3,6 +3,7 @@ package com.modosa.apkinstaller.activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Looper;
 import android.util.Log;
 
 import com.modosa.apkinstaller.R;
@@ -39,7 +40,9 @@ public class Install5Activity extends AbstractInstallerActivity {
     private class InstallApkTask extends Thread {
         @Override
         public void run() {
+            Looper.prepare();
             super.run();
+
             showMyToast0(String.format(getString(R.string.tip_start_install), apkinfo[0]));
             try {
                 String result = PackageInstallerUtil.installPackage(context, Uri.fromFile(installApkFile), null);
@@ -65,6 +68,7 @@ public class Install5Activity extends AbstractInstallerActivity {
     private class UninstallApkTask extends Thread {
         @Override
         public void run() {
+            Looper.prepare();
             super.run();
             Log.d("Start uninstall", uninstallPkgName);
 

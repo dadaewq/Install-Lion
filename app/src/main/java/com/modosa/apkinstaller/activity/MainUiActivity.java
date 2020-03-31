@@ -1,19 +1,24 @@
 package com.modosa.apkinstaller.activity;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -61,6 +66,14 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
         confirmPrompt();
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (requestCode == OpUtil.REQUEST_REFRESH_WRITE_PERMISSION && OpUtil.WRITE_PERMISSION.equals(permissions[0]) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            pickFileToInstall();
+        }
+    }
+
 
     private void init() {
         spGetPreferenceManager = PreferenceManager.getDefaultSharedPreferences(this);
@@ -100,8 +113,13 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
             case android.R.id.home:
                 swtichIsMainFragment(true);
                 break;
-            case R.id.InstallFromGetContent:
-                installFromGetContent();
+            case R.id.PickFileToInstall:
+//                Log.e("permission", ""+OpUtil.checkWritePermission(this) );
+                if (OpUtil.checkWritePermission(this)) {
+                    pickFileToInstall();
+                } else {
+                    OpUtil.requestWritePermission(this);
+                }
                 break;
             case R.id.Settings:
                 Intent settingsIntent = new Intent(Intent.ACTION_VIEW)
@@ -155,8 +173,28 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
 
         alertDialogConfirmPrompt = builder.create();
         OpUtil.showAlertDialog(this, alertDialogConfirmPrompt);
-        alertDialogConfirmPrompt.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.rBackground));
-        alertDialogConfirmPrompt.getButton(DialogInterface.BUTTON_NEUTRAL).setTextColor(getResources().getColor(R.color.rBackground));
+
+        OpUtil.setButtonTextColor(this, alertDialogConfirmPrompt);
+        Button button = alertDialogConfirmPrompt.getButton(DialogInterface.BUTTON_NEUTRAL);
+        button.setEnabled(false);
+        CountDownTimer timer = new CountDownTimer(10000, 1000) {
+            final String oK = getString(android.R.string.ok);
+
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onTick(long millisUntilFinished) {
+                button.setText(oK + "(" + millisUntilFinished / 1000 + "s" + ")");
+            }
+
+            @Override
+            public void onFinish() {
+                button.setText(oK);
+                button.setEnabled(true);
+            }
+        };
+        //调用 CountDownTimer 对象的 start() 方法开始倒计时，也不涉及到线程处理
+        timer.start();
+
 
     }
 
@@ -222,7 +260,7 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
 
     private void startPickFile(ComponentName componentName) {
 
-        Intent intent = new Intent(OpUtil.MODOSA_ACTION_GO_GET_CONTENT);
+        Intent intent = new Intent(OpUtil.MODOSA_ACTION_PICK_FILE);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setComponent(componentName);
         startActivity(intent);
@@ -236,7 +274,7 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
     }
 
 
-    private void installFromGetContent() {
+    private void pickFileToInstall() {
         String[] installerClassName = new String[MainFragment.INSTALLER_SIZE];
         ComponentName[] installerComponentNames = new ComponentName[MainFragment.INSTALLER_SIZE];
         ArrayList<ComponentName> componentNameArrayList = new ArrayList<>();
@@ -278,7 +316,7 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
                 startPickFile(componentNameArrayList.get(0));
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                        .setTitle(R.string.InstallFromGetContent)
+                        .setTitle(R.string.PickFileToInstall)
                         .setItems(items, (dialog, which) -> startPickFile(componentNameArrayList.get(which)));
 
                 alertDialogConfirmPrompt = builder.create();
