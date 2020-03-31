@@ -11,6 +11,8 @@
 
 安装狮-DPM-----支持Android6.0及以上，需要通过命令激活成为设备管理员
 
+` adb shell dpm set-device-owner com.modosa.apkinstaller/.receiver.AdminReceiver `
+
 ## Download
 [<img src="https://www.coolapk.com/static/images/header-logo.png"
      alt="Get it on CoolApk"
