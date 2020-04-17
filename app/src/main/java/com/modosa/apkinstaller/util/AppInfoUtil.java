@@ -1,6 +1,8 @@
 package com.modosa.apkinstaller.util;
 
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -34,13 +36,49 @@ public final class AppInfoUtil {
         } else {
             try {
                 return (pm.getApplicationInfo(pkgName, Build.VERSION.SDK_INT > Build.VERSION_CODES.M ? MATCH_UNINSTALLED_PACKAGES : GET_UNINSTALLED_PACKAGES).loadLabel(pm).toString());
-            } catch (PackageManager.NameNotFoundException ignore) {
-                return context.getString(R.string.uninstalled);
             } catch (Exception e) {
                 e.printStackTrace();
-                return pkgName;
+                return context.getString(R.string.unknown);
             }
         }
+    }
+
+    private static String getActivityLabel(Context context, ComponentName componentName) {
+        PackageManager pm = context.getPackageManager();
+
+        ActivityInfo activityInfo = null;
+        try {
+            activityInfo = pm.getActivityInfo(componentName, 0);
+        } catch (Exception ignore) {
+        }
+
+        if (activityInfo != null) {
+            return activityInfo.loadLabel(pm).toString();
+        } else {
+            try {
+                return (pm.getActivityInfo(componentName, Build.VERSION.SDK_INT > Build.VERSION_CODES.M ? MATCH_UNINSTALLED_PACKAGES : GET_UNINSTALLED_PACKAGES).loadLabel(pm).toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+                return context.getString(R.string.unknown);
+            }
+        }
+    }
+
+    public static String getCustomInstallerLable(Context context, String getCustomInstaller) {
+        String installerLable = context.getString(R.string.unknown);
+        if (getCustomInstaller.contains("/")) {
+            String[] names = getCustomInstaller.split("/");
+            if (names.length == 2 && !"".equals(names[0]) && !"".equals(names[1])) {
+                if (names[1].length() > 1 && names[1].startsWith(".")) {
+                    names[1] = names[0] + names[1];
+                }
+                installerLable = getActivityLabel(context, new ComponentName(names[0], names[1]));
+            }
+
+        } else {
+            installerLable = getApplicationLabel(context, getCustomInstaller);
+        }
+        return installerLable;
     }
 
     public static String[] getApplicationVersion(Context context, String pkgName) {

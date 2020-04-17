@@ -2,6 +2,7 @@
 <resources>
     <color name="Background">#121212</color>
     <color name="rBackground">#F5F5F5</color>
+    <color name="HeaderBackground">#121212</color>
 
     <color name="rail_color_primary">#434150</color>
     <color name="rail_color_primary_dark">#27262f</color>

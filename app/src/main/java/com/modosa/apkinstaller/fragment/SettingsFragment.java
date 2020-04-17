@@ -31,6 +31,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.modosa.apkinstaller.R;
+import com.modosa.apkinstaller.activity.AboutActivity;
 import com.modosa.apkinstaller.activity.MainUiActivity;
 import com.modosa.apkinstaller.activity.ManageAllowSourceActivity;
 import com.modosa.apkinstaller.util.FileSizeUtil;
@@ -87,6 +88,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         findPreference("hideIcon").setOnPreferenceClickListener(this);
         findPreference("clearAllowedList").setOnPreferenceClickListener(this);
         findPreference("bugReport").setOnPreferenceClickListener(this);
+        findPreference("instructions_before_use").setOnPreferenceClickListener(this);
+        findPreference("help").setOnPreferenceClickListener(this);
+        findPreference("about").setOnPreferenceClickListener(this);
 
         clearCache = findPreference("clearCache");
         assert clearCache != null;
@@ -192,6 +196,16 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     ignoreBatteryOptimization();
                 }
+                break;
+            case "instructions_before_use":
+                alertDialog = OpUtil.createDialogConfirmPrompt(context);
+                OpUtil.showDialogConfirmPrompt(context, alertDialog);
+                break;
+            case "help":
+                OpUtil.launchCustomTabsUrl(context, "https://dadaewq.gitee.io/tutorials/install-lion.html");
+                break;
+            case "about":
+                OpUtil.startMyClass(context, AboutActivity.class);
                 break;
             default:
         }

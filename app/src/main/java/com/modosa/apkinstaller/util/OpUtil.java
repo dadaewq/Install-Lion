@@ -1,6 +1,7 @@
 package com.modosa.apkinstaller.util;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -12,17 +13,29 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.CountDownTimer;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.Toast;
 
+import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.preference.PreferenceManager;
 
 import com.modosa.apkinstaller.R;
+import com.modosa.apkinstaller.activity.Install1Activity;
+import com.modosa.apkinstaller.activity.Install2Activity;
+import com.modosa.apkinstaller.activity.Install3Activity;
+import com.modosa.apkinstaller.activity.Install4Activity;
+import com.modosa.apkinstaller.activity.Install5Activity;
+import com.modosa.apkinstaller.activity.Install6Activity;
 import com.modosa.apkinstaller.activity.MainUiActivity;
+import com.modosa.apkinstaller.fragment.MainFragment;
 import com.modosa.apkinstaller.fragment.SettingsFragment;
 import com.modosa.apkinstaller.receiver.AdminReceiver;
 
@@ -42,6 +55,7 @@ import java.util.List;
  */
 public class OpUtil {
 
+    public final static String SP_KEY_CONFIRM_PROMPT = "ConfirmPrompt";
     public static final String MODOSA_ACTION_PICK_FILE = "modosa.action.GO_PICK_FILE";
     public static final String MODOSA_ACTION_GO_OPEN_DOCUMENT = "modosa.action.GO_OPEN_DOCUMENT";
     public static final String MODOSA_ACTION_GO_GET_FILE = "modosa.action.GO_GET_FILE";
@@ -66,6 +80,86 @@ public class OpUtil {
     public static boolean checkWritePermission(Context context) {
         int checkSelfPermission = ContextCompat.checkSelfPermission(context, WRITE_PERMISSION);
         return (checkSelfPermission == 0);
+    }
+
+    public static void launchCustomTabsUrl(Context context, String url) {
+        try {
+            CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder()
+                    .setShowTitle(true)
+                    .build();
+
+            customTabsIntent.launchUrl(context, Uri.parse(url));
+        } catch (Exception e) {
+            showToast1(context, "" + e);
+        }
+    }
+
+    public static void startMyClass(Context context, Class myClass) {
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW)
+                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    .setClass(context, myClass);
+            context.startActivity(intent);
+        } catch (Exception e) {
+            showToast1(context, "" + e);
+        }
+    }
+
+
+    public static AlertDialog createDialogConfirmPrompt(Context context) {
+
+        View view = View.inflate(context, R.layout.confirmprompt_doublecheckbox, null);
+
+        CheckBox checkBox1 = view.findViewById(R.id.confirm_checkbox1);
+        CheckBox checkBox2 = view.findViewById(R.id.confirm_checkbox2);
+        checkBox1.setText(R.string.checkbox1_instructions_before_use);
+        checkBox2.setText(R.string.checkbox2_instructions_before_use);
+        checkBox2.setEnabled(false);
+        checkBox1.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            checkBox2.setChecked(false);
+            checkBox2.setEnabled(isChecked);
+        });
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                .setTitle(R.string.title_instructions_before_use)
+                .setView(view)
+                .setPositiveButton(android.R.string.cancel, null)
+                .setNeutralButton(android.R.string.ok, (dialog, which) -> {
+                    boolean hasBothConfirm = false;
+                    if (checkBox1.isChecked() && checkBox2.isChecked()) {
+                        hasBothConfirm = true;
+                    }
+                    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SP_KEY_CONFIRM_PROMPT, hasBothConfirm).apply();
+                });
+
+        return builder.create();
+
+    }
+
+    public static void showDialogConfirmPrompt(Context context, AlertDialog alertDialog) {
+
+        OpUtil.showAlertDialog(context, alertDialog);
+
+        Button button = alertDialog.getButton(DialogInterface.BUTTON_NEUTRAL);
+        button.setEnabled(false);
+
+        CountDownTimer timer = new CountDownTimer(20000, 1000) {
+            final String oK = context.getString(android.R.string.ok);
+
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onTick(long millisUntilFinished) {
+                button.setText(oK + "(" + millisUntilFinished / 1000 + "s" + ")");
+            }
+
+            @Override
+            public void onFinish() {
+                button.setText(oK);
+                button.setEnabled(true);
+            }
+        };
+        //调用 CountDownTimer 对象的 start() 方法开始倒计时，也不涉及到线程处理
+        timer.start();
     }
 
     public static File createApkFromUri(Context context, InputStream is) {
@@ -155,7 +249,7 @@ public class OpUtil {
         }
     }
 
-    private static Uri getMyContentUriForFile(Context context, File file) {
+    public static Uri getMyContentUriForFile(Context context, File file) {
 
         return FileProvider.getUriForFile(context,
                 context.getPackageName() + ".FILE_PROVIDER", file);
@@ -193,6 +287,19 @@ public class OpUtil {
         }
 
     }
+
+    public static ComponentName[] getInstallerComponentNames(Context context) {
+        ComponentName[] installerComponentNames = new ComponentName[MainFragment.INSTALLER_SIZE];
+
+        installerComponentNames[1] = new ComponentName(context, Install1Activity.class);
+        installerComponentNames[2] = new ComponentName(context, Install2Activity.class);
+        installerComponentNames[3] = new ComponentName(context, Install3Activity.class);
+        installerComponentNames[4] = new ComponentName(context, Install4Activity.class);
+        installerComponentNames[5] = new ComponentName(context, Install5Activity.class);
+        installerComponentNames[6] = new ComponentName(context, Install6Activity.class);
+        return installerComponentNames;
+    }
+
 
     public static boolean getEnabledComponentState(Context context, ComponentName componentName) {
         PackageManager pm = context.getPackageManager();

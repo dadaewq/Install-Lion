@@ -93,8 +93,7 @@
 
         <activity
             android:name=".activity.SettingsActivity"
-            android:label="@string/Settings"
-            android:launchMode="singleInstance">
+            android:label="@string/Settings">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -106,6 +105,17 @@
             android:name=".activity.ManageAllowSourceActivity"
             android:label="@string/title_manageAllowSource"
             android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activity.AboutActivity"
+            android:excludeFromRecents="true"
+            android:theme="@style/AppTheme.About">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -127,6 +137,7 @@
 
                 <data android:scheme="file" />
                 <data android:scheme="content" />
+                <data android:mimeType="application/vnd.android.package-archive" />
 
             </intent-filter>
             <intent-filter>
@@ -240,6 +251,23 @@
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data android:scheme="package" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.Install6Activity"
+            android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+            android:excludeFromRecents="true"
+            android:label="@string/name_install6"
+            android:theme="@style/AppTheme.Dialog.NoActionbar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.INSTALL_PACKAGE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/vnd.android.package-archive" />
             </intent-filter>
         </activity>
         <activity

@@ -21,10 +21,10 @@ public class SettingsActivity extends AppCompatActivity {
 
     private static final String TAG_SETTINGS = "settings";
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main_ui);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

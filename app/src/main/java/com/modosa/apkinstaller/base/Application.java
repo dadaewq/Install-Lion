@@ -10,6 +10,7 @@ import com.microsoft.appcenter.analytics.Analytics;
 import com.microsoft.appcenter.crashes.Crashes;
 import com.modosa.apkinstaller.fragment.SettingsFragment;
 
+@SuppressWarnings("WeakerAccess")
 public class Application extends android.app.Application {
 
 

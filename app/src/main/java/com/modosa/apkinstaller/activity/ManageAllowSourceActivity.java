@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -58,7 +57,6 @@ public class ManageAllowSourceActivity extends AppCompatActivity {
 
     @Override
     public void onResume() {
-        Log.e("onResume", "onResume: ");
         super.onResume();
         if (alertDialog != null) {
             alertDialog.dismiss();

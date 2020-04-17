@@ -23,7 +23,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 /**
- * @author mihotel 2020.03.04
+ * @author mihotel (begin with 2020.03.04)
  */
 public class PraseContentUtil {
     private static Uri uri;

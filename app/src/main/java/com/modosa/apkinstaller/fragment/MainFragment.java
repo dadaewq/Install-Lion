@@ -1,16 +1,19 @@
 package com.modosa.apkinstaller.fragment;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -45,8 +48,9 @@ import static com.modosa.apkinstaller.util.OpUtil.setComponentState;
  * @author dadaewq
  */
 public class MainFragment extends PreferenceFragmentCompat {
-    public final static int INSTALLER_SIZE = 6;
+    public final static int INSTALLER_SIZE = 7;
     public static final int RESULT_REFRESH_1 = 5201;
+    public static final String SP_KEY_CUSTOM_INSTALLER = "custom_installer";
     private static final int REQUEST_CODE_0 = 2330;
     private static final int REQUEST_CODE_1 = 2331;
     private static final int REQUEST_CODE_2 = 2332;
@@ -67,6 +71,8 @@ public class MainFragment extends PreferenceFragmentCompat {
     private Context context;
     private MyHandler mHandler;
     private String command;
+    private SharedPreferences spGetPreferenceManager;
+    private AlertDialog alertDialog;
 
 
     @Override
@@ -108,6 +114,14 @@ public class MainFragment extends PreferenceFragmentCompat {
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (alertDialog != null) {
+            alertDialog.dismiss();
+        }
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         context = getActivity();
@@ -120,26 +134,27 @@ public class MainFragment extends PreferenceFragmentCompat {
 
 
     private void init() {
-
+        spGetPreferenceManager = getPreferenceManager().getSharedPreferences();
         installerComponentNames = new ComponentName[INSTALLER_SIZE];
         enableInstallerSwitchPreferenceCompats = new SwitchPreferenceCompat[INSTALLER_SIZE];
         preferenceArrayLists = new InstallerPreferenceArrayList[INSTALLER_SIZE];
         avInstallerPreferences = new Preference[INSTALLER_SIZE];
 
-        String[] installerClassName = new String[INSTALLER_SIZE];
+//        String[] installerClassName = new String[INSTALLER_SIZE];
         String[] keySwitchPreferenceEnable = new String[INSTALLER_SIZE];
         String[] keyPreferenceAvinstall = new String[INSTALLER_SIZE];
 
 
+        installerComponentNames = OpUtil.getInstallerComponentNames(context);
         for (int i = 1; i < INSTALLER_SIZE; i++) {
             int finalI = i;
 
             preferenceArrayLists[i] = new InstallerPreferenceArrayList();
-            installerClassName[i] = context.getPackageName() + ".activity" + ".Install" + i + "Activity";
+//            installerClassName[i] = context.getPackageName() + ".activity" + ".Install" + i + "Activity";
             keySwitchPreferenceEnable[i] = "enable" + i;
             keyPreferenceAvinstall[i] = "avInstall" + i;
 
-            installerComponentNames[i] = new ComponentName(context.getPackageName(), installerClassName[i]);
+//            installerComponentNames[i] = new ComponentName(context.getPackageName(), installerClassName[i]);
             enableInstallerSwitchPreferenceCompats[i] = getPreferenceManager().findPreference(keySwitchPreferenceEnable[i]);
             avInstallerPreferences[i] = getPreferenceManager().findPreference(keyPreferenceAvinstall[i]);
             preferenceArrayLists[i].add(avInstallerPreferences[i]);
@@ -237,6 +252,13 @@ public class MainFragment extends PreferenceFragmentCompat {
             } else {
                 OpUtil.showToast0(context, R.string.title_not_deviceowner);
             }
+            return true;
+        });
+
+        // 6-Custom
+
+        avInstallerPreferences[6].setOnPreferenceClickListener(preference -> {
+            showDialogSetCustomInstaller();
             return true;
         });
 
@@ -483,6 +505,17 @@ public class MainFragment extends PreferenceFragmentCompat {
                 }
 
                 break;
+            case 6:
+
+                // 6-Custom
+                String getCustomInstaller = spGetPreferenceManager.getString(SP_KEY_CUSTOM_INSTALLER, "").trim();
+                String installerLable = getString(R.string.empty);
+                if (!"".equals(getCustomInstaller)) {
+                    installerLable = AppInfoUtil.getCustomInstallerLable(context, getCustomInstaller);
+                }
+                avInstallerPreferences[6].setTitle(String.format(getString(R.string.title_custom_installer), installerLable));
+                avInstallerPreferences[6].setSummary(getCustomInstaller);
+                break;
             default:
 
         }
@@ -513,6 +546,30 @@ public class MainFragment extends PreferenceFragmentCompat {
         Objects.requireNonNull(clipboard).setPrimaryClip(clipData);
         OpUtil.showToast0(context, command);
     }
+
+    private void showDialogSetCustomInstaller() {
+        final EditText editInfo = new EditText(context);
+        editInfo.setHint(R.string.hint_set_custom_installer);
+        String getCustomInstaller = spGetPreferenceManager.getString(SP_KEY_CUSTOM_INSTALLER, "").trim();
+        if (!"".equals(getCustomInstaller)) {
+            editInfo.setText(getCustomInstaller);
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                .setTitle(R.string.title_set_custom_installer)
+                .setMessage(R.string.message_set_custom_installer)
+                .setView(editInfo)
+                .setNeutralButton(R.string.close, null)
+                .setNegativeButton(R.string.bt_empty, null)
+                .setPositiveButton(R.string.bt_set, (dialog, which) -> {
+                    spGetPreferenceManager.edit().putString(SP_KEY_CUSTOM_INSTALLER, editInfo.getText().toString().replace(" ", "")).apply();
+                    refreshInstallerStatus(enableInstallerSwitchPreferenceCompats[6]);
+                });
+
+        alertDialog = builder.create();
+        OpUtil.showAlertDialog(context, alertDialog);
+        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v -> editInfo.setText(""));
+    }
+
 
     public interface MyListener {
 

@@ -40,7 +40,6 @@ import java.util.ArrayList;
 public class MainUiActivity extends AppCompatActivity implements MainFragment.MyListener {
 
     public static final int REQUEST_REFRESH = 233;
-    private final static String CONFIRM_PROMPT = "ConfirmPrompt";
     private static final String TAG_MAINUI = "mainUi";
     private static final String TAG_DPM = "dpm";
     private long exitTime = 0;
@@ -48,7 +47,7 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
     private boolean isMain = true;
     private FragmentManager fragmentManager;
     private SharedPreferences spGetPreferenceManager;
-    private AlertDialog alertDialogConfirmPrompt;
+    private AlertDialog alertDialog;
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -81,8 +80,9 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
     }
 
     private void confirmPrompt() {
-        if (!spGetPreferenceManager.getBoolean(CONFIRM_PROMPT, false)) {
-            showDialogConfirmPrompt();
+        if (!spGetPreferenceManager.getBoolean(OpUtil.SP_KEY_CONFIRM_PROMPT, false)) {
+            alertDialog = OpUtil.createDialogConfirmPrompt(this);
+            OpUtil.showDialogConfirmPrompt(this, alertDialog);
         }
     }
 
@@ -140,8 +140,8 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
     @Override
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if (alertDialogConfirmPrompt != null) {
-            alertDialogConfirmPrompt.dismiss();
+        if (alertDialog != null) {
+            alertDialog.dismiss();
         }
     }
 
@@ -168,16 +168,16 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
                     if (checkBox1.isChecked() && checkBox2.isChecked()) {
                         hasBothConfirm = true;
                     }
-                    spGetPreferenceManager.edit().putBoolean(CONFIRM_PROMPT, hasBothConfirm).apply();
+                    spGetPreferenceManager.edit().putBoolean(OpUtil.SP_KEY_CONFIRM_PROMPT, hasBothConfirm).apply();
                 });
 
-        alertDialogConfirmPrompt = builder.create();
-        OpUtil.showAlertDialog(this, alertDialogConfirmPrompt);
+        alertDialog = builder.create();
+        OpUtil.showAlertDialog(this, alertDialog);
 
-        OpUtil.setButtonTextColor(this, alertDialogConfirmPrompt);
-        Button button = alertDialogConfirmPrompt.getButton(DialogInterface.BUTTON_NEUTRAL);
+        OpUtil.setButtonTextColor(this, alertDialog);
+        Button button = alertDialog.getButton(DialogInterface.BUTTON_NEUTRAL);
         button.setEnabled(false);
-        CountDownTimer timer = new CountDownTimer(10000, 1000) {
+        CountDownTimer timer = new CountDownTimer(20000, 1000) {
             final String oK = getString(android.R.string.ok);
 
             @SuppressLint("SetTextI18n")
@@ -259,7 +259,6 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
 
 
     private void startPickFile(ComponentName componentName) {
-
         Intent intent = new Intent(OpUtil.MODOSA_ACTION_PICK_FILE);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setComponent(componentName);
@@ -275,13 +274,13 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
 
 
     private void pickFileToInstall() {
-        String[] installerClassName = new String[MainFragment.INSTALLER_SIZE];
-        ComponentName[] installerComponentNames = new ComponentName[MainFragment.INSTALLER_SIZE];
+//        String[] installerClassName = new String[MainFragment.INSTALLER_SIZE];
+        ComponentName[] installerComponentNames = OpUtil.getInstallerComponentNames(this);
         ArrayList<ComponentName> componentNameArrayList = new ArrayList<>();
         for (int i = 1; i < MainFragment.INSTALLER_SIZE; i++) {
-            installerClassName[i] = getPackageName() + ".activity" + ".Install" + i + "Activity";
-
-            installerComponentNames[i] = new ComponentName(getPackageName(), installerClassName[i]);
+//            installerClassName[i] = getPackageName() + ".activity" + ".Install" + i + "Activity";
+//
+//            installerComponentNames[i] = new ComponentName(getPackageName(), installerClassName[i]);
 
             getAvinstaller(componentNameArrayList, installerComponentNames[i]);
         }
@@ -303,6 +302,8 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
                     namelist.add(getString(R.string.name_install4));
                 } else if (componentName == installerComponentNames[5]) {
                     namelist.add(getString(R.string.name_install5));
+                } else if (componentName == installerComponentNames[6]) {
+                    namelist.add(getString(R.string.name_install6));
                 }
             }
 
@@ -319,9 +320,9 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
                         .setTitle(R.string.PickFileToInstall)
                         .setItems(items, (dialog, which) -> startPickFile(componentNameArrayList.get(which)));
 
-                alertDialogConfirmPrompt = builder.create();
+                alertDialog = builder.create();
 
-                OpUtil.showAlertDialog(this, alertDialogConfirmPrompt);
+                OpUtil.showAlertDialog(this, alertDialog);
             }
 
         } else {

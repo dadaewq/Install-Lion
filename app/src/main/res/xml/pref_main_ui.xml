@@ -75,4 +75,15 @@
             app:key="avInstall5"
             app:title="@string/title_not_deviceowner" />
     </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/name_install6">
+        <SwitchPreferenceCompat
+            app:key="enable6"
+            app:summaryOff="@string/summaryOff"
+            app:summaryOn="@string/summaryOn"
+            app:title="@string/enable_title" />
+        <Preference
+            app:key="avInstall6"
+            app:title="@string/title_custom_installer" />
+    </PreferenceCategory>
 </PreferenceScreen>

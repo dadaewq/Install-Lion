@@ -282,19 +282,18 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
 
     private void initInstall() {
         source = checkInstallSource();
+
+        boolean skipConfirm = true;
         boolean needconfirm = spGetPreferenceManager.getBoolean("needconfirm", true);
-        show_notification = spGetPreferenceManager.getBoolean("show_notification", false);
-        deleteSucceededApk = spGetPreferenceManager.getBoolean("deleteSucceededApk", false);
-        enableAnotherinstaller = spGetPreferenceManager.getBoolean(SettingsFragment.SP_KEY_ENABLE_ANOTHER_INSTALLER, false);
-//        boolean allowsource = spAllowSource.getBoolean(source[0], false);
-
-        boolean allowsource = false;
-
+        boolean isAllowsource = false;
         String allowsourceString = spAllowSource.getString(ManageAllowSourceActivity.SP_KEY_ALLOWSOURCE, "");
         List<String> allowsourceList = OpUtil.convertToList(allowsourceString, ",");
-
         if (!source[1].equals(ILLEGALPKGNAME)) {
-            allowsource = allowsourceList.contains(source[0]);
+            isAllowsource = allowsourceList.contains(source[0]);
+        }
+
+        if (needconfirm && !isAllowsource) {
+            skipConfirm = false;
         }
 
         validApkPath = preInstallGetValidApkPath();
@@ -305,17 +304,16 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
             cachePath = validApkPath;
             Log.e("cachePath", cachePath + "");
 
-            if (needconfirm) {
-                if (!source[1].equals(ILLEGALPKGNAME) && allowsource) {
-                    startInstall(validApkPath);
-                    finish();
-                    return;
-                }
-            } else {
+            show_notification = spGetPreferenceManager.getBoolean("show_notification", false);
+            deleteSucceededApk = spGetPreferenceManager.getBoolean("deleteSucceededApk", false);
+            enableAnotherinstaller = spGetPreferenceManager.getBoolean(SettingsFragment.SP_KEY_ENABLE_ANOTHER_INSTALLER, false);
+
+            if (skipConfirm) {
                 startInstall(validApkPath);
                 finish();
                 return;
             }
+
             String[] appVersion = AppInfoUtil.getApplicationVersion(this, apkinfo[1]);
 
             View infoView = View.inflate(this, R.layout.install_content_view, null);
@@ -431,7 +429,7 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
         }
         String refererPackageLabel =
                 AppInfoUtil.getApplicationLabel(this, fromPkgName);
-        if (getString(R.string.uninstalled).equals(refererPackageLabel)) {
+        if (getString(R.string.unknown).equals(refererPackageLabel)) {
             fromPkgLabel = ILLEGALPKGNAME;
         } else {
             fromPkgLabel = refererPackageLabel;
@@ -458,13 +456,13 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
                     try {
                         is = getContentResolver().openInputStream(uri);
                     } catch (Exception e) {
-                        copyErr(uri + "\n" + e);
+                        copyErr(uri + "\nopenInputStream " + e);
                         showMyToast1("致命错误，请向开发者报告\n" + uri + "\n" + e + "\n已复制到剪贴板");
                         e.printStackTrace();
                         finish();
                     }
                     if (is == null) {
-                        copyErr(uri + "\n");
+                        copyErr(uri + "\nis = null");
                         showMyToast1("致命错误，请向开发者报告\n" + uri + "\n已复制到剪贴板");
                         finish();
                     }
@@ -548,14 +546,13 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
 
     void showNotificationWithdeleteCache(String channelId, boolean success) {
         Log.e("installed " + (success ? "success" : "fail"), apkinfo[1]);
-        if (success) {
-            isInstalledSuccess = true;
+        isInstalledSuccess = success;
+        if (isInstalledSuccess) {
             deleteCache();
             if (show_notification) {
                 new NotifyUtil(this).sendNotification(channelId, String.format(getString(R.string.tip_success_install), apkinfo[0]), apkinfo[1], validApkPath, istemp, enableAnotherinstaller);
             }
         } else {
-            isInstalledSuccess = false;
             if (show_notification) {
                 new NotifyUtil(this).sendNotification(NotifyUtil.CHANNEL_ID_FAIL, String.format(getString(R.string.tip_failed_install), apkinfo[0]), apkinfo[1], validApkPath, istemp, enableAnotherinstaller);
             } else {

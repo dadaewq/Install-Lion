@@ -260,7 +260,7 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
                 .setTitle(R.string.title_dialog_SetOrganizationName)
                 .setView(editOraName)
                 .setNeutralButton(R.string.close, null)
-                .setNegativeButton(R.string.clear, (dialog, which) -> {
+                .setNegativeButton(R.string.bt_clear, (dialog, which) -> {
                     editorGetPreferenceManager.putString(sp_key_orgName, null).apply();
                     devicePolicyManager.setOrganizationName(adminComponentName, null);
                 })
@@ -281,7 +281,7 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
         final EditText editInfo = new EditText(context);
         CharSequence getLockScreenInfo = devicePolicyManager.getDeviceOwnerLockScreenInfo();
         if (getLockScreenInfo == null) {
-            editInfo.setHint("");
+            editInfo.setText("");
         } else {
             editInfo.setText(getLockScreenInfo);
         }
@@ -289,7 +289,7 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
                 .setTitle(R.string.title_dialog_SetLockScreenInfo)
                 .setView(editInfo)
                 .setNeutralButton(R.string.close, null)
-                .setNegativeButton(R.string.clear, (dialog, which) -> devicePolicyManager.setDeviceOwnerLockScreenInfo(adminComponentName, null))
+                .setNegativeButton(R.string.bt_clear, (dialog, which) -> devicePolicyManager.setDeviceOwnerLockScreenInfo(adminComponentName, null))
                 .setPositiveButton(R.string.bt_set, (dialog, which) -> devicePolicyManager.setDeviceOwnerLockScreenInfo(adminComponentName, editInfo.getText().toString()));
 
         alertDialog = builder.create();
@@ -385,7 +385,7 @@ public class DpmSettingsFragment extends PreferenceFragmentCompat implements Pre
                 .setTitle(R.string.title_SetUserRestrictions)
                 .setView(keyOfRestriction)
                 .setNeutralButton(R.string.close, null)
-                .setNegativeButton(R.string.clear, null)
+                .setNegativeButton(R.string.bt_clear, null)
                 .setPositiveButton(R.string.bt_add, null);
 
         alertDialog = builder.create();

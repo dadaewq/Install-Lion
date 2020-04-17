@@ -37,7 +37,7 @@
             app:title="@string/hideIcon" />
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/title_others">
+    <PreferenceCategory app:title="@string/title_general">
         <Preference
             app:key="clearAllowedList"
             app:title="@string/title_manageAllowSource" />
@@ -55,5 +55,16 @@
             app:isPreferenceVisible="false"
             app:key="ignoreBatteryOptimization"
             app:title="@string/title_ignoreBatteryOptimization" />
+    </PreferenceCategory>
+    <PreferenceCategory app:title="@string/title_others">
+        <Preference
+            app:key="instructions_before_use"
+            app:title="@string/title_instructions_before_use" />
+        <Preference
+            app:key="help"
+            app:title="@string/title_help" />
+        <Preference
+            app:key="about"
+            app:title="@string/title_about" />
     </PreferenceCategory>
 </PreferenceScreen>

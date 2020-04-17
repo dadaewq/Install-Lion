@@ -44,7 +44,7 @@
     <string name="name_install3">Install Lion-Shizuku</string>
     <string name="name_install4">Install Lion-Root</string>
     <string name="name_install5">Install Lion-DPM</string>
-
+    <string name="name_install6">Install Lion-Custom</string>
     <string name="summary_notexist">Not exist！</string>
     <string name="summary_permission_no">Unauthorized！</string>
     <string name="summary_permission_yes">Authorized</string>
@@ -70,6 +70,7 @@
     <string name="tip_ltsdk26">Only supports Android 8.0 and above devices</string>
     <string name="tip_manualAuthorize">Please find the app and authorize it manually</string>
     <string name="tip_start_install">Start installing  %1$s</string>
+    <string name="tip_use_to_install">Use %1$s to install %2$s</string>
     <string name="tip_start_uninstall">Start uninstalling  %1$s</string>
     <string name="tip_success_install">%1$s Installed succeed</string>
     <string name="tip_success_uninstall">%1$s Uninstalled succeed</string>
@@ -85,16 +86,18 @@
     <string name="title_icebox__authorization_state">Ice Box authorization state</string>
     <string name="title_icebox_support_state">Ice Box support state</string>
     <string name="title_shizuku_authorization_state">Shizuku authorization state</string>
-
-
     <string name="tip_failed_get_content">Get Failed</string>
-
     <string name="checkbox_deactivate">Confirm Deactivate</string>
-
     <string name="tip_start_activating">Trying to activate</string>
     <string name="tip_success_deactivate">Cancel succeed</string>
     <string name="tip_failed_deactivate">Unable to deactivate</string>
     <string name="title_not_deviceowner">Not the Device Owner currently</string>
+    <string name="title_custom_installer">Current： %s</string>
+    <string name="title_set_custom_installer">Set the custom installer</string>
+    <string name="message_set_custom_installer">\nPlease enter the package name or full activity name</string>
+    <string name="hint_set_custom_installer">For example：com.android.packageinstaller\nor com.google.android.packageinstaller/com.android.packageinstaller.InstallStart</string>
+    <string name="tip_not_set_custom_installer">You have not set the custom installer</string>
+    <string name="tip_invalid__custom_installer">Installed failed！Custom installer %s is valid</string>
     <string name="summary_clicktocopycmd">\n%1$sn(Click to copy)</string>
     <string name="title_deactivate_deviceowner">Deactivate Device Owner</string>
     <string name="message_deactivate">\nThis operation is irrevocable\n\nMake sure you have unlocked unnecessary default apps\n</string>
@@ -111,8 +114,8 @@
     <string name="title_RebootDevice">Reboot device now</string>
     <string name="title_dpm_settings">Device Owner settings</string>
     <string name="title_lockDefaultApp">Lock Default App</string>
-    <string name="title_others">Others</string>
     <string name="title_display">Display</string>
+    <string name="title_general">General</string>
     <string name="title_SetOrganizationName">Set organization name</string>
     <string name="title_dialog_SetOrganizationName">set the name of the organization under management</string>
     <string name="title_SetLockScreenInfo">Set lock screen info</string>
@@ -123,7 +126,8 @@
     <string name="title_SetUserRestrictions">Set user restrictions</string>
     <string name="hint_restrictionkey">Please input the key of the restriction</string>
     <string name="bt_add">Add</string>
-    <string name="clear">Clear</string>
+    <string name="bt_clear">Clear</string>
+    <string name="bt_empty">Clear</string>
     <string name="bt_set">Set</string>
     <string name="clear_lock">Clear Lock</string>
     <string name="close">Close</string>
@@ -157,7 +161,18 @@
     <string name="title_about_install">Installation</string>
     <string name="bt_install">Install</string>
     <string name="empty">Empty</string>
-    <string name="uninstalled">Uninstalled</string>
     <string name="message_confirm_remove_list">Remove from list</string>
     <string name="file_picker_tv_sd_card">Internal shared storage</string>
+    <string name="title_others">Others</string>
+    <string name="title_help">Help</string>
+    <string name="title_about">About</string>
+    <string name="rate">Rate</string>
+    <string name="title_Introduction">What\'s this</string>
+    <string name="desc_Introduction">Provide multiple installers to install APK and uninstall apps silently without root or using root</string>
+    <string name="title_developer">Developer</string>
+    <string name="desc_developer">Developer</string>
+    <string name="title_other_works">Other Works</string>
+    <string name="name_dark_mode_switch">Dark Mode Switch</string>
+    <string name="desc_dark_mode_switch">Switch the dark mode of Android system conveniently\nSupport Android 4.1+</string>
+    <string name="title_licenses">About Open Source</string>
 </resources>

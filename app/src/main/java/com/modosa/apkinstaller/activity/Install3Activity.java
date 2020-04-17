@@ -119,7 +119,6 @@ public class Install3Activity extends AbstractInstallerActivity implements SAIPa
                 }
 
                 showNotificationWithdeleteCache(CHANNEL_ID, false);
-
                 break;
             default:
                 finish();
