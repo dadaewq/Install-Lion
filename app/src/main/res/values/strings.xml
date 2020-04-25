@@ -71,6 +71,7 @@
     <string name="tip_manualAuthorize">Please find the app and authorize it manually</string>
     <string name="tip_start_install">Start installing  %1$s</string>
     <string name="tip_use_to_install">Use %1$s to install %2$s</string>
+    <string name="tip_use_to_uninstall">Use %1$s to uninstall %2$s</string>
     <string name="tip_start_uninstall">Start uninstalling  %1$s</string>
     <string name="tip_success_install">%1$s Installed succeed</string>
     <string name="tip_success_uninstall">%1$s Uninstalled succeed</string>
@@ -97,7 +98,7 @@
     <string name="message_set_custom_installer">\nPlease enter the package name or full activity name</string>
     <string name="hint_set_custom_installer">For example：com.android.packageinstaller\nor com.google.android.packageinstaller/com.android.packageinstaller.InstallStart</string>
     <string name="tip_not_set_custom_installer">You have not set the custom installer</string>
-    <string name="tip_invalid__custom_installer">Installed failed！Custom installer %s is valid</string>
+    <string name="tip_invalid__custom_installer">failed！Custom installer %s is valid</string>
     <string name="summary_clicktocopycmd">\n%1$sn(Click to copy)</string>
     <string name="title_deactivate_deviceowner">Deactivate Device Owner</string>
     <string name="message_deactivate">\nThis operation is irrevocable\n\nMake sure you have unlocked unnecessary default apps\n</string>

@@ -8,8 +8,8 @@ android {
         applicationId "com.modosa.apkinstaller"
         minSdkVersion 22
         targetSdkVersion 29
-        versionCode 39
-        versionName "3.7.1"
+        versionCode 40
+        versionName "3.7.3"
         flavorDimensions "default"
     }
 
@@ -49,7 +49,7 @@ dependencies {
     implementation "com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}"
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.preference:preference:1.1.0'
+    implementation 'androidx.preference:preference:1.1.1'
     implementation 'io.reactivex.rxjava2:rxjava:2.2.13'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
     implementation 'com.catchingnow.icebox:SDK:1.0.5'

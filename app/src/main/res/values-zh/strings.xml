@@ -73,6 +73,7 @@
     <string name="tip_manualAuthorize">请找到本应用并手动授权</string>
     <string name="tip_start_install">开始安装  %1$s</string>
     <string name="tip_use_to_install">使用%1$s 安装 %2$s</string>
+    <string name="tip_use_to_uninstall">使用%1$s 卸载 %2$s</string>
     <string name="tip_start_uninstall">开始卸载  %1$s</string>
     <string name="tip_success_install">%1$s 安装成功</string>
     <string name="tip_success_uninstall">%1$s 卸载成功</string>
@@ -97,7 +98,7 @@
     <string name="message_set_custom_installer">\n请输入包名或完整的活动名</string>
     <string name="hint_set_custom_installer">例如：com.android.packageinstaller\n或com.google.android.packageinstaller/com.android.packageinstaller.InstallStart</string>
     <string name="tip_not_set_custom_installer">您还没有设置自定义安装器</string>
-    <string name="tip_invalid__custom_installer">安装失败！自定义安装器 %s 无效</string>
+    <string name="tip_invalid__custom_installer">失败！自定义安装器 %s 无效</string>
     <string name="summary_clicktocopycmd">\n%1$s\n(点击可复制)</string>
     <string name="title_deactivate_deviceowner">解除设备管理员权限</string>
     <string name="message_deactivate">\n此操作不可撤销\n\n请确保已取消锁定不必要的默认应用\n</string>

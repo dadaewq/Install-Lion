@@ -24,6 +24,7 @@
             app:summary="@string/summary_deleteSucceededApk"
             app:title="@string/title_deleteSucceededApk" />
         <Preference
+            app:isPreferenceVisible="false"
             app:key="installByAnotherAfterFail"
             app:title="@string/title_installByAnotherAfterFail" />
     </PreferenceCategory>

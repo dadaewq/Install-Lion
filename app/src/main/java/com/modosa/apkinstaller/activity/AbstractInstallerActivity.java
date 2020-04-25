@@ -20,7 +20,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
 import com.modosa.apkinstaller.R;
-import com.modosa.apkinstaller.fragment.SettingsFragment;
 import com.modosa.apkinstaller.util.AppInfoUtil;
 import com.modosa.apkinstaller.util.NotifyUtil;
 import com.modosa.apkinstaller.util.OpUtil;
@@ -43,13 +42,13 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
     private static final int REQUEST_PICK_APK_FILE = 0x2331;
     private static final String ILLEGALPKGNAME = "IL^&IllegalPN*@!128`+=：:,.[";
     private final String nl = System.getProperty("line.separator");
+    private final boolean enableAnotherinstaller = false;
     String[] apkinfo;
     String uninstallPackageLable;
     StringBuilder alertDialogMessage;
     File installApkFile;
     boolean istemp = false;
     private boolean show_notification;
-    private boolean enableAnotherinstaller;
     private String validApkPath;
     private boolean isInstalledSuccess = false;
     private boolean deleteSucceededApk;
@@ -95,7 +94,14 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
                 }
                 break;
             default:
-                uri = getIntent().getData();
+                Intent originalintent = getIntent();
+                if (Intent.ACTION_SEND.equals(action)) {
+                    if (originalintent.hasExtra(Intent.EXTRA_STREAM)) {
+                        uri = originalintent.getParcelableExtra(Intent.EXTRA_STREAM);
+                    }
+                } else {
+                    uri = originalintent.getData();
+                }
                 initFromUri();
 
         }
@@ -306,7 +312,7 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
 
             show_notification = spGetPreferenceManager.getBoolean("show_notification", false);
             deleteSucceededApk = spGetPreferenceManager.getBoolean("deleteSucceededApk", false);
-            enableAnotherinstaller = spGetPreferenceManager.getBoolean(SettingsFragment.SP_KEY_ENABLE_ANOTHER_INSTALLER, false);
+//            enableAnotherinstaller = spGetPreferenceManager.getBoolean(SettingsFragment.SP_KEY_ENABLE_ANOTHER_INSTALLER, false);
 
             if (skipConfirm) {
                 startInstall(validApkPath);
@@ -458,16 +464,15 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
                     } catch (Exception e) {
                         copyErr(uri + "\nopenInputStream " + e);
                         showMyToast1("致命错误，请向开发者报告\n" + uri + "\n" + e + "\n已复制到剪贴板");
-                        e.printStackTrace();
+                        Log.e("openInputStream", "" + e);
                         finish();
+
                     }
                     if (is == null) {
                         copyErr(uri + "\nis = null");
                         showMyToast1("致命错误，请向开发者报告\n" + uri + "\n已复制到剪贴板");
                         finish();
-                    }
-
-                    if (is != null) {
+                    } else {
                         getPath = OpUtil.createApkFromUri(this, is).getPath();
                     }
                     Log.e("createApkFromUri", getPath + "");

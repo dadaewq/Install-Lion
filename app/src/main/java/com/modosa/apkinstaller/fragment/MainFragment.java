@@ -248,7 +248,7 @@ public class MainFragment extends PreferenceFragmentCompat {
         assert dpm_settings != null;
         dpm_settings.setOnPreferenceClickListener(preference -> {
             if (isDeviceOwner()) {
-                ((MyListener) Objects.requireNonNull(getActivity())).swtichIsMainFragment(false);
+                ((MyListener) requireActivity()).swtichIsMainFragment(false);
             } else {
                 OpUtil.showToast0(context, R.string.title_not_deviceowner);
             }
@@ -537,7 +537,7 @@ public class MainFragment extends PreferenceFragmentCompat {
     }
 
     private boolean isDeviceOwner() {
-        return ((MyListener) Objects.requireNonNull(getActivity())).isDeviceOwner();
+        return ((MyListener) requireActivity()).isDeviceOwner();
     }
 
     private void copyCommand() {

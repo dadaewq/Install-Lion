@@ -48,10 +48,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class SettingsFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener {
     public static final String SP_KEY_NIGHT_MODE = "MODE_NIGHT";
-    public static final String SP_KEY_ENABLE_ANOTHER_INSTALLER = "enableAnotherInstaller";
     public static final String SP_KEY_ANOTHER_INSTALLER_NAME = "anotherInstallerName";
     public static final String SP_KEY_DISABLE_BUG_REPORT = "disableBugReport";
     public static final String SP_KEY_EASTER_EGG = "Easter Egg";
+    private static final String SP_KEY_ENABLE_ANOTHER_INSTALLER = "enableAnotherInstaller";
     private Context context;
     private SharedPreferences spGetPreferenceManager;
     private MyHandler mHandler;
