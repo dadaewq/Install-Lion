@@ -1,21 +1,16 @@
 package com.modosa.apkinstaller.activity;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -90,6 +85,10 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
         runOnUiThread(() -> Toast.makeText(this, text, Toast.LENGTH_SHORT).show());
     }
 
+    private void showMyToast1(final String text) {
+        runOnUiThread(() -> Toast.makeText(this, text, Toast.LENGTH_LONG).show());
+    }
+
     private void showMyToast0(final int stringId) {
         runOnUiThread(() -> Toast.makeText(this, stringId, Toast.LENGTH_SHORT).show());
     }
@@ -114,7 +113,6 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
                 swtichIsMainFragment(true);
                 break;
             case R.id.PickFileToInstall:
-//                Log.e("permission", ""+OpUtil.checkWritePermission(this) );
                 if (OpUtil.checkWritePermission(this)) {
                     pickFileToInstall();
                 } else {
@@ -145,58 +143,6 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
         }
     }
 
-    private void showDialogConfirmPrompt() {
-
-        View view = View.inflate(this, R.layout.confirmprompt_doublecheckbox, null);
-
-        CheckBox checkBox1 = view.findViewById(R.id.confirm_checkbox1);
-        CheckBox checkBox2 = view.findViewById(R.id.confirm_checkbox2);
-        checkBox1.setText(R.string.checkbox1_instructions_before_use);
-        checkBox2.setText(R.string.checkbox2_instructions_before_use);
-        checkBox2.setEnabled(false);
-        checkBox1.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            checkBox2.setChecked(false);
-            checkBox2.setEnabled(isChecked);
-        });
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setTitle(R.string.title_instructions_before_use)
-                .setView(view)
-                .setPositiveButton(android.R.string.cancel, null)
-                .setNeutralButton(android.R.string.ok, (dialog, which) -> {
-                    boolean hasBothConfirm = false;
-                    if (checkBox1.isChecked() && checkBox2.isChecked()) {
-                        hasBothConfirm = true;
-                    }
-                    spGetPreferenceManager.edit().putBoolean(OpUtil.SP_KEY_CONFIRM_PROMPT, hasBothConfirm).apply();
-                });
-
-        alertDialog = builder.create();
-        OpUtil.showAlertDialog(this, alertDialog);
-
-        OpUtil.setButtonTextColor(this, alertDialog);
-        Button button = alertDialog.getButton(DialogInterface.BUTTON_NEUTRAL);
-        button.setEnabled(false);
-        CountDownTimer timer = new CountDownTimer(20000, 1000) {
-            final String oK = getString(android.R.string.ok);
-
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onTick(long millisUntilFinished) {
-                button.setText(oK + "(" + millisUntilFinished / 1000 + "s" + ")");
-            }
-
-            @Override
-            public void onFinish() {
-                button.setText(oK);
-                button.setEnabled(true);
-            }
-        };
-        //调用 CountDownTimer 对象的 start() 方法开始倒计时，也不涉及到线程处理
-        timer.start();
-
-
-    }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -262,72 +208,35 @@ public class MainUiActivity extends AppCompatActivity implements MainFragment.My
         Intent intent = new Intent(OpUtil.MODOSA_ACTION_PICK_FILE);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setComponent(componentName);
-        startActivity(intent);
-
-    }
-
-    private void getAvinstaller(ArrayList<ComponentName> list, ComponentName componentName) {
-        if (OpUtil.getEnabledComponentState(this, componentName)) {
-            list.add(componentName);
+        try {
+            startActivity(intent);
+        } catch (Exception e) {
+            showMyToast1("+e");
         }
-    }
 
+
+    }
 
     private void pickFileToInstall() {
-//        String[] installerClassName = new String[MainFragment.INSTALLER_SIZE];
-        ComponentName[] installerComponentNames = OpUtil.getInstallerComponentNames(this);
-        ArrayList<ComponentName> componentNameArrayList = new ArrayList<>();
-        for (int i = 1; i < MainFragment.INSTALLER_SIZE; i++) {
-//            installerClassName[i] = getPackageName() + ".activity" + ".Install" + i + "Activity";
-//
-//            installerComponentNames[i] = new ComponentName(getPackageName(), installerClassName[i]);
-
-            getAvinstaller(componentNameArrayList, installerComponentNames[i]);
-        }
-
-
-        if (componentNameArrayList.size() != 0) {
-
-            String[] items = new String[componentNameArrayList.size()];
-
-            ArrayList<String> namelist = new ArrayList<>();
-            for (ComponentName componentName : componentNameArrayList) {
-                if (componentName == installerComponentNames[1]) {
-                    namelist.add(getString(R.string.name_install1));
-                } else if (componentName == installerComponentNames[2]) {
-                    namelist.add(getString(R.string.name_install2));
-                } else if (componentName == installerComponentNames[3]) {
-                    namelist.add(getString(R.string.name_install3));
-                } else if (componentName == installerComponentNames[4]) {
-                    namelist.add(getString(R.string.name_install4));
-                } else if (componentName == installerComponentNames[5]) {
-                    namelist.add(getString(R.string.name_install5));
-                } else if (componentName == installerComponentNames[6]) {
-                    namelist.add(getString(R.string.name_install6));
-                }
+        OpUtil.pickFileToInstall(this, new OpUtil.PickInstaller() {
+            @Override
+            public void startPicked(String item, ComponentName componentName) {
+                showMyToast1(item);
+                startPickFile(componentName);
             }
 
-            for (int i = 0; i < namelist.size(); i++) {
-                items[i] = namelist.get(i);
-            }
-
-
-            if (items.length == 1) {
-                showMyToast0(items[0]);
-                startPickFile(componentNameArrayList.get(0));
-            } else {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this)
+            @Override
+            public void showPickDialog(Context context, String[] items, ArrayList<ComponentName> componentNameArrayList) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context)
                         .setTitle(R.string.PickFileToInstall)
                         .setItems(items, (dialog, which) -> startPickFile(componentNameArrayList.get(which)));
 
                 alertDialog = builder.create();
 
-                OpUtil.showAlertDialog(this, alertDialog);
+                OpUtil.showAlertDialog(context, alertDialog);
             }
-
-        } else {
-            showMyToast0(R.string.tip_enable_one_installer);
-        }
+        });
     }
+
 }
 

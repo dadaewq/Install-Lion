@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -39,9 +38,16 @@ public class LaunchAppActivity extends Activity {
                     notificationManager.cancel(getIntent.getExtras().getInt("notificationId"));
                 }
             }
-            String EXTRA_PACKAGE_NAME = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ? Intent.EXTRA_PACKAGE_NAME : "android.intent.extra.PACKAGE_NAME";
+            String EXTRA_PACKAGE_NAME = "android.intent.extra.PACKAGE_NAME";
+            String extraRealPath = "realPath";
 
-            if (getIntent.hasExtra(EXTRA_PACKAGE_NAME)) {
+            if (getIntent.hasExtra("isTemp")) {
+                if (getIntent.hasExtra(extraRealPath)) {
+                    File apkFile = new File(getIntent.getStringExtra(extraRealPath) + "");
+                    OpUtil.startAnotherInstaller(this, apkFile, getIntent.getBooleanExtra("isTemp", false));
+
+                }
+            } else if (getIntent.hasExtra(EXTRA_PACKAGE_NAME)) {
                 String packagename = getIntent.getStringExtra(EXTRA_PACKAGE_NAME) + "";
                 Log.d("PACKAGE_NAME ==>", packagename);
                 try {
@@ -51,10 +57,8 @@ public class LaunchAppActivity extends Activity {
                     Toast.makeText(this, e + "", Toast.LENGTH_LONG).show();
                 }
             } else {
-                String extraRealPath = "realPath";
                 if (getIntent.hasExtra(extraRealPath)) {
-
-                    File apkFile = new File(getIntent.getStringExtra(extraRealPath));
+                    File apkFile = new File(getIntent.getStringExtra(extraRealPath) + "");
                     OpUtil.deleteSingleFile(apkFile);
 
                     if (apkFile.exists()) {

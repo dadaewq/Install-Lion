@@ -6,12 +6,21 @@
     android:orientation="vertical"
     android:padding="20dp">
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/tv_installWithAnotherAfterFail"
+        android:textColor="@color/rBackground"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
     <CheckBox
         android:id="@+id/confirm_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:checked="false"
-        android:text="@string/checkbox_installByAnotherAfterFail"
+        android:text="@string/checkbox_installWithAnotherAfterFail"
         android:textSize="16sp" />
 
     <ScrollView
@@ -22,9 +31,8 @@
             android:id="@+id/editText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/et_installByAnotherAfterFail"
+            android:hint="@string/hint_set_custom_installer"
             android:importantForAutofill="no"
-            android:textColor="@color/rBackground"
             tools:ignore="TextFields" />
     </ScrollView>
 

@@ -40,6 +40,7 @@ import static com.modosa.apkinstaller.util.OpUtil.showToast0;
  * @author dadaewq
  */
 
+@SuppressWarnings("ConstantConditions")
 @RequiresApi(api = Build.VERSION_CODES.O)
 public class DpmSettingsFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener {
     public static final int RESULT_REFRESH_2 = 5202;

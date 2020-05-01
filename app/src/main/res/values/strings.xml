@@ -3,8 +3,8 @@
     <string name="title_instructions_before_use">Instructions before use</string>
     <string name="tv_instructions_before_use">\nThe main function of this App is to install apk and uninstall the application\n
         \nMost custom systems other than native Android cannot be set as default installation and uninstallation applications due to system limitations, and the system will almost always let the system\'s default package installer handle it when initiating the installation,and there is no good solution.\n
-        \nIn this case, it is recommended to use the \"Pick a file to install\" function in this App or use a file manager that supports selecting the open way to initiate the installation.\n
-        \nImportant：Please try these steps if the installation failed——turn off Google Play\'s security scan; turn on the USB installation in the developer options, turn off the \"Monitor adb installation\", etc to prevent the installation from failing. (Especially non-native Android)\n
+        \nIn this case,you can use the \"Pick a file to install\" function in this App,use a file manager that supports selecting the open way or share the APK to Install Lion to initiate the installation.\n
+        \nImportant：Please try these steps if the installation failed——turn off Google Play\'s security scan; turn on the USB installation in the developer options, turn off the \"Monitor adb installation\", etc to prevent the installation from failing.\n
         \nAndroid 11 devices please grant \"All files access\"\n
         \nInstall Lion will track bugs through network for optimization and improvement.You can disable it in the settings.\n
         \nFriendly reminder：
@@ -95,7 +95,7 @@
     <string name="title_not_deviceowner">Not the Device Owner currently</string>
     <string name="title_custom_installer">Current： %s</string>
     <string name="title_set_custom_installer">Set the custom installer</string>
-    <string name="message_set_custom_installer">\nPlease enter the package name or full activity name</string>
+    <string name="message_set_custom_installer">\nPlease enter the package name or full activity name of the specified application</string>
     <string name="hint_set_custom_installer">For example：com.android.packageinstaller\nor com.google.android.packageinstaller/com.android.packageinstaller.InstallStart</string>
     <string name="tip_not_set_custom_installer">You have not set the custom installer</string>
     <string name="tip_invalid__custom_installer">failed！Custom installer %s is valid</string>
@@ -108,10 +108,13 @@
     <string name="title_DISALLOW_UNINSTALL_APPS">Disallow uninstall Apps</string>
     <string name="title_DISALLOW_INSTALL_UNKNOWN_SOURCES">Disallow install unknown sources Apps</string>
     <string name="title_DISALLOW_ADD_MANAGED_PROFILE">Disallow add managed profiles</string>
+    <string name="title_uninstallApp">Uninstall app</string>
     <string name="title_clearCache">Click to clear cache</string>
     <string name="tip_success_clear_cache">Clean up</string>
     <string name="summary_clearCache">Current cache size：%s</string>
     <string name="PickFileToInstall">Pick a file to install</string>
+    <string name="title_pickUninstaller">Pick a uninstaller</string>
+    <string name="message_uninstallPackageName">Please enter the package name of the application</string>
     <string name="title_RebootDevice">Reboot device now</string>
     <string name="title_dpm_settings">Device Owner settings</string>
     <string name="title_lockDefaultApp">Lock Default App</string>
@@ -147,9 +150,12 @@
     <string name="title_useInternalFilePicker">Use internal file picker</string>
     <string name="summaryOn_useInternalFilePicker">Use system file picker when picking a file to install</string>
     <string name="summaryOff_useInternalFilePicker">Use internal file picker when picking a file to install</string>
-    <string name="title_installByAnotherAfterFail">Install with other app after failed installation</string>
-    <string name="checkbox_installByAnotherAfterFail">Enable this feature</string>
-    <string name="et_installByAnotherAfterFail">Enter the package name to specify the application, leave it blank to choose by the system</string>
+    <string name="title_installWithAnotherAfterFail">Install with another app after failed installation</string>
+    <string name="title_installWithAnother">install By Another</string>
+    <string name="checkbox_installWithAnotherAfterFail">Enable this feature</string>
+    <string name="tv_installWithAnotherAfterFail">This function needs to open the \"Show notification\"
+        \nAfter failed installation, you can initiate the installation of specified installer in the notification
+        \nPlease enter the package name or full activity name of the specified application.If left blank, it will be determined by the system</string>
     <string name="summary_deleteSucceededApk">Delete the APK automatically after successful installation (if the real path can be obtained)</string>
     <string name="title_AppTheme">Theme</string>
     <string name="AppTheme_MODE_NIGHT_NO">Light</string>

@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -29,16 +30,19 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.SwitchPreferenceCompat;
 
 import com.modosa.apkinstaller.R;
 import com.modosa.apkinstaller.activity.AboutActivity;
 import com.modosa.apkinstaller.activity.MainUiActivity;
 import com.modosa.apkinstaller.activity.ManageAllowSourceActivity;
+import com.modosa.apkinstaller.util.AppInfoUtil;
 import com.modosa.apkinstaller.util.FileSizeUtil;
 import com.modosa.apkinstaller.util.OpUtil;
 import com.modosa.apkinstaller.util.ResultUtil;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -46,12 +50,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * @author dadaewq
  */
+@SuppressWarnings("ConstantConditions")
 public class SettingsFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener {
     public static final String SP_KEY_NIGHT_MODE = "MODE_NIGHT";
     public static final String SP_KEY_ANOTHER_INSTALLER_NAME = "anotherInstallerName";
     public static final String SP_KEY_DISABLE_BUG_REPORT = "disableBugReport";
     public static final String SP_KEY_EASTER_EGG = "Easter Egg";
-    private static final String SP_KEY_ENABLE_ANOTHER_INSTALLER = "enableAnotherInstaller";
+    public static final String SP_KEY_ENABLE_ANOTHER_INSTALLER = "enableAnotherInstaller";
     private Context context;
     private SharedPreferences spGetPreferenceManager;
     private MyHandler mHandler;
@@ -83,10 +88,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     private void findPreferencesAndSetListner() {
         spGetPreferenceManager = getPreferenceManager().getSharedPreferences();
 
-        findPreference("installByAnotherAfterFail").setOnPreferenceClickListener(this);
+        findPreference("installWithAnotherAfterFail").setOnPreferenceClickListener(this);
         findPreference("setAppTheme").setOnPreferenceClickListener(this);
         findPreference("hideIcon").setOnPreferenceClickListener(this);
-        findPreference("clearAllowedList").setOnPreferenceClickListener(this);
+        findPreference("manageAllowedList").setOnPreferenceClickListener(this);
+        findPreference("uninstallApp").setOnPreferenceClickListener(this);
         findPreference("bugReport").setOnPreferenceClickListener(this);
         findPreference("instructions_before_use").setOnPreferenceClickListener(this);
         findPreference("help").setOnPreferenceClickListener(this);
@@ -158,8 +164,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     public boolean onPreferenceClick(Preference preference) {
         switch (preference.getKey()) {
 
-            case "installByAnotherAfterFail":
-                showDialogInstallByAnotherAfterFail();
+            case "installWithAnotherAfterFail":
+                showDialogInstallWithAnotherAfterFail();
                 break;
             case "setAppTheme":
                 showDialogSetAppTheme();
@@ -167,7 +173,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
             case "hideIcon":
                 showDialogHideIcon();
                 break;
-            case "clearAllowedList":
+            case "manageAllowedList":
 
                 Intent settingsIntent = new Intent(Intent.ACTION_VIEW)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -185,6 +191,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                     msg.arg1 = 6;
                     mHandler.sendMessage(msg);
                 });
+                break;
+            case "uninstallApp":
+                uninstallApp();
                 break;
             case "manualAuthorize":
                 manualuthorize();
@@ -212,7 +221,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         return true;
     }
 
-    private void showDialogInstallByAnotherAfterFail() {
+    private void showDialogInstallWithAnotherAfterFail() {
         View view = View.inflate(context, R.layout.install_by_another, null);
         CheckBox checkBox = view.findViewById(R.id.confirm_checkbox);
         EditText editText = view.findViewById(R.id.editText);
@@ -223,13 +232,20 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                .setTitle(R.string.title_installByAnotherAfterFail)
+                .setTitle(R.string.title_installWithAnotherAfterFail)
                 .setView(view)
                 .setNeutralButton(android.R.string.cancel, null)
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     SharedPreferences.Editor editor = spGetPreferenceManager.edit();
                     editor.putBoolean(SP_KEY_ENABLE_ANOTHER_INSTALLER, checkBox.isChecked());
-                    editor.putString(SP_KEY_ANOTHER_INSTALLER_NAME, editText.getText().toString().trim());
+                    if (checkBox.isChecked()) {
+                        ((SwitchPreferenceCompat) Objects.requireNonNull(findPreference("show_notification"))).setChecked(true);
+                    }
+                    String packageName = editText.getText().toString().replace(" ", "");
+                    editor.putString(SP_KEY_ANOTHER_INSTALLER_NAME, packageName);
+                    if (!"".equals(packageName)) {
+                        OpUtil.showToast0(context, AppInfoUtil.getCustomInstallerLable(context, packageName));
+                    }
                     editor.apply();
                 });
 
@@ -239,17 +255,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     }
 
     private void showDialogSetAppTheme() {
-
-//        MaterialDialog dialog = new MaterialDialog(this, MaterialDialog.getDEFAULT_BEHAVIOR());
-//
-//        int[] disabledIndices = {1, 3};
-//        dialog.title(R.string.title_AppTheme, null);
-//        DialogSingleChoiceExtKt.listItemsSingleChoice(dialog, R.array.AppTheme, null, null, 0,
-//                true,(materialDialog, index, text) -> {
-//                    Toast.makeText(this, "Selected item  " + text + " at index " + index, Toast.LENGTH_SHORT).show();
-//                    return null;
-//                });
-
 
         View view = View.inflate(context, R.layout.app_theme, null);
         RadioGroup radioGroup = view.findViewById(R.id.radioGroup);
@@ -323,8 +328,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         checkBox1.setText(R.string.hideIcon);
         checkBox2.setText(R.string.hideIconByTranslucent);
 
-        ComponentName launchMainUiComponentName1 = new ComponentName(context, context.getPackageName() + ".activity.MainActivity");
-        ComponentName launchMainUiComponentName2 = new ComponentName(context, context.getPackageName() + ".activity.TransparentActivity");
+        ComponentName launchMainUiComponentName1 = new ComponentName(context, MainUiActivity.class.getName().replace(MainUiActivity.class.getSimpleName(), "MainActivity"));
+        ComponentName launchMainUiComponentName2 = new ComponentName(context, MainUiActivity.class.getName().replace(MainUiActivity.class.getSimpleName(), "TransparentActivity"));
         PackageManager pm = context.getPackageManager();
 
         boolean isDisabledMain = !OpUtil.getEnabledComponentState(context, launchMainUiComponentName1);
@@ -359,6 +364,52 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         OpUtil.showAlertDialog(context, alertDialog);
     }
 
+    private void showDialogUninstall(String item, ComponentName componentName) {
+
+        EditText editText = new EditText(context);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                .setMessage(item + "\n" + context.getString(R.string.message_uninstallPackageName))
+                .setView(editText)
+                .setNeutralButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, null);
+        alertDialog = builder.create();
+
+        OpUtil.showAlertDialog(context, alertDialog);
+
+        alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String packageName = editText.getText().toString().trim();
+            if (!"".equals(packageName)) {
+                Intent intent = new Intent(Intent.ACTION_DELETE, Uri.parse("package:" + packageName))
+                        .setComponent(componentName);
+                try {
+                    context.startActivity(intent);
+                } catch (Exception e) {
+                    OpUtil.showToast1(context, "" + e);
+                }
+            }
+        });
+    }
+
+    private void uninstallApp() {
+        OpUtil.pickFileToInstall(context, new OpUtil.PickInstaller() {
+            @Override
+            public void startPicked(String item, ComponentName componentName) {
+                showDialogUninstall(item, componentName);
+            }
+
+            @Override
+            public void showPickDialog(Context context, String[] items, ArrayList<ComponentName> componentNameArrayList) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                        .setTitle(R.string.title_pickUninstaller)
+                        .setItems(items, (dialog, which) -> showDialogUninstall(items[which], componentNameArrayList.get(which)));
+
+                alertDialog = builder.create();
+
+                OpUtil.showAlertDialog(context, alertDialog);
+            }
+        });
+    }
 
     private void manualuthorize() {
         String targetPackage = "com.android.settings";

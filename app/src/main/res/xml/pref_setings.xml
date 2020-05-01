@@ -24,9 +24,8 @@
             app:summary="@string/summary_deleteSucceededApk"
             app:title="@string/title_deleteSucceededApk" />
         <Preference
-            app:isPreferenceVisible="false"
-            app:key="installByAnotherAfterFail"
-            app:title="@string/title_installByAnotherAfterFail" />
+            app:key="installWithAnotherAfterFail"
+            app:title="@string/title_installWithAnotherAfterFail" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/title_display">
@@ -40,8 +39,11 @@
 
     <PreferenceCategory app:title="@string/title_general">
         <Preference
-            app:key="clearAllowedList"
+            app:key="manageAllowedList"
             app:title="@string/title_manageAllowSource" />
+        <Preference
+            app:key="uninstallApp"
+            app:title="@string/title_uninstallApp" />
         <Preference
             app:key="clearCache"
             app:title="@string/title_clearCache" />

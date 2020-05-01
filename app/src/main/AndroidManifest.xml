@@ -138,6 +138,7 @@
                 <data android:scheme="file" />
                 <data android:scheme="content" />
                 <data android:mimeType="application/vnd.android.package-archive" />
+                <data android:mimeType="application/apk.1" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -145,6 +146,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data android:mimeType="application/vnd.android.package-archive" />
+                <data android:mimeType="application/apk.1" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.DELETE" />
@@ -170,6 +172,7 @@
                 <data android:scheme="file" />
                 <data android:scheme="content" />
                 <data android:mimeType="application/vnd.android.package-archive" />
+                <data android:mimeType="application/apk.1" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -177,6 +180,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data android:mimeType="application/vnd.android.package-archive" />
+                <data android:mimeType="application/apk.1" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.DELETE" />
@@ -202,6 +206,7 @@
                 <data android:scheme="file" />
                 <data android:scheme="content" />
                 <data android:mimeType="application/vnd.android.package-archive" />
+                <data android:mimeType="application/apk.1" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -209,6 +214,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data android:mimeType="application/vnd.android.package-archive" />
+                <data android:mimeType="application/apk.1" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.DELETE" />
@@ -236,6 +242,7 @@
                 <data android:scheme="file" />
                 <data android:scheme="content" />
                 <data android:mimeType="application/vnd.android.package-archive" />
+                <data android:mimeType="application/apk.1" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -243,6 +250,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data android:mimeType="application/vnd.android.package-archive" />
+                <data android:mimeType="application/apk.1" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.DELETE" />
@@ -270,6 +278,8 @@
                 <data android:scheme="file" />
                 <data android:scheme="content" />
                 <data android:mimeType="application/vnd.android.package-archive" />
+                <data android:mimeType="application/apk.1" />
+                <data android:mimeType="*/*" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -277,6 +287,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data android:mimeType="application/vnd.android.package-archive" />
+                <data android:mimeType="application/apk.1" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.DELETE" />
@@ -302,6 +313,7 @@
                 <data android:scheme="file" />
                 <data android:scheme="content" />
                 <data android:mimeType="application/vnd.android.package-archive" />
+                <data android:mimeType="application/apk.1" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -309,6 +321,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data android:mimeType="application/vnd.android.package-archive" />
+                <data android:mimeType="application/apk.1" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.DELETE" />

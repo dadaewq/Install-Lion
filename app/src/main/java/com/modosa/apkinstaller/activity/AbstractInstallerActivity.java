@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
 import com.modosa.apkinstaller.R;
+import com.modosa.apkinstaller.fragment.SettingsFragment;
 import com.modosa.apkinstaller.util.AppInfoUtil;
 import com.modosa.apkinstaller.util.NotifyUtil;
 import com.modosa.apkinstaller.util.OpUtil;
@@ -42,12 +43,12 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
     private static final int REQUEST_PICK_APK_FILE = 0x2331;
     private static final String ILLEGALPKGNAME = "IL^&IllegalPN*@!128`+=：:,.[";
     private final String nl = System.getProperty("line.separator");
-    private final boolean enableAnotherinstaller = false;
     String[] apkinfo;
     String uninstallPackageLable;
     StringBuilder alertDialogMessage;
     File installApkFile;
     boolean istemp = false;
+    private boolean enableAnotherinstaller;
     private boolean show_notification;
     private String validApkPath;
     private boolean isInstalledSuccess = false;
@@ -312,7 +313,7 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
 
             show_notification = spGetPreferenceManager.getBoolean("show_notification", false);
             deleteSucceededApk = spGetPreferenceManager.getBoolean("deleteSucceededApk", false);
-//            enableAnotherinstaller = spGetPreferenceManager.getBoolean(SettingsFragment.SP_KEY_ENABLE_ANOTHER_INSTALLER, false);
+            enableAnotherinstaller = spGetPreferenceManager.getBoolean(SettingsFragment.SP_KEY_ENABLE_ANOTHER_INSTALLER, false);
 
             if (skipConfirm) {
                 startInstall(validApkPath);
@@ -466,7 +467,6 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
                         showMyToast1("致命错误，请向开发者报告\n" + uri + "\n" + e + "\n已复制到剪贴板");
                         Log.e("openInputStream", "" + e);
                         finish();
-
                     }
                     if (is == null) {
                         copyErr(uri + "\nis = null");
@@ -504,20 +504,6 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
      * 开始卸载 uninstallPkgname
      */
     protected abstract void startUninstall(String uninstallPkgname);
-
-//    private void requestPermission() {
-//        try {
-//            ActivityCompat.requestPermissions(this, writePermissions, REQUEST_REFRESH_WRITE_PERMISSION);
-//        } catch (Exception e) {
-//            showMyToast1("" + e);
-//            finish();
-//        }
-//    }
-
-//    private boolean checkPermission() {
-//        int checkSelfPermission = ContextCompat.checkSelfPermission(this, writePermissions[0]);
-//        return (checkSelfPermission == 0);
-//    }
 
     void copyErr(String err) {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
@@ -564,9 +550,6 @@ public abstract class AbstractInstallerActivity extends AppCompatActivity {
                 if (!enableAnotherinstaller) {
                     deleteCache();
                 }
-            }
-            if (enableAnotherinstaller) {
-                OpUtil.startAnotherInstaller(this, installApkFile, istemp);
             }
         }
     }

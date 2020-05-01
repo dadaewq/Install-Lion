@@ -52,6 +52,7 @@ public class NotifyUtil {
 
         PendingIntent deleteFilePendingIntent = null;
         PendingIntent runAppPendingIntent = null;
+        PendingIntent installApkPendingIntent = null;
 
 
 //        如果使用 AppInfoUtils.getApkIcon()在InstallActivity用Bundle传LargeIcon
@@ -62,13 +63,19 @@ public class NotifyUtil {
         if (CHANNEL_ID_FAIL.equals(channelId) || Install2Activity.CHANNEL_ID.equals(channelId)) {
             largeIcon = AppInfoUtil.getApkIconBitmap(context, realPath);
             version = AppInfoUtil.getApkVersion(context, realPath);
-            if (isTemp && !enableAnotherinstaller) {
-                OpUtil.deleteSingleFile(new File(realPath));
+            if (enableAnotherinstaller) {
+//                if(CHANNEL_ID_FAIL.equals(channelId)){
+                installApkPendingIntent = getInstallApkPendingIntent(context, notificationId, realPath, isTemp);
+//                }
+            } else {
+                if (isTemp) {
+                    OpUtil.deleteSingleFile(new File(realPath));
+                }
             }
 
         } else {
             largeIcon = AppInfoUtil.getApplicationIconBitmap(context, packageName);
-            runAppPendingIntent = getRunAppPendingIntent((Activity) context, notificationId, packageName);
+            runAppPendingIntent = getRunAppPendingIntent(context, notificationId, packageName);
             if (!isTemp) {
                 deleteFilePendingIntent = getDeleteFilePendingIntent((Activity) context, notificationId, realPath);
 
@@ -81,7 +88,7 @@ public class NotifyUtil {
             versionName = version[0];
         }
 
-        notifyLiveStart(deleteFilePendingIntent, runAppPendingIntent, notificationId);
+        notifyLiveStart(deleteFilePendingIntent, runAppPendingIntent, installApkPendingIntent, notificationId);
     }
 
     private String getChannelName(String channelId) {
@@ -110,7 +117,7 @@ public class NotifyUtil {
         return channelName;
     }
 
-    private void notifyLiveStart(PendingIntent deleteFilePendingIntent, PendingIntent runAppPendingIntent, int notificationId) {
+    private void notifyLiveStart(PendingIntent deleteFilePendingIntent, PendingIntent runAppPendingIntent, PendingIntent installApkPendingIntent, int notificationId) {
 
         NotificationChannel channel;
 
@@ -142,7 +149,6 @@ public class NotifyUtil {
                         R.drawable.ic_filter_vintage_black_24dp)
                 //设置点击通知后自动删除通知
                 .setAutoCancel(true);
-
 //                .setContentIntent(null);
 
         if (deleteFilePendingIntent != null) {
@@ -153,6 +159,9 @@ public class NotifyUtil {
             builder.addAction(0, context.getString(R.string.click_launch), runAppPendingIntent);
         }
 
+        if (installApkPendingIntent != null) {
+            builder.addAction(0, context.getString(R.string.title_installWithAnother), installApkPendingIntent);
+        }
 
         //设置通知栏显示内容
         builder.setContentText(versionName);
@@ -176,7 +185,7 @@ public class NotifyUtil {
     }
 
 
-    private PendingIntent getRunAppPendingIntent(Activity context, int notificationId, String packageName) {
+    private PendingIntent getRunAppPendingIntent(Context context, int notificationId, String packageName) {
         try {
             Intent intent = context.getPackageManager().getLaunchIntentForPackage(packageName);
             if (intent != null) {
@@ -208,4 +217,19 @@ public class NotifyUtil {
         }
     }
 
+    private PendingIntent getInstallApkPendingIntent(Context context, int notificationId, String realPath, boolean isTemp) {
+
+        Intent intent = new Intent(context, LaunchAppActivity.class)
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .putExtra("notificationId", notificationId)
+                .putExtra("realPath", realPath)
+                .putExtra("isTemp", isTemp);
+
+        try {
+            return PendingIntent.getActivity(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

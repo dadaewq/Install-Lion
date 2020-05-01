@@ -4,8 +4,8 @@
     <string name="title_instructions_before_use">用前须知</string>
     <string name="tv_instructions_before_use">\n本应用的主要功能是安装APK和卸载应用\n
         \n除了原生Android外的绝大部分定制系统由于系统的限制，无法将本应用设置为默认安装与卸载应用,而且发起安装时这些系统会直接让系统默认的软件包安装程序来处理，也没有很好的解决办法。\n
-        \n这种情况推荐用本应用内的\"选择文件安装\"功能或用一些支持选择打开方式的文件管理器等来发起安装。\n
-        \n重要提示：安装失败的请尝试这些步骤——关闭Google Play的安全扫描;在开发者选项打开USB安装、关闭\"监控ADB安装\"等等以防止安装失败。(尤其是非原生Android)\n
+        \n这种情况可使用本应用内的\"选择文件安装\"、用一些支持选择打开方式的文件管理器或分享APK到安装狮等方式来发起安装。\n
+        \n重要提示：安装失败的请尝试这些步骤——关闭Google Play的安全扫描;在开发者选项打开USB安装、关闭\"监控ADB安装\"等等以防止安装失败。\n
         \nAndroid 11设备请授予\"所有文件访问权限\"\n
         \n为了优化和改进应用，安装狮会通过网络来收集错误。您可以在设置中关闭它。\n
         \n友情提示：
@@ -95,7 +95,7 @@
     <string name="title_not_deviceowner">当前不是 设备管理员</string>
     <string name="title_custom_installer">当前: %s</string>
     <string name="title_set_custom_installer">设置自定义安装器</string>
-    <string name="message_set_custom_installer">\n请输入包名或完整的活动名</string>
+    <string name="message_set_custom_installer">\n请输入指定应用的包名或完整的活动名</string>
     <string name="hint_set_custom_installer">例如：com.android.packageinstaller\n或com.google.android.packageinstaller/com.android.packageinstaller.InstallStart</string>
     <string name="tip_not_set_custom_installer">您还没有设置自定义安装器</string>
     <string name="tip_invalid__custom_installer">失败！自定义安装器 %s 无效</string>
@@ -108,10 +108,13 @@
     <string name="title_DISALLOW_UNINSTALL_APPS">禁止卸载应用</string>
     <string name="title_DISALLOW_INSTALL_UNKNOWN_SOURCES">禁止安装未知来源应用</string>
     <string name="title_DISALLOW_ADD_MANAGED_PROFILE">禁止添加配置管理文件</string>
+    <string name="title_uninstallApp">卸载应用</string>
     <string name="title_clearCache">点击清理缓存</string>
     <string name="tip_success_clear_cache">清理完成</string>
     <string name="summary_clearCache">当前缓存大小： %s</string>
     <string name="PickFileToInstall">选择文件安装</string>
+    <string name="title_pickUninstaller">选择卸载器</string>
+    <string name="message_uninstallPackageName">输入应用的包名开始卸载</string>
     <string name="title_RebootDevice">立即重启设备</string>
     <string name="title_dpm_settings">设备管理员设置</string>
     <string name="title_lockDefaultApp">锁定默认应用</string>
@@ -147,9 +150,10 @@
     <string name="title_useInternalFilePicker">使用内置文件选择器</string>
     <string name="summaryOn_useInternalFilePicker">选择文件安装时使用内置文件选择器</string>
     <string name="summaryOff_useInternalFilePicker">选择文件安装时使用系统文件选择器</string>
-    <string name="title_installByAnotherAfterFail">安装失败后用其他安装</string>
-    <string name="checkbox_installByAnotherAfterFail">启用此功能</string>
-    <string name="et_installByAnotherAfterFail">输入包名来指定应用，留空则由系统选择</string>
+    <string name="title_installWithAnotherAfterFail">安装失败后用其他安装</string>
+    <string name="title_installWithAnother">用其他安装</string>
+    <string name="checkbox_installWithAnotherAfterFail">启用此功能</string>
+    <string name="tv_installWithAnotherAfterFail">此功能需要打开“显示通知”\n安装失败后可在通知中向指定应用发起安装\n请输入指定应用的包名或完整的活动名，留空则由系统选择\n</string>
     <string name="summary_deleteSucceededApk">安装成功后自动删除安装包（如果能获取到真实路径）</string>
     <string name="title_AppTheme">主题</string>
     <string name="AppTheme_MODE_NIGHT_NO">浅色</string>

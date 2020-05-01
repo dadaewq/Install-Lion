@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.CountDownTimer;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -162,6 +163,7 @@ public class OpUtil {
         timer.start();
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static File createApkFromUri(Context context, InputStream is) {
 
         // getExternalCacheDir 此方法会确保此路径存在
@@ -255,38 +257,98 @@ public class OpUtil {
                 context.getPackageName() + ".FILE_PROVIDER", file);
     }
 
+    public static Pair<Boolean, Intent> getStartIntentPair(String getCustomInstaller, Intent startIntent) {
+        boolean prepareOperate = false;
+        if (getCustomInstaller.contains("/")) {
+            try {
+                String[] names = getCustomInstaller.split("/");
+                if (names[1].length() > 1 && names[1].startsWith(".")) {
+                    names[1] = names[0] + names[1];
+                }
+                startIntent.setComponent(new ComponentName(names[0], names[1]));
+                prepareOperate = true;
+            } catch (Exception ignore) {
+            }
+        } else {
+            startIntent.setPackage(getCustomInstaller);
+            prepareOperate = true;
+        }
+        return new Pair<>(prepareOperate, startIntent);
+    }
+
     public static void startAnotherInstaller(Context context, File installApkFile, boolean istemp) {
         String anotherInstallerName = PreferenceManager.getDefaultSharedPreferences(context).getString(SettingsFragment.SP_KEY_ANOTHER_INSTALLER_NAME, "").trim();
 
-        Intent systemIntent = new Intent(Intent.ACTION_VIEW)
+        Intent anotherIntent = new Intent(Intent.ACTION_VIEW)
                 .setDataAndType(getMyContentUriForFile(context, installApkFile), "application/vnd.android.package-archive")
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-        Intent anotherIntent = (Intent) systemIntent.clone();
-        boolean useSystemIntent = true;
-        if (!"".equals(anotherInstallerName)) {
-            anotherIntent.setPackage(anotherInstallerName);
-            try {
-                context.startActivity(anotherIntent);
-                useSystemIntent = false;
-            } catch (Exception e) {
-                e.printStackTrace();
+        boolean useAnotherInstaller = !"".equals(anotherInstallerName);
+
+        if (useAnotherInstaller) {
+            anotherIntent = getStartIntentPair(anotherInstallerName, anotherIntent).second;
+        }
+        try {
+            context.startActivity(anotherIntent);
+        } catch (Exception e) {
+            if (useAnotherInstaller) {
+                OpUtil.showToast1(context, String.format(context.getString(R.string.tip_invalid__custom_installer), anotherInstallerName));
+            } else {
+                OpUtil.showToast1(context, "" + e);
+            }
+            e.printStackTrace();
+            if (istemp) {
+                deleteSingleFile(installApkFile);
             }
         }
 
-        if (useSystemIntent) {
-            try {
-                context.startActivity(systemIntent);
-            } catch (Exception e) {
-                e.printStackTrace();
-                if (istemp) {
-                    deleteSingleFile(installApkFile);
-                }
-            }
-        }
+//        if (useAnotherInstaller) {
+//            try {
+//                context.startActivity(anotherIntent);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                if (istemp) {
+//                    deleteSingleFile(installApkFile);
+//                }
+//            }
+//        }
 
     }
+
+
+//    public static void startAnotherInstaller(Context context, File installApkFile, boolean istemp) {
+//        String anotherInstallerName = PreferenceManager.getDefaultSharedPreferences(context).getString(SettingsFragment.SP_KEY_ANOTHER_INSTALLER_NAME, "").trim();
+//
+//        Intent systemIntent = new Intent(Intent.ACTION_VIEW)
+//                .setDataAndType(getMyContentUriForFile(context, installApkFile), "application/vnd.android.package-archive")
+//                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//
+//        Intent anotherIntent = (Intent) systemIntent.clone();
+//        boolean useSystemIntent = true;
+//        if (!"".equals(anotherInstallerName)) {
+//            anotherIntent.setPackage(anotherInstallerName);
+//            try {
+//                context.startActivity(anotherIntent);
+//                useSystemIntent = false;
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        if (useSystemIntent) {
+//            try {
+//                context.startActivity(systemIntent);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                if (istemp) {
+//                    deleteSingleFile(installApkFile);
+//                }
+//            }
+//        }
+//
+//    }
 
     public static ComponentName[] getInstallerComponentNames(Context context) {
         ComponentName[] installerComponentNames = new ComponentName[MainFragment.INSTALLER_SIZE];
@@ -299,7 +361,6 @@ public class OpUtil {
         installerComponentNames[6] = new ComponentName(context, Install6Activity.class);
         return installerComponentNames;
     }
-
 
     public static boolean getEnabledComponentState(Context context, ComponentName componentName) {
         PackageManager pm = context.getPackageManager();
@@ -317,7 +378,6 @@ public class OpUtil {
         pm.setComponentEnabledSetting(componentName, flag, PackageManager.DONT_KILL_APP);
     }
 
-
     /**
      * 只有是文件且存在时删除
      */
@@ -327,7 +387,7 @@ public class OpUtil {
         }
     }
 
-
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void deleteDirectory(String filePath) {
         // 如果dir不以文件分隔符结尾，自动添加文件分隔符
         if (!filePath.endsWith(File.separator)) {
@@ -391,7 +451,6 @@ public class OpUtil {
         return sb.toString();
     }
 
-
     public static void showToast0(Context context, final String text) {
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
     }
@@ -400,7 +459,7 @@ public class OpUtil {
         Toast.makeText(context, stringId, Toast.LENGTH_SHORT).show();
     }
 
-    private static void showToast1(Context context, final String text) {
+    public static void showToast1(Context context, final String text) {
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
     }
 
@@ -408,5 +467,90 @@ public class OpUtil {
         Toast.makeText(context, stringId, Toast.LENGTH_SHORT).show();
     }
 
+    private static Pair<ArrayList<ComponentName>, String[]> getAvinstaller(Context context) {
 
+        ComponentName[] installerComponentNames = OpUtil.getInstallerComponentNames(context);
+        ArrayList<ComponentName> componentNameArrayList = new ArrayList<>();
+        ArrayList<String> namelist = new ArrayList<>();
+
+        for (int i = 1; i < installerComponentNames.length; i++) {
+            if (OpUtil.getEnabledComponentState(context, installerComponentNames[i])) {
+                componentNameArrayList.add(installerComponentNames[i]);
+                switch (i) {
+                    case 1:
+                        namelist.add(context.getString(R.string.name_install1));
+                        break;
+                    case 2:
+                        namelist.add(context.getString(R.string.name_install2));
+                        break;
+                    case 3:
+                        namelist.add(context.getString(R.string.name_install3));
+                        break;
+                    case 4:
+                        namelist.add(context.getString(R.string.name_install4));
+                        break;
+                    case 5:
+                        namelist.add(context.getString(R.string.name_install5));
+                        break;
+                    case 6:
+                        namelist.add(context.getString(R.string.name_install6));
+                        break;
+                    default:
+                }
+
+            }
+        }
+
+
+        String[] items = new String[componentNameArrayList.size()];
+        for (int i = 0; i < namelist.size(); i++) {
+            items[i] = namelist.get(i);
+        }
+
+        return new Pair<>(componentNameArrayList, items);
+
+//        if (componentNameArrayList.size() != 0) {
+//            for (ComponentName componentName : componentNameArrayList) {
+//                if (componentName == installerComponentNames[1]) {
+//                    namelist.add(context.getString(R.string.name_install1));
+//                } else if (componentName == installerComponentNames[2]) {
+//                    namelist.add(context.getString(R.string.name_install2));
+//                } else if (componentName == installerComponentNames[3]) {
+//                    namelist.add(context.getString(R.string.name_install3));
+//                } else if (componentName == installerComponentNames[4]) {
+//                    namelist.add(context.getString(R.string.name_install4));
+//                } else if (componentName == installerComponentNames[5]) {
+//                    namelist.add(context.getString(R.string.name_install5));
+//                } else if (componentName == installerComponentNames[6]) {
+//                    namelist.add(context.getString(R.string.name_install6));
+//                }
+//            }
+//        }
+
+
+    }
+
+
+    public static void pickFileToInstall(Context context, PickInstaller pickInstaller) {
+        Pair<ArrayList<ComponentName>, String[]> getAvinstallerPair = getAvinstaller(context);
+
+        ArrayList<ComponentName> componentNameArrayList = getAvinstallerPair.first;
+        if (componentNameArrayList.size() != 0) {
+            String[] items = getAvinstallerPair.second;
+
+            if (items.length == 1) {
+                pickInstaller.startPicked(items[0], componentNameArrayList.get(0));
+            } else {
+                pickInstaller.showPickDialog(context, items, componentNameArrayList);
+            }
+        } else {
+            showToast1(context, context.getString(R.string.tip_enable_one_installer));
+        }
+    }
+
+    public interface PickInstaller {
+        void startPicked(String item, ComponentName componentName);
+
+        void showPickDialog(Context context, String[] items, ArrayList<ComponentName> componentNameArrayList);
+    }
 }

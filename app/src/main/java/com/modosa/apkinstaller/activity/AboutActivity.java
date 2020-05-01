@@ -89,5 +89,6 @@ public class AboutActivity extends AbsAboutActivity {
         items.add(new License("SAI", "Aefyr", License.GPL_V3, "https://github.com/Aefyr/SAI"));
         items.add(new License("AndroidFilePicker", "rosuH", License.MIT, "https://github.com/rosuH/AndroidFilePicker"));
         items.add(new License("AndroidX", "Google", License.APACHE_2, "https://source.google.com"));
+        items.add(new License("RxJava", "ReactiveX", License.APACHE_2, "https://github.com/ReactiveX/RxJava"));
     }
 }

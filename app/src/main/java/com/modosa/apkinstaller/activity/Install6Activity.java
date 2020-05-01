@@ -1,9 +1,9 @@
 package com.modosa.apkinstaller.activity;
 
-import android.content.ComponentName;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
+import android.util.Pair;
 
 import androidx.preference.PreferenceManager;
 
@@ -19,7 +19,6 @@ import java.io.File;
  */
 public class Install6Activity extends AbstractInstallerActivity {
 
-    private Intent startIntent;
     private boolean needDelete = false;
 
 
@@ -45,9 +44,10 @@ public class Install6Activity extends AbstractInstallerActivity {
             Log.d("Start uninstall", param + "");
         }
 
-        boolean prepareOperate = false;
+        boolean prepareOperate;
         String getCustomInstaller = PreferenceManager.getDefaultSharedPreferences(this).getString(MainFragment.SP_KEY_CUSTOM_INSTALLER, "").trim();
         if (!"".equals(getCustomInstaller)) {
+            Intent startIntent;
             if (isInstall) {
                 startIntent = new Intent(Intent.ACTION_VIEW)
                         .setDataAndType(OpUtil.getMyContentUriForFile(this, installApkFile), "application/vnd.android.package-archive")
@@ -58,20 +58,10 @@ public class Install6Activity extends AbstractInstallerActivity {
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             }
 
-            if (getCustomInstaller.contains("/")) {
-                try {
-                    String[] names = getCustomInstaller.split("/");
-                    if (names[1].length() > 1 && names[1].startsWith(".")) {
-                        names[1] = names[0] + names[1];
-                    }
-                    startIntent.setComponent(new ComponentName(names[0], names[1]));
-                    prepareOperate = true;
-                } catch (Exception ignore) {
-                }
-            } else {
-                startIntent.setPackage(getCustomInstaller);
-                prepareOperate = true;
-            }
+            Pair<Boolean, Intent> pair = OpUtil.getStartIntentPair(getCustomInstaller, startIntent);
+            prepareOperate = pair.first;
+            startIntent = pair.second;
+
 
             if (prepareOperate) {
                 try {
