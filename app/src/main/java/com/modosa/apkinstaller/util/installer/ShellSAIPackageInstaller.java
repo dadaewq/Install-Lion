@@ -83,7 +83,12 @@ public abstract class ShellSAIPackageInstaller extends SAIPackageInstaller {
                     installationCompleted();
                     return;
                 }
-                ensureCommandSucceeded(getShell().exec(new Shell.Command("pm", "install-write", "-S", String.valueOf(apkSource.getApkLength()), String.valueOf(sessionId), String.format("%d.apk", currentApkFile++)), apkSource.openApkInputStream()));
+                ensureCommandSucceeded(getShell().exec(
+                        new Shell.Command("pm", "install-write", "-S",
+                                String.valueOf(apkSource.getApkLength()),
+                                String.valueOf(sessionId), String.format("%d.apk", currentApkFile++)),
+                        apkSource.openApkInputStream())
+                );
             }
 
             mIsAwaitingBroadcast.set(true);
