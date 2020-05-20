@@ -19,7 +19,6 @@ public class IOUtils {
         }
     }
 
-
     public static Thread writeStreamToStringBuilder(StringBuilder builder, InputStream inputStream) {
         Thread t = new Thread(() -> {
             try {

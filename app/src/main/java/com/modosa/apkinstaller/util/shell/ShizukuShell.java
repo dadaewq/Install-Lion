@@ -60,43 +60,44 @@ public class ShizukuShell implements Shell {
     }
 
     private Result execInternal(Command command, @Nullable InputStream inputPipe) {
+
         StringBuilder stdOutSb = new StringBuilder();
         StringBuilder stdErrSb = new StringBuilder();
 
         try {
-            Command.Builder shCommand = new Command.Builder("sh", "-c", command.toString());
-
-            RemoteProcess process = ShizukuService.newProcess(shCommand.build().toStringArray(), null, null);
-
+            RemoteProcess process = ShizukuService.newProcess(new String[]{"sh"}, null, null);
             Thread stdOutD = IOUtils.writeStreamToStringBuilder(stdOutSb, process.getInputStream());
             Thread stdErrD = IOUtils.writeStreamToStringBuilder(stdErrSb, process.getErrorStream());
+            OutputStream outputStream = process.getOutputStream();
+            outputStream.write(command.toString().getBytes());
+            outputStream.flush();
 
-            if (inputPipe != null) {
-                try (OutputStream outputStream = process.getOutputStream(); InputStream inputStream = inputPipe) {
+            if (inputPipe != null && process.alive()) {
+                try (InputStream inputStream = inputPipe) {
                     IOUtils.copyStream(inputStream, outputStream);
                 } catch (Exception e) {
-                    stdOutD.interrupt();
-                    stdErrD.interrupt();
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        process.destroyForcibly();
-                    } else {
-                        process.destroy();
-                    }
-
                     throw new RuntimeException(e);
                 }
             }
 
+            outputStream.close();
+
             process.waitFor();
             stdOutD.join();
             stdErrD.join();
+            int exitValue = process.exitValue();
 
-            return new Result(command, process.exitValue(), stdOutSb.toString().trim(), stdErrSb.toString().trim());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                process.destroyForcibly();
+            } else {
+                process.destroy();
+            }
+
+            return new Result(command, exitValue, stdOutSb.toString().trim(), stdErrSb.toString().trim());
         } catch (Exception e) {
             Log.w(TAG, "Unable execute command: ");
             Log.w(TAG, e);
-            return new Result(command, -1, stdOutSb.toString().trim(), stdErrSb.toString() + "\n\n<!> SAI ShizukuShell Java exception: " + ResultUtil.throwableToString(e));
+            return new Result(command, -1, "", "\n\n<!> SAI ShizukuShell Java exception: " + ResultUtil.throwableToString(e));
         }
     }
 }
