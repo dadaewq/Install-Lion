@@ -14,7 +14,7 @@
 ` adb shell dpm set-device-owner com.modosa.apkinstaller/.receiver.AdminReceiver `
 
 ## Download
-[<img src="https://www.coolapk.com/static/images/header-logo.png"
+[<img src="https://static.coolapk.com/static/web/v8/images/header-logo.png"
      alt="Get it on CoolApk"
      height="80">](https://www.coolapk.com/apk/com.modosa.apkinstaller)
 
@@ -28,3 +28,8 @@
 [FreezeYou](https://github.com/Playhi/FreezeYou)
 
 [AndroidFilePicker](https://github.com/rosuH/AndroidFilePicker)
+
+
+## Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/dadaewq/Install-Lion.svg)](https://starchart.cc/dadaewq/Install-Lion)
